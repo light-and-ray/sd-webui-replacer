@@ -16,15 +16,16 @@ You just need to upload your image, enter 3 prompts, and click "Run". You can ov
 
 By default if a prompt is empty, it uses first prompt from examples. You can disable this behavior in settings for positive and negative prompts. Detection prompt can not be empty
 
-If you don't like "Replacer" name of this extention, you can override it using exvirovment variable `SD_WEBUI_REPLACER_EXT_NAME`
+If you don't like "Replacer" name of this extention, you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
 
 
 --------------------------
 
 Need to do:
-- cache mask
++ cache mask
 - batch processing
-- additional options
 - upscaler for img2img override
+- additional options
 - progress bar
+- control net
 - txt2img script

@@ -4,7 +4,7 @@ import gradio as gr
 from modules import scripts, shared
 from modules import script_callbacks
 
-EXT_NAME =  path = os.environ.get("SD_WEBUI_REPLACER_EXT_NAME", "Replacer")
+EXT_NAME =  path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
 detectionPromptExamples_defaults = [

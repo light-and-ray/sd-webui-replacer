@@ -12,13 +12,16 @@ import numpy as np
 import os
 import copy
 import importlib
+from functools import lru_cache
+import random
 from modules import paths
 from modules.ui import plaintext_to_html
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples, getNegativePromptExamples
 from scripts.replacer_options import useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
+from scripts.replacer_mask_creator import MasksCreator
 
-cachedImage = None
-cachedMask = None
+
+
 
 
 def inpaint(
@@ -38,7 +41,6 @@ def inpaint(
     height,
     width,
     inpaint_full_res_padding,
-    is_batch,
     seed,
 ):
 
@@ -72,10 +74,9 @@ def inpaint(
 
     p.extra_generation_params["Mask blur"] = mask_blur
     p.extra_generation_params["Detection prompt"] = detectionPrompt
+    is_batch = (n_iter > 1 or batch_size > 1)
+    p.seed = seed
 
-
-    if (seed is not None):
-        p.seed = seed
 
     if shared.cmd_opts.enable_console_prompts:
         print(f"\nimg2img: {positvePrompt}", file=shared.progress_print_out)
@@ -117,8 +118,6 @@ def generate(
     # progress=gr.Progress(track_tqdm=True),
     
 ) -> Image.Image:
-    from scripts.sam import sam_predict, update_mask
-
     if detectionPrompt == '':
         detectionPrompt = getDetectionPromptExamples()[0]
 
@@ -127,14 +126,19 @@ def generate(
 
     if negativePrompt == '' and useFirstNegativePromptFromExamples():
         negativePrompt = getNegativePromptExamples()[0]
+    
+    samModel = 'sam_hq_vit_l.pth'
+    grdinoModel = 'GroundingDINO_SwinT_OGC (694MB)'
+    boxThreshold = 0.3
 
-    mask, samLog = sam_predict('sam_hq_vit_l.pth', image, [], [], True,
-        'GroundingDINO_SwinT_OGC (694MB)', detectionPrompt, 0.3, False, ['0'])
-    print(samLog)
-    mask = mask[3 + 0]
-    
-    maskExpanded = update_mask(mask, 0, 35, image)[1]
-    
+    masksCreator = MasksCreator(detectionPrompt, image, samModel, grdinoModel, boxThreshold)
+
+    seed = int(random.randrange(4294967294))
+    maskNum = seed % len(masksCreator.previews)
+
+    maskPreview = masksCreator.previews[maskNum]
+    mask = masksCreator.masksExpanded[maskNum]
+    maskCutted = masksCreator.cutted[maskNum]
 
     steps = 20
     sampler_name = 'DPM++ 2M SDE Karras'
@@ -147,12 +151,10 @@ def generate(
     height = 512
     width = 512
     inpaint_full_res_padding = 20
-    seed = None
 
-    is_batch = False
 
-    return inpaint(positvePrompt, negativePrompt, detectionPrompt, image, maskExpanded,
+    return inpaint(positvePrompt, negativePrompt, detectionPrompt, image, mask,
             steps, sampler_name, mask_blur, inpainting_fill, n_iter,
             batch_size, cfg_scale, denoising_strength,
-            height, width, inpaint_full_res_padding, is_batch, seed)
+            height, width, inpaint_full_res_padding, seed)
 
