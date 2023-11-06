@@ -8,13 +8,15 @@ EXT_NAME =  path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer"
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
 detectionPromptExamples_defaults = [
+            "background",
             "hairstyle",
-            "t-shirt"
+            "t-shirt",
         ]
 
 positvePromptExamples_defaults = [
+            "waterfall",
             "photo of blonde girl",
-            "photo of girl with red t-shirt"
+            "photo of girl with red t-shirt",
         ]
 
 negativePromptExamples_defaults = [

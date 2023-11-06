@@ -3,7 +3,7 @@ from PIL import ImageChops
 
 
 def is_images_the_same(image_one, image_two):
-    diff = ImageChops.difference(image_one, image_two)
+    diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
 
     if diff.getbbox():
         return False
