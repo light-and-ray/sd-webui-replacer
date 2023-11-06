@@ -94,6 +94,7 @@ def on_ui_settings():
             gr.Textbox,
             {
                 "lines" : 2,
+                "placeholder" : "\n".join(detectionPromptExamples_defaults),
             },
             section=section,
         )
@@ -107,6 +108,7 @@ def on_ui_settings():
             gr.Textbox,
             {
                 "lines" : 2,
+                "placeholder" : "\n".join(positvePromptExamples_defaults),
             },
             section=section,
         )
@@ -120,6 +122,7 @@ def on_ui_settings():
             gr.Textbox,
             {
                 "lines" : 2,
+                "placeholder" : "\n".join(negativePromptExamples_defaults),
             },
             section=section,
         )
