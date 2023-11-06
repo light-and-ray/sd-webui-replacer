@@ -22,7 +22,7 @@ If you don't like "Replacer" name of this extention, you can override it using e
 --------------------------
 
 Need to do:
-+ cache mask
+- ☑️ cache mask
 - batch processing
 - upscaler for img2img override
 - additional options

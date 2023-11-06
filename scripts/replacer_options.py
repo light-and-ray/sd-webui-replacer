@@ -67,7 +67,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_first_positive_prompt_from_examples",
         shared.OptionInfo(
             True,
-            "Use first positive pormpt form examples, if field is empty",
+            "Use first positive pormpt form examples, if field is empty (Requires Reload UI)",
             gr.Checkbox,
             section=section,
         )
@@ -82,6 +82,7 @@ def on_ui_settings():
             section=section,
         )
     )
+
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_detection_prompt_examples",
