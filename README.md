@@ -43,6 +43,7 @@ Need to do:
 - ☑️ "apply hires fix" button
 - additional options
 - progress bar
+- auto pass into hires fix
 - control net
 - tiled vae
 - "hide segment anything extention" option

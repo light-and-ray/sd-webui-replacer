@@ -259,8 +259,9 @@ def generate(
 
     for image in images:
         if n > 1: 
-            print(f'    [{EXT_NAME}]    processing {i}/{n}')
+            print(flush=True)
             print()
+            print(f'    [{EXT_NAME}]    processing {i}/{n}')
 
         saveDir = ""
         save_to_dirs = True
@@ -270,8 +271,13 @@ def generate(
         else:
             saveDir = getSaveDir()
 
-        newImages, generation_info_js, processed_info, processed_comments = \
-                generateSingle(image, gArgs, saveDir, "", save_to_dirs)
+        try:
+            newImages, generation_info_js, processed_info, processed_comments = \
+                    generateSingle(image, gArgs, saveDir, "", save_to_dirs)
+        except IndexError:
+            print(f'    [{EXT_NAME}]    Exception IndexError - nothing found with the detection prompt')
+            i += 1
+            continue
 
         if not (tab_index == 2 and not show_batch_dir_results):
             resultImages += newImages
@@ -301,7 +307,6 @@ def applyHiresFixSingle(
     saveDir : str,
 ):
     generatedImages, _, _, _ = inpaint(image, gArgs)
-    hrArgs.height, hrArgs.width = image.size
 
     resultImages = []
     generation_info_js = ""
@@ -352,7 +357,7 @@ def applyHiresFix(
     if gArgs.generationsN > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
         print(errorText)
-        return None, errorText, "", ""
+        return None, "", errorText, ""
 
     resultImages = []
     generation_info_js = ""
@@ -362,6 +367,7 @@ def applyHiresFix(
 
     for image in gArgs.images:
         saveDir = getSaveDir()
+        hrArgs.height, hrArgs.width = image.size
 
         resultImages, generation_info_js, processed_info, processed_comments = \
             applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
