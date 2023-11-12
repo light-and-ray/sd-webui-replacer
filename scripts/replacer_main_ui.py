@@ -17,9 +17,12 @@ from modules import scripts, shared, ui_common, postprocessing, call_queue
 from scripts.replacer_generate import generate
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
 from modules.ui_common import create_output_panel
-from scripts.replacer_options import EXT_NAME, getDetectionPromptExamples, getPositivePromptExamples
+from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER
+from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
 from scripts.replacer_options import useFirstNegativePromptFromExamples
+from modules.processing_scripts.seed import ScriptSeed
+from modules.shared import cmd_opts
 
 
 
@@ -121,7 +124,17 @@ def on_ui_tabs():
 
                 with gr.Accordion("Advanced options", open=False):
                     with gr.Row():
-                        pass
+                        upscalerForImg2Img = gr.Dropdown(
+                            value=None,
+                            choices=[x.name for x in shared.sd_upscalers],
+                            label="Upscaler for img2Img",
+                        )
+                        
+                        if cmd_opts.use_textbox_seed:
+                            seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
+                        else:
+                            seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
+
 
 
             with gr.Column():
@@ -143,6 +156,8 @@ def on_ui_tabs():
                 input_batch_dir,
                 output_batch_dir,
                 show_batch_dir_results,
+                upscalerForImg2Img,
+                seed,
             ],
             outputs=[
                 img2img_gallery,

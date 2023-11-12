@@ -42,8 +42,12 @@ def inpaint(
     width,
     inpaint_full_res_padding,
     seed,
+    upscalerForImg2Img,
 ):
-
+    if (upscalerForImg2Img is not None):
+        override_settings = {
+            "upscaler_for_img2img" : upscalerForImg2Img,
+        }
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
         outpath_samples=opts.outdir_samples or opts.outdir_img2img_samples,
@@ -68,7 +72,7 @@ def inpaint(
         inpaint_full_res=True,
         inpaint_full_res_padding=inpaint_full_res_padding,
         inpainting_mask_invert=False,
-        override_settings=[],
+        override_settings=override_settings,
         do_not_save_samples=True,
     )
 
@@ -115,6 +119,8 @@ def generate(
     input_batch_dir,
     output_batch_dir,
     show_batch_dir_results,
+    upscalerForImg2Img,
+    seed,
     # progress=gr.Progress(track_tqdm=True),
     
 ) -> Image.Image:
@@ -133,7 +139,8 @@ def generate(
 
     masksCreator = MasksCreator(detectionPrompt, image, samModel, grdinoModel, boxThreshold)
 
-    seed = int(random.randrange(4294967294))
+    if (seed == -1):
+        seed = int(random.randrange(4294967294))
     maskNum = seed % len(masksCreator.previews)
 
     maskPreview = masksCreator.previews[maskNum]
@@ -156,5 +163,5 @@ def generate(
     return inpaint(positvePrompt, negativePrompt, detectionPrompt, image, mask,
             steps, sampler_name, mask_blur, inpainting_fill, n_iter,
             batch_size, cfg_scale, denoising_strength,
-            height, width, inpaint_full_res_padding, seed)
+            height, width, inpaint_full_res_padding, seed, upscalerForImg2Img)
 
