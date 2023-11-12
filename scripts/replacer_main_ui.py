@@ -21,7 +21,6 @@ from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
 from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
-from modules.processing_scripts.seed import ScriptSeed
 from modules.shared import cmd_opts
 from modules import sd_samplers
 from modules.ui_components import ToolButton

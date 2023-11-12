@@ -42,8 +42,8 @@ Need to do:
 - ☑️ batch processing
 - ☑️ "apply hires fix" button
 - additional options
-- progress bar
-- auto pass into hires fix
+- progress bar + interrupt
+- option for pass into hires fix automatically
 - control net
 - tiled vae
 - "hide segment anything extention" option
