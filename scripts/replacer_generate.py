@@ -21,13 +21,19 @@ from scripts.replacer_options import useFirstPositivePromptFromExamples, useFirs
 from scripts.replacer_options import getHiresFixPositivePromptSuffixExamples
 from scripts.replacer_mask_creator import MasksCreator
 from scripts.replacer_generation_args import GenerationArgs
+from scripts.replacer_options import EXT_NAME, getSaveDir
+from modules.images import save_image
 
 
-
+    
 
 
 def inpaint(
+    image : Image,
     gArgs : GenerationArgs,
+    savePath : str = "",
+    saveSuffix : str = "",
+    save_to_dirs : bool = True
 ):
     override_settings = {}
     if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
@@ -50,7 +56,7 @@ def inpaint(
         cfg_scale=gArgs.cfg_scale,
         width=gArgs.width,
         height=gArgs.height,
-        init_images=[gArgs.image],
+        init_images=[image],
         mask=gArgs.mask,
         mask_blur=gArgs.mask_blur,
         inpainting_fill=gArgs.inpainting_fill,
@@ -70,8 +76,8 @@ def inpaint(
     p.seed = gArgs.seed
 
 
-    if shared.cmd_opts.enable_console_prompts:
-        print(f"\nimg2img: {gArgs.positvePrompt}", file=shared.progress_print_out)
+    # if shared.cmd_opts.enable_console_prompts:
+    #     print(f"\nimg2img: {gArgs.positvePrompt}", file=shared.progress_print_out)
 
     with closing(p):
         if is_batch:
@@ -87,8 +93,13 @@ def inpaint(
     shared.total_tqdm.clear()
 
     generation_info_js = processed.js()
-    if opts.samples_log_stdout:
-        print(generation_info_js)
+    # if opts.samples_log_stdout:
+    #     print(generation_info_js)
+
+    if savePath != "":
+        for imageToSave in processed.images:
+            save_image(imageToSave, savePath, "", gArgs.seed, gArgs.positvePrompt, opts.samples_format,
+                    info=processed.info, p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
         processed.images = []
@@ -106,12 +117,36 @@ def getLastUsedSeed():
         return lastGenerationArgs.seed
 
 
+
+def generateSingle(
+    image : Image,
+    gArgs : GenerationArgs,
+    savePath : str,
+    saveSuffix : str,
+    save_to_dirs : bool
+):
+    masksCreator = MasksCreator(gArgs.detectionPrompt, image, gArgs.samModel,
+                gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand)
+
+    maskNum = gArgs.seed % len(masksCreator.previews)
+
+    maskPreview = masksCreator.previews[maskNum]
+    gArgs.mask = masksCreator.masksExpanded[maskNum]
+    maskCutted = masksCreator.cutted[maskNum]
+
+    resultImages, generation_info_js, processed_info, processed_comments = \
+        inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs)
+
+    return resultImages, generation_info_js, processed_info, processed_comments
+
+
+
 def generate(
     detectionPrompt: str,
     positvePrompt: str,
     negativePrompt: str,
     tab_index,
-    image,
+    image_single,
     image_batch,
     input_batch_dir,
     output_batch_dir,
@@ -132,6 +167,40 @@ def generate(
 
     if (seed == -1):
         seed = int(random.randrange(4294967294))
+
+
+    images = []
+    if tab_index == 0:
+        images = [image_single]
+        generationsN = 1
+
+
+    if tab_index == 1:
+        def getImages(image_folder):
+            for img in image_folder:
+                if isinstance(img, Image.Image):
+                    image = img
+                else:
+                    image = Image.open(os.path.abspath(img.name)).convert('RGBA')
+                yield image
+        images = getImages(image_batch)
+        generationsN = len(image_batch)
+
+
+    if tab_index == 2:
+        def readImages(input_dir):
+            assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
+            assert input_dir, 'input directory not selected'
+
+            image_list = shared.listfiles(input_dir)
+            for filename in image_list:
+                try:
+                    image = Image.open(filename).convert('RGBA')
+                except Exception:
+                    continue
+                yield image
+        images = readImages(input_batch_dir)
+        generationsN = len(shared.listfiles(input_batch_dir))
 
 
     samModel = 'sam_hq_vit_l.pth'
@@ -156,7 +225,6 @@ def generate(
         positvePrompt,
         negativePrompt,
         detectionPrompt,
-        image,
         None,
         upscalerForImg2Img,
         seed,
@@ -164,6 +232,7 @@ def generate(
         grdinoModel,
         boxThreshold,
         maskExpand,
+        
         steps,
         sampler_name,
         mask_blur,
@@ -176,21 +245,76 @@ def generate(
         width,
         inpaint_full_res_padding,
         img2img_fix_steps,
-    )
 
-    masksCreator = MasksCreator(detectionPrompt, image, samModel, grdinoModel, boxThreshold, maskExpand)
+        images,
+        generationsN,
+        )
 
-    maskNum = gArgs.seed % len(masksCreator.previews)
+    resultImages = []
+    generation_info_js = ""
+    processed_info = ""
+    processed_comments = ""
+    i = 1
+    n = generationsN
 
-    maskPreview = masksCreator.previews[maskNum]
-    gArgs.mask = masksCreator.masksExpanded[maskNum]
-    maskCutted = masksCreator.cutted[maskNum]
+    for image in images:
+        if n > 1: 
+            print(f'    [{EXT_NAME}]    processing {i}/{n}')
+            print()
 
-    resultImages, generation_info_js, processed_info, processed_comments = inpaint(gArgs)
+        saveDir = ""
+        save_to_dirs = True
+        if tab_index == 2:
+            saveDir = output_batch_dir
+            save_to_dirs = False
+        else:
+            saveDir = getSaveDir()
 
+        newImages, generation_info_js, processed_info, processed_comments = \
+                generateSingle(image, gArgs, saveDir, "", save_to_dirs)
+
+        if not (tab_index == 2 and not show_batch_dir_results):
+            resultImages += newImages
+
+        i += 1
+
+
+    if tab_index == 1:
+        gArgs.images = getImages(image_batch)
+    if tab_index == 2:
+        gArgs.images = readImages(input_batch_dir)
 
     global lastGenerationArgs
     lastGenerationArgs = gArgs
+
+
+    return resultImages, generation_info_js, processed_info, processed_comments
+
+
+
+
+
+def applyHiresFixSingle(
+    image : Image,
+    gArgs : GenerationArgs,
+    hrArgs : GenerationArgs,
+    saveDir : str,
+):
+    generatedImages, _, _, _ = inpaint(image, gArgs)
+    hrArgs.height, hrArgs.width = image.size
+
+    resultImages = []
+    generation_info_js = ""
+    processed_info = ""
+    processed_comments = ""
+    n = len(generatedImages)
+    if n > 1: 
+        print(f'    [{EXT_NAME}]    hiresfix batch count*size {n} for single image')
+
+    for generatedImage in generatedImages:
+        newImages, generation_info_js, processed_info, processed_comments = \
+            inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
+        resultImages += newImages
 
     return resultImages, generation_info_js, processed_info, processed_comments
 
@@ -212,23 +336,35 @@ def applyHiresFix(
     global lastGenerationArgs
     if lastGenerationArgs is None:
         return [], "", "", ""
-    
+
     gArgs = copy.copy(lastGenerationArgs)
     gArgs.upscalerForImg2Img = hf_upscaler
 
-    generatedImages, _, _, _ = inpaint(gArgs)
-
     hrArgs = copy.copy(lastGenerationArgs)
-
     hrArgs.cfg_scale = hf_cfg_scale
     hrArgs.denoising_strength = hf_denoise
     hrArgs.sampler_name = hf_sampler
     hrArgs.steps = hf_steps
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
-    hrArgs.image = generatedImages[0]
     hrArgs.img2img_fix_steps = True
-    hrArgs.height, hrArgs.width = hrArgs.image.size
 
-    resultImages, generation_info_js, processed_info, processed_comments = inpaint(hrArgs)
+    if gArgs.generationsN > 1:
+        errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
+        print(errorText)
+        return None, errorText, "", ""
+
+    resultImages = []
+    generation_info_js = ""
+    processed_info = ""
+    processed_comments = ""
+
+
+    for image in gArgs.images:
+        saveDir = getSaveDir()
+
+        resultImages, generation_info_js, processed_info, processed_comments = \
+            applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
+
+
     return resultImages, generation_info_js, processed_info, processed_comments

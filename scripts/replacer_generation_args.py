@@ -4,7 +4,6 @@ class GenerationArgs:
             positvePrompt,
             negativePrompt,
             detectionPrompt,
-            image,
             mask,
             upscalerForImg2Img,
             seed,
@@ -24,11 +23,12 @@ class GenerationArgs:
             width,
             inpaint_full_res_padding,
             img2img_fix_steps,
+            images,
+            generationsN,
         ):
         self.positvePrompt = positvePrompt
         self.negativePrompt = negativePrompt
         self.detectionPrompt = detectionPrompt
-        self.image = image
         self.mask = mask
         self.upscalerForImg2Img = upscalerForImg2Img
         self.seed = seed
@@ -36,6 +36,7 @@ class GenerationArgs:
         self.grdinoModel = grdinoModel
         self.boxThreshold = boxThreshold
         self.maskExpand = maskExpand
+        
         self.steps = steps
         self.sampler_name = sampler_name
         self.mask_blur = mask_blur
@@ -48,5 +49,6 @@ class GenerationArgs:
         self.width = width
         self.inpaint_full_res_padding = inpaint_full_res_padding
         self.img2img_fix_steps = img2img_fix_steps
-
-    
+        
+        self.images = images
+        self.generationsN = generationsN

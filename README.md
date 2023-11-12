@@ -39,7 +39,7 @@ set SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
 
 Need to do:
 - ☑️ cache mask
-- batch processing
+- ☑️ batch processing
 - ☑️ "apply hires fix" button
 - additional options
 - progress bar

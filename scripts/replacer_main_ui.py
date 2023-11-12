@@ -219,11 +219,18 @@ def on_ui_tabs():
                                 label="",
                             )
 
+        def tab_single_on_select():
+            return 0, gr.Button.update(visible=True)
 
+        def tab_batch_on_select():
+            return 1, gr.Button.update(visible=False)
+        
+        def tab_batch_dir_on_select():
+            return 2, gr.Button.update(visible=False)
 
-        tab_single.select(fn=lambda: 0, inputs=[], outputs=[tab_index])
-        tab_batch.select(fn=lambda: 1, inputs=[], outputs=[tab_index])
-        tab_batch_dir.select(fn=lambda: 2, inputs=[], outputs=[tab_index])
+        tab_single.select(fn=tab_single_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
+        tab_batch.select(fn=tab_batch_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
+        tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
 
         run_button.click(
             fn=wrap_gradio_gpu_call(generate, extra_outputs=[None, '', '']),

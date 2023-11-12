@@ -7,6 +7,9 @@ from modules import script_callbacks
 EXT_NAME =  path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
+def getSaveDir():
+    return f"outputs/{EXT_NAME_LOWER}"
+
 detectionPromptExamples_defaults = [
             "background",
             "hairstyle",
