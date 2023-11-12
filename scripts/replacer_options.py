@@ -21,9 +21,13 @@ positvePromptExamples_defaults = [
 
 negativePromptExamples_defaults = [
     "cartoon, painting, illustration, (worst quality, low quality, normal quality:2)",
-    "poor quality, low quality,  low res"
+    "poor quality, low quality,  low res",
 ]
 
+hiresFixPositivePromptSuffixExamples_defaults = [
+    "<lora:lcm-lora-sdv1-5:1>",
+    " ",
+]
 
 
 
@@ -49,6 +53,12 @@ def getNegativePromptExamples():
     else:
         return res.split("\n")
 
+def getHiresFixPositivePromptSuffixExamples():
+    res : str = shared.opts.data.get(EXT_NAME_LOWER + "_hf_positive_prompt_suffix_examples", "")
+    if res == "":
+        return hiresFixPositivePromptSuffixExamples_defaults
+    else:
+        return res.split("\n")
 
 
 def useFirstPositivePromptFromExamples():
@@ -123,6 +133,20 @@ def on_ui_settings():
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(negativePromptExamples_defaults),
+            },
+            section=section,
+        )
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_hf_positive_prompt_suffix_examples",
+        shared.OptionInfo(
+            "",
+            "Override HiresFix suffix for positive prompt examples (Requires Reload UI)",
+            gr.Textbox,
+            {
+                "lines" : 2,
+                "placeholder" : "\n".join(hiresFixPositivePromptSuffixExamples_defaults),
             },
             section=section,
         )

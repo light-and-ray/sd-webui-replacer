@@ -14,16 +14,18 @@ from modules.shared import opts, state
 from PIL import Image, PngImagePlugin
 import torch
 from modules import scripts, shared, ui_common, postprocessing, call_queue
-from scripts.replacer_generate import generate
+from scripts.replacer_generate import generate, applyHiresFix, getLastUsedSeed
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
 from modules.ui_common import create_output_panel
 from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
-from scripts.replacer_options import useFirstNegativePromptFromExamples
+from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
 from modules.processing_scripts.seed import ScriptSeed
 from modules.shared import cmd_opts
-
+from modules import sd_samplers
+from modules.ui_components import ToolButton
+from modules import ui
 
 
 class Script(scripts.Script):
@@ -83,7 +85,6 @@ def on_ui_tabs():
                         examples=getPositivePromptExamples(),
                         inputs=positvePrompt,
                         label="",
-                        
                     )
 
                 with gr.Row():
@@ -101,13 +102,37 @@ def on_ui_tabs():
                     gr.Examples(
                         examples=getNegativePromptExamples(),
                         inputs=negativePrompt,
-                        label="",
-                        
+                        label="",  
                     )
 
-                run_button = gr.Button("Run")      
+                run_button = gr.Button("Run")
 
-        
+
+                with gr.Accordion("Advanced options", open=False):
+                    with gr.Row():
+                        upscalerForImg2Img = gr.Dropdown(
+                            value=None,
+                            choices=[x.name for x in shared.sd_upscalers],
+                            label="Upscaler for img2Img",
+                        )
+
+                        if cmd_opts.use_textbox_seed:
+                            seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
+                        else:
+                            seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
+                        
+                        random_seed = ToolButton(
+                            ui.random_symbol,
+                            elem_id="replacer_random_seed",
+                            label='Random seed'
+                        )
+                        reuse_seed = ToolButton(
+                            ui.reuse_symbol,
+                            elem_id="replacer_reuse_seed",
+                            label='Reuse seed'
+                        )
+
+
                 with gr.Tabs(elem_id="mode_extras"):
                     with gr.TabItem('Single Image', id="single_image", elem_id="single_tab") as tab_single:
                         image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="image", image_mode="RGBA")
@@ -122,23 +147,79 @@ def on_ui_tabs():
 
 
 
-                with gr.Accordion("Advanced options", open=False):
-                    with gr.Row():
-                        upscalerForImg2Img = gr.Dropdown(
-                            value=None,
-                            choices=[x.name for x in shared.sd_upscalers],
-                            label="Upscaler for img2Img",
-                        )
-                        
-                        if cmd_opts.use_textbox_seed:
-                            seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
-                        else:
-                            seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
-
 
 
             with gr.Column():
-                img2img_gallery, generation_info, html_info, html_log = create_output_panel("img2img", opts.outdir_img2img_samples)
+                with gr.Row():
+                    img2img_gallery, generation_info, html_info, html_log = \
+                        create_output_panel("img2img", opts.outdir_img2img_samples)
+                    
+                with gr.Row():
+                    apply_hires_fix_button = gr.Button("Apply HiresFix")
+
+                with gr.Row():
+                    with gr.Accordion("HiresFix options", open=False):
+                        with gr.Row():
+                            hf_upscaler = gr.Dropdown(
+                                value="ESRGAN_4x",
+                                choices=[x.name for x in shared.sd_upscalers],
+                                label="Upscaler",
+                            )
+
+                            hf_steps = gr.Slider(
+                                label='Hires steps',
+                                value=4,
+                                step=1,
+                                minimum=1,
+                                maximum=150,
+                                elem_id="hf_steps"
+                            )
+
+                            hf_cfg_scale = gr.Slider(
+                                label='CFG Scale',
+                                value=1.0,
+                                step=0.5,
+                                minimum=1.0,
+                                maximum=30.0,
+                                elem_id="hf_cfg_scale"
+                            )
+
+                        with gr.Row():
+                            hf_sampler = gr.Dropdown(
+                                label='Hires sampling method',
+                                elem_id="hf_sampler",
+                                choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
+                                value="Euler a"
+                            )
+
+                            hf_denoise = gr.Slider(
+                                label='Denoising strength',
+                                value=0.35,
+                                step=0.01,
+                                minimum=0.0,
+                                maximum=1.0,
+                                elem_id="hf_denoise"
+                            )
+                        
+                        with gr.Row():
+                            placeholder = None
+                            placeholder = getHiresFixPositivePromptSuffixExamples()[0]
+
+                            hfPositivePromptSuffix = gr.Textbox(
+                                label="Suffix for positive prompt", 
+                                show_label=True, 
+                                lines=1, 
+                                elem_classes=["hfPositivePromptSuffix"],
+                                placeholder=placeholder
+                            )
+
+                            gr.Examples(
+                                examples=getHiresFixPositivePromptSuffixExamples(),
+                                inputs=hfPositivePromptSuffix,
+                                label="",
+                            )
+
+
 
         tab_single.select(fn=lambda: 0, inputs=[], outputs=[tab_index])
         tab_batch.select(fn=lambda: 1, inputs=[], outputs=[tab_index])
@@ -166,6 +247,46 @@ def on_ui_tabs():
                 html_log,
             ]
         )
+
+
+        apply_hires_fix_button.click(
+            fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
+            inputs=[
+                hf_upscaler,
+                hf_steps,
+                hf_sampler,
+                hf_denoise,
+                hf_cfg_scale,
+                hfPositivePromptSuffix,
+            ],
+            outputs=[
+                img2img_gallery,
+                generation_info,
+                html_info,
+                html_log,
+            ]
+        )
+
+
+        random_seed.click(
+            fn=lambda: -1,
+            inputs=[
+            ],
+            outputs=[
+                seed,
+            ]
+        )
+
+        reuse_seed.click(
+            fn=getLastUsedSeed,
+            inputs=[
+            ],
+            outputs=[
+                seed,
+            ]
+        )
+
+
 
 
     return [(replacer, EXT_NAME, EXT_NAME)]

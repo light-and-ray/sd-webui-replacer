@@ -15,12 +15,13 @@ masksCreatorCached = None
 
 
 class MasksCreator:
-    def __init__(self, detectionPrompt, image, samModel, grdinoModel, boxThreshold):
+    def __init__(self, detectionPrompt, image, samModel, grdinoModel, boxThreshold, maskExpand):
         self.detectionPrompt = detectionPrompt
         self.image = image
         self.samModel = samModel
         self.grdinoModel = grdinoModel
         self.boxThreshold = boxThreshold
+        self.maskExpand = maskExpand
 
         global masksCreatorCached
 
@@ -29,6 +30,7 @@ class MasksCreator:
                 self.samModel == masksCreatorCached.samModel and\
                 self.grdinoModel == masksCreatorCached.grdinoModel and\
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
+                self.maskExpand == masksCreatorCached.maskExpand and\
                 is_images_the_same(self.image, masksCreatorCached.image):
             self.previews = masksCreatorCached.previews
             self.masksExpanded = masksCreatorCached.masksExpanded
@@ -53,7 +55,8 @@ class MasksCreator:
         self.cutted = []
         
         for mask in masks:
-            expanded = update_mask(mask, 0, 35, self.image)
+            expanded = update_mask(mask, 0, self.maskExpand, self.image)
             self.previews.append(expanded[0])
             self.masksExpanded.append(expanded[1])
             self.cutted.append(expanded[2])
+            
