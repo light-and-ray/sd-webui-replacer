@@ -333,6 +333,7 @@ def applyHiresFix(
     hf_denoise,
     hf_cfg_scale,
     hfPositivePromptSuffix,
+    hf_size_limit,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -348,7 +349,8 @@ def applyHiresFix(
     hrArgs = copy.copy(lastGenerationArgs)
     hrArgs.cfg_scale = hf_cfg_scale
     hrArgs.denoising_strength = hf_denoise
-    hrArgs.sampler_name = hf_sampler
+    if not hf_sampler == 'Use same sampler':
+        hrArgs.sampler_name = hf_sampler
     hrArgs.steps = hf_steps
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
@@ -368,6 +370,12 @@ def applyHiresFix(
     for image in gArgs.images:
         saveDir = getSaveDir()
         hrArgs.height, hrArgs.width = image.size
+        if hrArgs.height > hf_size_limit:
+            hrArgs.height = hf_size_limit
+            hrArgs.upscalerForImg2Img = hf_upscaler
+        if hrArgs.width > hf_size_limit:
+            hrArgs.width = hf_size_limit
+            hrArgs.upscalerForImg2Img = hf_upscaler
 
         resultImages, generation_info_js, processed_info, processed_comments = \
             applyHiresFixSingle(image, gArgs, hrArgs, saveDir)

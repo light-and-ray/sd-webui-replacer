@@ -22,6 +22,8 @@ By default if a prompt is empty, it uses first prompt from examples. You can dis
 
 Default settings designed for using lcm lora for fast upscale. It requires lcm lora I mentioned, cfg scale 1.0 and sampling steps 4. There is no difference in quality for my opinion
 
+Despite in txt2img for lcm lora DPM++ samplers produses awful results, while hires fix it produces a way better result. So I recommend to "Use the same sampler" option
+
 ### Extention name
 If you don't like "Replacer" name of this extention, you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
 
@@ -37,14 +39,25 @@ set SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
 
 --------------------------
 
-Need to do:
+## Need to do:
+
 - ☑️ cache mask
 - ☑️ batch processing
 - ☑️ "apply hires fix" button
 - additional options
 - progress bar + interrupt
 - option for pass into hires fix automatically
+- batch get options from png info
 - control net
 - tiled vae
 - "hide segment anything extention" option
 - txt2img script
+
+### small todo:
+- add detection parametres in metadata
+- handle OOM and other errors in batches
+- extra mask expand for hires fix
+- hide hires button depends on previous generation generationN (rename into imagesLen)
+- copy `images` while appling hires fix
+- handle empty out dir in batch dir
+- turn sam_predict, update_mask into global functions

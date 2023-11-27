@@ -188,7 +188,7 @@ def on_ui_tabs():
                                 label='Hires sampling method',
                                 elem_id="hf_sampler",
                                 choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
-                                value="Euler a"
+                                value="Use same sampler"
                             )
 
                             hf_denoise = gr.Slider(
@@ -217,6 +217,17 @@ def on_ui_tabs():
                                 inputs=hfPositivePromptSuffix,
                                 label="",
                             )
+
+                        with gr.Row():
+                            hf_size_limit = gr.Slider(
+                                label='Limit render size',
+                                value=2000,
+                                step=1,
+                                minimum=1000,
+                                maximum=10000,
+                                elem_id="hf_size_limit"
+                            )
+
 
         def tab_single_on_select():
             return 0, gr.Button.update(visible=True)
@@ -264,6 +275,7 @@ def on_ui_tabs():
                 hf_denoise,
                 hf_cfg_scale,
                 hfPositivePromptSuffix,
+                hf_size_limit,
             ],
             outputs=[
                 img2img_gallery,
