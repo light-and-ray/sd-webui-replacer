@@ -17,7 +17,7 @@ from modules import scripts, shared, ui_common, postprocessing, call_queue
 from scripts.replacer_generate import generate, applyHiresFix, getLastUsedSeed
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
 from modules.ui_common import create_output_panel, refresh_symbol
-from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER
+from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
 from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
@@ -225,7 +225,7 @@ def on_ui_tabs():
             with gr.Column():
                 with gr.Row():
                     img2img_gallery, generation_info, html_info, html_log = \
-                        create_output_panel("img2img", opts.outdir_img2img_samples)
+                        create_output_panel(EXT_NAME_LOWER, getSaveDir())
                     
                 with gr.Row():
                     apply_hires_fix_button = gr.Button("Apply HiresFix")
