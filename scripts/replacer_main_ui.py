@@ -16,7 +16,7 @@ import torch
 from modules import scripts, shared, ui_common, postprocessing, call_queue
 from scripts.replacer_generate import generate, applyHiresFix, getLastUsedSeed
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
-from modules.ui_common import create_output_panel
+from modules.ui_common import create_output_panel, refresh_symbol
 from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
@@ -25,6 +25,7 @@ from modules.shared import cmd_opts
 from modules import sd_samplers
 from modules.ui_components import ToolButton
 from modules import ui
+
 
 
 class Script(scripts.Script):
@@ -109,6 +110,78 @@ def on_ui_tabs():
 
                 with gr.Accordion("Advanced options", open=False):
                     with gr.Row():
+                        sampler = gr.Dropdown(
+                            label='Sampling method',
+                            elem_id="replacer_sampler",
+                            choices=sd_samplers.visible_sampler_names(),
+                            value="DPM++ 2M SDE Karras"
+                        )
+
+                        steps = gr.Slider(
+                            label='Steps',
+                            value=20,
+                            step=1,
+                            minimum=1,
+                            maximum=150,
+                            elem_id="replacer_steps"
+                        )
+
+                    with gr.Row():
+                        box_threshold = gr.Slider(label='Box Threshold',
+                            value=0.3, elem_id="replacer_box_threshold",
+                            minimum=0.0, maximum=1.0, step=0.05)
+                        mask_expand = gr.Slider(label='Mask Expand',
+                            value=35, elem_id="replacer_mask_expand",
+                            minimum=0, maximum=100, step=1)
+                        mask_blur = gr.Slider(label='Mask Blur',
+                            value=4, elem_id="replacer_mask_blur",
+                            minimum=0, maximum=10, step=1)
+
+                    with gr.Row():
+                        from scripts.sam import sam_model_list, refresh_sam_models
+                        from scripts.dino import dino_model_list
+
+                        sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
+                            value=sam_model_list[0] if len(sam_model_list) > 0 else None)
+                        sam_refresh_models = ToolButton(value=refresh_symbol)
+                        sam_refresh_models.click(refresh_sam_models, sam_model_name,sam_model_name)
+
+                        dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
+
+                    with gr.Row():
+                        cfg_scale = gr.Slider(label='CFG Scale',
+                            value=5.5, elem_id="replacer_cfg_scale",
+                            minimum=1.0, maximum=30.0, step=0.5)
+                        denoise = gr.Slider(label='Denoising',
+                            value=1.0, elem_id="replacer_denoise",
+                            minimum=0.0, maximum=1.0, step=0.01)
+                        inpaint_padding = gr.Slider(label='Padding',
+                            value=20, elem_id="replacer_inpaint_padding",
+                            minimum=0, maximum=100, step=1)
+                        
+                    with gr.Row():
+                        inpainting_fill = gr.Radio(label='Masked content',
+                            choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                            value='fill', type="index", elem_id="replacer_inpainting_fill")
+
+                    with gr.Row():
+                        width = gr.Slider(label='width',
+                            value=512, elem_id="replacer_width",
+                            minimum=64, maximum=2048, step=8)
+                        batch_count = gr.Slider(label='batch count',
+                            value=1, elem_id="replacer_batch_count",
+                            minimum=1, maximum=10, step=1)
+
+                    with gr.Row():
+                        height = gr.Slider(label='height',
+                            value=512, elem_id="replacer_height",
+                            minimum=64, maximum=2048, step=8)
+                        batch_size = gr.Slider(label='batch size',
+                            value=1, elem_id="replacer_batch_size",
+                            minimum=1, maximum=10, step=1)
+
+
+                    with gr.Row():
                         upscalerForImg2Img = gr.Dropdown(
                             value=None,
                             choices=[x.name for x in shared.sd_upscalers],
@@ -130,6 +203,7 @@ def on_ui_tabs():
                             elem_id="replacer_reuse_seed",
                             label='Reuse seed'
                         )
+
 
 
                 with gr.Tabs(elem_id="mode_extras"):
@@ -256,6 +330,21 @@ def on_ui_tabs():
                 show_batch_dir_results,
                 upscalerForImg2Img,
                 seed,
+                sampler,
+                steps,
+                box_threshold,
+                mask_expand,
+                mask_blur,
+                sam_model_name,
+                dino_model_name,
+                cfg_scale,
+                denoise,
+                inpaint_padding,
+                inpainting_fill,
+                width,
+                batch_count,
+                height,
+                batch_size,
             ],
             outputs=[
                 img2img_gallery,

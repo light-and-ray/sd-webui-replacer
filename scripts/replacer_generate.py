@@ -76,25 +76,13 @@ def inpaint(
     p.seed = gArgs.seed
 
 
-    # if shared.cmd_opts.enable_console_prompts:
-    #     print(f"\nimg2img: {gArgs.positvePrompt}", file=shared.progress_print_out)
-
     with closing(p):
-        if is_batch:
-            pass
-            # assert not shared.cmd_opts.hide_ui_dir_config, "Launched with --hide-ui-dir-config, batch img2img disabled"
-
-            # process_batch(p, img2img_batch_input_dir, img2img_batch_output_dir, img2img_batch_inpaint_mask_dir, args, to_scale=selected_scale_tab == 1, scale_by=scale_by, use_png_info=img2img_batch_use_png_info, png_info_props=img2img_batch_png_info_props, png_info_dir=img2img_batch_png_info_dir)
-
-            # processed = Processed(p, [], p.seed, "")
-        else:
-            processed = process_images(p)
+        processed = process_images(p)
 
     shared.total_tqdm.clear()
 
     generation_info_js = processed.js()
-    # if opts.samples_log_stdout:
-    #     print(generation_info_js)
+
 
     if savePath != "":
         for imageToSave in processed.images:
@@ -153,6 +141,21 @@ def generate(
     show_batch_dir_results,
     upscalerForImg2Img,
     seed,
+    sampler,
+    steps,
+    box_threshold,
+    mask_expand,
+    mask_blur,
+    sam_model_name,
+    dino_model_name,
+    cfg_scale,
+    denoise,
+    inpaint_padding,
+    inpainting_fill,
+    width,
+    batch_count,
+    height,
+    batch_size,
     # progress=gr.Progress(track_tqdm=True),
     
 ) -> Image.Image:
@@ -203,22 +206,6 @@ def generate(
         generationsN = len(shared.listfiles(input_batch_dir))
 
 
-    samModel = 'sam_hq_vit_l.pth'
-    grdinoModel = 'GroundingDINO_SwinT_OGC (694MB)'
-    boxThreshold = 0.3
-    maskExpand = 35
-    
-    steps = 20
-    sampler_name = 'DPM++ 2M SDE Karras'
-    mask_blur = 4
-    inpainting_fill = 0 # Fill
-    n_iter = 1
-    batch_size = 1
-    cfg_scale = 5.5
-    denoising_strength = 1.0
-    height = 512
-    width = 512
-    inpaint_full_res_padding = 20
     img2img_fix_steps = False
 
     gArgs = GenerationArgs(
@@ -228,22 +215,22 @@ def generate(
         None,
         upscalerForImg2Img,
         seed,
-        samModel,
-        grdinoModel,
-        boxThreshold,
-        maskExpand,
+        sam_model_name,
+        dino_model_name,
+        box_threshold,
+        mask_expand,
         
         steps,
-        sampler_name,
+        sampler,
         mask_blur,
         inpainting_fill,
-        n_iter,
+        batch_count,
         batch_size,
         cfg_scale,
-        denoising_strength,
+        denoise,
         height,
         width,
-        inpaint_full_res_padding,
+        inpaint_padding,
         img2img_fix_steps,
 
         images,
@@ -274,9 +261,11 @@ def generate(
         try:
             newImages, generation_info_js, processed_info, processed_comments = \
                     generateSingle(image, gArgs, saveDir, "", save_to_dirs)
-        except IndexError:
-            print(f'    [{EXT_NAME}]    Exception IndexError - nothing found with the detection prompt')
+        except Exception as e:
+            print(f'    [{EXT_NAME}]    Exception: {e}')
             i += 1
+            if generationsN == 1:
+                raise
             continue
 
         if not (tab_index == 2 and not show_batch_dir_results):
@@ -356,7 +345,7 @@ def applyHiresFix(
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True
 
-    if gArgs.generationsN > 1:
+    if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
         print(errorText)
         return None, "", errorText, ""
