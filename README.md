@@ -1,6 +1,6 @@
 # Replacer
 
-The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. Aka "Fast Inpaint"
+Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-webui. The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. Aka "Fast Inpaint"
 
 ![](images/img1.jpg)
 

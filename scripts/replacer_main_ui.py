@@ -249,7 +249,7 @@ def on_ui_tabs():
                             )
 
                             hf_cfg_scale = gr.Slider(
-                                label='CFG Scale',
+                                label='Hires CFG Scale',
                                 value=1.0,
                                 step=0.5,
                                 minimum=1.0,
@@ -266,7 +266,7 @@ def on_ui_tabs():
                             )
 
                             hf_denoise = gr.Slider(
-                                label='Denoising strength',
+                                label='Hires Denoising',
                                 value=0.35,
                                 step=0.01,
                                 minimum=0.0,
