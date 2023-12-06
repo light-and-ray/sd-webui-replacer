@@ -7,11 +7,11 @@ from modules import script_callbacks
 EXT_NAME = path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
-default_output_dir = os.path.join(paths_internal.data_path, 'outputs', EXT_NAME_LOWER).strip()
+defaultOutputDirectory = f"outputs/{EXT_NAME_LOWER}"
 
 
 def getSaveDir():
-    return getattr(shared.opts, EXT_NAME_LOWER + "_save_dir", default_output_dir)
+    return getattr(shared.opts, EXT_NAME_LOWER + "_save_dir", defaultOutputDirectory)
 
 
 detectionPromptExamples_defaults = [
@@ -162,7 +162,7 @@ def on_ui_settings():
     shared.opts.add_option(
         EXT_NAME_LOWER + "_save_dir",
         shared.OptionInfo(
-            default_output_dir,
+            defaultOutputDirectory,
             f"{EXT_NAME} save directory",
             gr.Textbox,
             {
