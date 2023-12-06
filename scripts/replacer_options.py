@@ -1,14 +1,18 @@
 import os
 from modules.shared import opts, state
 import gradio as gr
-from modules import scripts, shared
+from modules import scripts, shared, paths_internal
 from modules import script_callbacks
 
-EXT_NAME =  path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
+EXT_NAME = path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
+default_output_dir = os.path.join(paths_internal.data_path, 'outputs', EXT_NAME_LOWER).strip()
+
+
 def getSaveDir():
-    return f"outputs/{EXT_NAME_LOWER}"
+    return getattr(shared.opts, EXT_NAME_LOWER + "_save_dir", default_output_dir)
+
 
 detectionPromptExamples_defaults = [
             "background",
@@ -155,5 +159,18 @@ def on_ui_settings():
         )
     )
 
-script_callbacks.on_ui_settings(on_ui_settings)
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_save_dir",
+        shared.OptionInfo(
+            default_output_dir,
+            "Replacer save directory",
+            gr.Textbox,
+            {
+                "visible": not shared.cmd_opts.hide_ui_dir_config,
+            },
+            section=section,
+        )
+    )
 
+
+script_callbacks.on_ui_settings(on_ui_settings)
