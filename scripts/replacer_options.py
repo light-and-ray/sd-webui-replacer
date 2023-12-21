@@ -11,7 +11,7 @@ defaultOutputDirectory = f"outputs/{EXT_NAME_LOWER}"
 
 
 def getSaveDir():
-    return getattr(shared.opts, EXT_NAME_LOWER + "_save_dir", defaultOutputDirectory)
+    return shared.opts.data.get(EXT_NAME_LOWER + "_save_dir", defaultOutputDirectory)
 
 
 detectionPromptExamples_defaults = [

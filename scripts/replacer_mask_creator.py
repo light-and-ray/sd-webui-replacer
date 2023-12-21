@@ -2,6 +2,11 @@ from PIL import Image, PngImagePlugin
 from PIL import ImageChops
 
 
+class NothingDetectedError(Exception):
+    def __init__(self):            
+        super().__init__("Nothing has been detected")
+
+
 def is_images_the_same(image_one, image_two):
     diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
 
@@ -48,12 +53,15 @@ class MasksCreator:
         masks, samLog = sam_predict(self.samModel, self.image, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)
+        if len(masks) == 0:
+            raise NothingDetectedError()
+
         masks = [masks[3], masks[4], masks[5]]
-        
+
         self.previews = []
         self.masksExpanded = []
         self.cutted = []
-        
+
         for mask in masks:
             expanded = update_mask(mask, 0, self.maskExpand, self.image)
             self.previews.append(expanded[0])
