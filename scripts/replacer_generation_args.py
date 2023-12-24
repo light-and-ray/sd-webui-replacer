@@ -27,3 +27,4 @@ class GenerationArgs:
     img2img_fix_steps: Any
     images: Any
     generationsN: Any
+    save_grid : Any

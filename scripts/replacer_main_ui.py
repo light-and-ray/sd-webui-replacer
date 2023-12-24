@@ -196,6 +196,9 @@ def on_ui_tabs():
                             label='Reuse seed'
                         )
 
+                    with gr.Row():
+                        save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
+
 
 
                 with gr.Tabs(elem_id="mode_extras"):
@@ -208,7 +211,8 @@ def on_ui_tabs():
                     with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="batch_directory_tab") as tab_batch_dir:
                         input_batch_dir = gr.Textbox(label="Input directory", **shared.hide_dirs, placeholder="A directory on the same machine where the server is running.", elem_id="input_batch_dir")
                         output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="output_batch_dir")
-                        show_batch_dir_results = gr.Checkbox(label='Show result images', value=True, elem_id="show_batch_dir_results")
+                        show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
+                        
 
 
 
@@ -343,6 +347,7 @@ def on_ui_tabs():
                 batch_count,
                 height,
                 batch_size,
+                save_grid,
             ],
             outputs=[
                 img2img_gallery,

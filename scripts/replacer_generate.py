@@ -29,7 +29,6 @@ def inpaint(
     override_settings = {}
     if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
-
     if gArgs.img2img_fix_steps is not None and gArgs.img2img_fix_steps != "":
         override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
@@ -65,6 +64,7 @@ def inpaint(
     p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
     is_batch = (gArgs.n_iter > 1 or gArgs.batch_size > 1)
     p.seed = gArgs.seed
+    p.do_not_save_grid = not gArgs.save_grid
     
 
 
@@ -147,7 +147,8 @@ def generate(
     width,
     batch_count,
     height,
-    batch_size,    
+    batch_size,
+    save_grid,
 ):
     shared.state.begin(job='replacer')
     shared.total_tqdm.clear()
@@ -229,6 +230,7 @@ def generate(
 
         images,
         generationsN,
+        save_grid,
         )
 
     resultImages = []
