@@ -1,27 +1,18 @@
-from PIL import Image, PngImagePlugin
-from PIL import ImageChops
-import gradio as gr
-from modules.img2img import img2img
-from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
-from modules.processing import Processed, StableDiffusionProcessingImg2Img, process_images
+from PIL import Image
+from modules.processing import StableDiffusionProcessingImg2Img, process_images
 import modules.shared as shared
-from modules.shared import opts, state
+from modules.shared import opts
 from contextlib import closing
-import modules.scripts
-import numpy as np
 import os
 import copy
-import importlib
-from functools import lru_cache
 import random
-from modules import paths
 from modules.ui import plaintext_to_html
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples, getNegativePromptExamples
 from scripts.replacer_options import useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
 from scripts.replacer_options import getHiresFixPositivePromptSuffixExamples
 from scripts.replacer_mask_creator import MasksCreator
 from scripts.replacer_generation_args import GenerationArgs
-from scripts.replacer_options import EXT_NAME, getSaveDir
+from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
 from modules.images import save_image
 
 
@@ -74,12 +65,11 @@ def inpaint(
     p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
     is_batch = (gArgs.n_iter > 1 or gArgs.batch_size > 1)
     p.seed = gArgs.seed
+    
 
 
     with closing(p):
         processed = process_images(p)
-
-    shared.total_tqdm.clear()
 
     generation_info_js = processed.js()
 
@@ -121,6 +111,8 @@ def generateSingle(
     maskPreview = masksCreator.previews[maskNum]
     gArgs.mask = masksCreator.masksExpanded[maskNum]
     maskCutted = masksCreator.cutted[maskNum]
+    shared.state.assign_current_image(maskPreview)
+    shared.state.textinfo = "inpaint"
 
     resultImages, generation_info_js, processed_info, processed_comments = \
         inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs)
@@ -155,10 +147,11 @@ def generate(
     width,
     batch_count,
     height,
-    batch_size,
-    # progress=gr.Progress(track_tqdm=True),
-    
-) -> Image.Image:
+    batch_size,    
+):
+    shared.state.begin(job='replacer')
+    shared.total_tqdm.clear()
+
     if detectionPrompt == '':
         detectionPrompt = getDetectionPromptExamples()[0]
 
@@ -205,6 +198,7 @@ def generate(
         images = readImages(input_batch_dir)
         generationsN = len(shared.listfiles(input_batch_dir))
 
+    shared.state.job_count = generationsN*batch_count
 
     img2img_fix_steps = False
 
@@ -245,10 +239,18 @@ def generate(
     n = generationsN
 
     for image in images:
+        if shared.state.interrupted:
+            break
+        
+        progressInfo = "Generate mask"
         if n > 1: 
             print(flush=True)
             print()
             print(f'    [{EXT_NAME}]    processing {i}/{n}')
+            progressInfo += f" {i}/{n}"
+
+        shared.state.textinfo = progressInfo
+        shared.state.skipped = False
 
         saveDir = ""
         save_to_dirs = True
@@ -281,7 +283,7 @@ def generate(
 
     global lastGenerationArgs
     lastGenerationArgs = gArgs
-
+    shared.state.end()
 
     return resultImages, generation_info_js, processed_info, processed_comments
 
@@ -324,6 +326,10 @@ def applyHiresFix(
     hfPositivePromptSuffix,
     hf_size_limit,
 ):
+    shared.state.begin(job='replacer_hf')
+    shared.state.job_count = 2
+    shared.total_tqdm.clear()
+
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
 
@@ -369,5 +375,13 @@ def applyHiresFix(
         resultImages, generation_info_js, processed_info, processed_comments = \
             applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
 
+    shared.state.end()
 
     return resultImages, generation_info_js, processed_info, processed_comments
+
+
+def generate_webui(id_task, *args, **kwargs):
+    return generate(*args, **kwargs)
+
+def applyHiresFix_webui(id_task, *args, **kwargs):
+    return applyHiresFix(*args, **kwargs)

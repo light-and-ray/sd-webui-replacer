@@ -1,30 +1,17 @@
-from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
-from typing import Optional
-import uuid
 import modules.scripts as scripts
-import modules.shared
 from modules import script_callbacks
-import os
-import random
-import time
-import numpy as np
 import gradio as gr
-from modules.shared import opts, state
-from PIL import Image, PngImagePlugin
-import torch
-from modules import scripts, shared, ui_common, postprocessing, call_queue
-from scripts.replacer_generate import generate, applyHiresFix, getLastUsedSeed
-from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call, wrap_gradio_call
+from modules import scripts, shared, sd_samplers, ui_toprow, ui
+from scripts.replacer_generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
+from modules.call_queue import wrap_gradio_gpu_call
 from modules.ui_common import create_output_panel, refresh_symbol
 from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
 from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
 from modules.shared import cmd_opts
-from modules import sd_samplers
 from modules.ui_components import ToolButton
-from modules import ui
+
 
 
 
@@ -51,6 +38,7 @@ def on_ui_tabs():
     with gr.Blocks() as replacer:
         
         tab_index = gr.State(value=0)
+        dummy_component = gr.Label(visible=False)
 
         with gr.Row():
 
@@ -105,7 +93,11 @@ def on_ui_tabs():
                         label="",  
                     )
 
-                run_button = gr.Button("Run")
+                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
+                toprow.create_inline_toprow_image()
+                run_button = toprow.submit
+                setattr(run_button, 'variant', 'secondary')
+                setattr(run_button, 'value', 'Run')
 
 
                 with gr.Accordion("Advanced options", open=False):
@@ -225,10 +217,14 @@ def on_ui_tabs():
             with gr.Column():
                 with gr.Row():
                     img2img_gallery, generation_info, html_info, html_log = \
-                        create_output_panel(EXT_NAME_LOWER, getSaveDir())
+                        create_output_panel('replacer', getSaveDir())
                     
                 with gr.Row():
-                    apply_hires_fix_button = gr.Button("Apply HiresFix")
+                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
+                    toprow.create_inline_toprow_image()
+                    apply_hires_fix_button = toprow.submit
+                    setattr(apply_hires_fix_button, 'variant', 'secondary')
+                    setattr(apply_hires_fix_button, 'value', 'Apply HiresFix')
 
                 with gr.Row():
                     with gr.Accordion("HiresFix options", open=False):
@@ -317,8 +313,10 @@ def on_ui_tabs():
         tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
 
         run_button.click(
-            fn=wrap_gradio_gpu_call(generate, extra_outputs=[None, '', '']),
+            _js=f"submit_replacer",
+            fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
+                dummy_component,
                 detectionPrompt,
                 positvePrompt,
                 negativePrompt,
@@ -351,13 +349,16 @@ def on_ui_tabs():
                 generation_info,
                 html_info,
                 html_log,
-            ]
+            ],
+            show_progress=False,
         )
 
 
         apply_hires_fix_button.click(
-            fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
+            _js=f"submit_replacer_hf",
+            fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
+                dummy_component,
                 hf_upscaler,
                 hf_steps,
                 hf_sampler,
@@ -371,7 +372,8 @@ def on_ui_tabs():
                 generation_info,
                 html_info,
                 html_log,
-            ]
+            ],
+            show_progress=False,
         )
 
 

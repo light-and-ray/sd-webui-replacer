@@ -1,9 +1,9 @@
-from PIL import Image, PngImagePlugin
 from PIL import ImageChops
+import modules.shared as shared
 
 
 class NothingDetectedError(Exception):
-    def __init__(self):            
+    def __init__(self):
         super().__init__("Nothing has been detected")
 
 
@@ -63,6 +63,9 @@ class MasksCreator:
         self.cutted = []
 
         for mask in masks:
+            if shared.state.interrupted or shared.state.skipped:
+                break
+
             expanded = update_mask(mask, 0, self.maskExpand, self.image)
             self.previews.append(expanded[0])
             self.masksExpanded.append(expanded[1])

@@ -1,7 +1,6 @@
 import os
-from modules.shared import opts, state
 import gradio as gr
-from modules import scripts, shared, paths_internal
+from modules import shared
 from modules import script_callbacks
 
 EXT_NAME = path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
