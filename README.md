@@ -83,7 +83,7 @@ I recommend to use [EpicPhotoGasm - Z - Inpainting](https://civitai.com/models/1
 - batch get options from png info
 - control net
 - tiled vae
-- "hide segment anything extention" option
+- ☑️ "hide segment anything extention" option
 - txt2img script
 - allow multiply instances
 

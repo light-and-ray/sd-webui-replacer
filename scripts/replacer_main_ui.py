@@ -9,8 +9,28 @@ from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
 from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
 from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
 from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
+from scripts.replacer_options import needHideSegmentAnythingAccordions
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton
+
+
+
+def hideSegmantAnythingAccordions(demo, app):
+    if not needHideSegmentAnythingAccordions():
+        return
+    
+    try:
+        for tab in ['txt2img', 'img2img']:
+            samUseCpuPath = f"{tab}/Use CPU for SAM/value"
+            samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
+            accordion = samUseCpu.parent.parent.parent.parent
+            accordion.open = True
+            accordion.visible = False
+            accordion.render = False
+        print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
+    except Exception as e:
+        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions")
+        print(e)
 
 
 
@@ -96,8 +116,8 @@ def on_ui_tabs():
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit
-                setattr(run_button, 'variant', 'secondary')
-                setattr(run_button, 'value', 'Run')
+                run_button.variant = 'secondary'
+                run_button.value = 'Run'
 
 
                 with gr.Accordion("Advanced options", open=False):
@@ -227,8 +247,8 @@ def on_ui_tabs():
                     toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
                     toprow.create_inline_toprow_image()
                     apply_hires_fix_button = toprow.submit
-                    setattr(apply_hires_fix_button, 'variant', 'secondary')
-                    setattr(apply_hires_fix_button, 'value', 'Apply HiresFix')
+                    apply_hires_fix_button.variant = 'secondary'
+                    apply_hires_fix_button.value = 'Apply HiresFix'
 
                 with gr.Row():
                     with gr.Accordion("HiresFix options", open=False):
@@ -408,5 +428,6 @@ def on_ui_tabs():
 
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
+script_callbacks.on_app_started(hideSegmantAnythingAccordions)
 
 

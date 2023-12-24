@@ -75,6 +75,9 @@ def useFirstNegativePromptFromExamples():
     res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_use_first_negative_prompt_from_examples", True)
     return res
 
+def needHideSegmentAnythingAccordions():
+    res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_segment_anything_accordions", False)
+    return res
 
 
 
@@ -85,20 +88,30 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_first_positive_prompt_from_examples",
         shared.OptionInfo(
             True,
-            "Use first positive pormpt form examples, if field is empty (Requires Reload UI)",
+            "Use first positive pormpt form examples, if field is empty",
             gr.Checkbox,
             section=section,
-        )
+        ).needs_reload_ui()
     )
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_use_first_negative_prompt_from_examples",
         shared.OptionInfo(
             True,
-            "Use first negative pormpt form examples, if field is empty (Requires Reload UI)",
+            "Use first negative pormpt form examples, if field is empty",
             gr.Checkbox,
             section=section,
-        )
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_hide_segment_anything_accordions",
+        shared.OptionInfo(
+            False,
+            f"Hide Segment Anything accordions at txt2img and img2img tabs. Useful if you installed it only for {EXT_NAME}",
+            gr.Checkbox,
+            section=section,
+        ).needs_reload_ui()
     )
 
 
@@ -106,56 +119,56 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_detection_prompt_examples",
         shared.OptionInfo(
             "",
-            "Override Detection prompt examples (Requires Reload UI)",
+            "Override Detection prompt examples",
             gr.Textbox,
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(detectionPromptExamples_defaults),
             },
             section=section,
-        )
+        ).needs_reload_ui()
     )
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_positive_prompt_examples",
         shared.OptionInfo(
             "",
-            "Override Positive prompt examples (Requires Reload UI)",
+            "Override Positive prompt examples",
             gr.Textbox,
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(positvePromptExamples_defaults),
             },
             section=section,
-        )
+        ).needs_reload_ui()
     )
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_negative_prompt_examples",
         shared.OptionInfo(
             "",
-            "Override Negative prompt examples (Requires Reload UI)",
+            "Override Negative prompt examples",
             gr.Textbox,
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(negativePromptExamples_defaults),
             },
             section=section,
-        )
+        ).needs_reload_ui()
     )
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_hf_positive_prompt_suffix_examples",
         shared.OptionInfo(
             "",
-            "Override HiresFix suffix for positive prompt examples (Requires Reload UI)",
+            "Override HiresFix suffix for positive prompt examples",
             gr.Textbox,
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(hiresFixPositivePromptSuffixExamples_defaults),
             },
             section=section,
-        )
+        ).needs_reload_ui()
     )
 
     shared.opts.add_option(
