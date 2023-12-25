@@ -6,10 +6,10 @@ Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-w
 
 
 ## Installation
-1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention
+1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings
 2. Put model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth) (or others) into `extensions/sd-webui-segment-anything/models/sam`
 3. _(Optional)_ For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`
-4. Install this extention
+4. Install this extention. Be sure your sd-webui version is >= 1.7.0
 5. Reload UI
 
 ## Usage
