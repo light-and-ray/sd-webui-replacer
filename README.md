@@ -86,6 +86,7 @@ I recommend to use [EpicPhotoGasm - Z - Inpainting](https://civitai.com/models/1
 - ☑️ "hide segment anything extention" option
 - txt2img script
 - allow multiply instances
+- ADetiler as method for mask generation
 
 ### small todo:
 - add detection parametres in metadata
