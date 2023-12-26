@@ -24,7 +24,6 @@ def hideSegmantAnythingAccordions(demo, app):
             samUseCpuPath = f"{tab}/Use CPU for SAM/value"
             samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
             accordion = samUseCpu.parent.parent.parent.parent
-            accordion.open = True
             accordion.visible = False
             accordion.render = False
         print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")

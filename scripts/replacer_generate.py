@@ -299,6 +299,7 @@ def applyHiresFixSingle(
     hrArgs : GenerationArgs,
     saveDir : str,
 ):
+    shared.state.textinfo = "inpaint with upscle"
     generatedImages, _, _, _ = inpaint(image, gArgs)
 
     resultImages = []
@@ -310,6 +311,7 @@ def applyHiresFixSingle(
         print(f'    [{EXT_NAME}]    hiresfix batch count*size {n} for single image')
 
     for generatedImage in generatedImages:
+        shared.state.textinfo = "hiresfix"
         newImages, generation_info_js, processed_info, processed_comments = \
             inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
         resultImages += newImages
