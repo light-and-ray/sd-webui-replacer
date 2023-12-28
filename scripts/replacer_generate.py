@@ -299,7 +299,7 @@ def applyHiresFixSingle(
     hrArgs : GenerationArgs,
     saveDir : str,
 ):
-    shared.state.textinfo = "inpaint with upscle"
+    shared.state.textinfo = "inpaint with upscaler"
     generatedImages, _, _, _ = inpaint(image, gArgs)
 
     resultImages = []
