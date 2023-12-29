@@ -1,31 +1,16 @@
 function submit_replacer() {
-    showSubmitButtons('replacer', false);
+    var arguments_ = Array.from(arguments);
+    galleryId = arguments_.pop();
+    buttonsId = arguments_.pop();
+    showSubmitButtons(buttonsId, false);
 
     var id = randomId();
 
-    requestProgress(id, gradioApp().getElementById('replacer_gallery_container'), gradioApp().getElementById('replacer_gallery'), function() {
-        showSubmitButtons('replacer', true);
+    requestProgress(id, gradioApp().getElementById(galleryId + '_gallery_container'), gradioApp().getElementById(galleryId + '_gallery'), function() {
+        showSubmitButtons(buttonsId, true);
     });
 
-    var res = create_submit_args(arguments);
-
-    res[0] = id;
-
-    console.log(res);
-    return res;
-}
-
-
-function submit_replacer_hf() {
-    showSubmitButtons('replacer_hf', false);
-
-    var id = randomId();
-
-    requestProgress(id, gradioApp().getElementById('replacer_gallery_container'), gradioApp().getElementById('replacer_gallery'), function() {
-        showSubmitButtons('replacer_hf', true);
-    });
-
-    var res = create_submit_args(arguments);
+    var res = create_submit_args(arguments_);
 
     res[0] = id;
 

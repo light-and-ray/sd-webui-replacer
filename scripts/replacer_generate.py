@@ -150,7 +150,7 @@ def generate(
     batch_size,
     save_grid,
 ):
-    shared.state.begin(job='replacer')
+    shared.state.begin(job=EXT_NAME_LOWER)
     shared.total_tqdm.clear()
 
     if detectionPrompt == '':
@@ -270,6 +270,7 @@ def generate(
             i += 1
             if generationsN == 1:
                 raise
+            shared.state.nextjob()
             continue
 
         if not (tab_index == 2 and not show_batch_dir_results):
@@ -330,7 +331,7 @@ def applyHiresFix(
     hfPositivePromptSuffix,
     hf_size_limit,
 ):
-    shared.state.begin(job='replacer_hf')
+    shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
     shared.state.job_count = 2
     shared.total_tqdm.clear()
 

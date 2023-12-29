@@ -3,7 +3,7 @@ import gradio as gr
 from modules import shared
 from modules import script_callbacks
 
-EXT_NAME = path = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer")
+EXT_NAME = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer").strip()
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
 defaultOutputDirectory = f"outputs/{EXT_NAME_LOWER}"

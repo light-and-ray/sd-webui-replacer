@@ -32,7 +32,12 @@ def hideSegmantAnythingAccordions(demo, app):
         print(e)
 
 
-
+def getSubmitJsFunction(galleryId, buttonsId):
+    return 'function(){'\
+        'var arguments_ = Array.from(arguments);'\
+        f'arguments_.push("{buttonsId}", "{galleryId}");'\
+        'return submit_replacer.apply(null, arguments_);'\
+    '}'
 
 class Script(scripts.Script):
     def __init__(self) -> None:
@@ -112,7 +117,7 @@ def on_ui_tabs():
                         label="",  
                     )
 
-                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
+                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=EXT_NAME_LOWER)
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit
                 run_button.variant = 'secondary'
@@ -240,10 +245,10 @@ def on_ui_tabs():
             with gr.Column():
                 with gr.Row():
                     img2img_gallery, generation_info, html_info, html_log = \
-                        create_output_panel('replacer', getSaveDir())
+                        create_output_panel(EXT_NAME_LOWER, getSaveDir())
                     
                 with gr.Row():
-                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
+                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{EXT_NAME_LOWER}_hf')
                     toprow.create_inline_toprow_image()
                     apply_hires_fix_button = toprow.submit
                     apply_hires_fix_button.variant = 'secondary'
@@ -335,8 +340,9 @@ def on_ui_tabs():
         tab_batch.select(fn=tab_batch_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
         tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
 
+        
         run_button.click(
-            _js=f"submit_replacer",
+            _js=getSubmitJsFunction(EXT_NAME_LOWER, EXT_NAME_LOWER),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -379,7 +385,7 @@ def on_ui_tabs():
 
 
         apply_hires_fix_button.click(
-            _js=f"submit_replacer_hf",
+            _js=getSubmitJsFunction(EXT_NAME_LOWER, f'{EXT_NAME_LOWER}_hf'),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
