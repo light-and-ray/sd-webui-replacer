@@ -181,21 +181,20 @@ def on_ui_tabs():
                             value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                     with gr.Row():
-                        width = gr.Slider(label='width',
-                            value=512, elem_id="replacer_width",
-                            minimum=64, maximum=2048, step=8)
-                        batch_count = gr.Slider(label='batch count',
-                            value=1, elem_id="replacer_batch_count",
-                            minimum=1, maximum=10, step=1)
-
-                    with gr.Row():
-                        height = gr.Slider(label='height',
-                            value=512, elem_id="replacer_height",
-                            minimum=64, maximum=2048, step=8)
-                        batch_size = gr.Slider(label='batch size',
-                            value=1, elem_id="replacer_batch_size",
-                            minimum=1, maximum=10, step=1)
-
+                        with gr.Column():
+                            width = gr.Slider(label='width',
+                                value=512, elem_id="replacer_width",
+                                minimum=64, maximum=2048, step=8)
+                            height = gr.Slider(label='height',
+                                value=512, elem_id="replacer_height",
+                                minimum=64, maximum=2048, step=8)
+                        with gr.Column():
+                            batch_count = gr.Slider(label='batch count',
+                                value=1, elem_id="replacer_batch_count",
+                                minimum=1, maximum=10, step=1)
+                            batch_size = gr.Slider(label='batch size',
+                                value=1, elem_id="replacer_batch_size",
+                                minimum=1, maximum=10, step=1)
 
                     with gr.Row():
                         upscalerForImg2Img = gr.Dropdown(
