@@ -36,7 +36,14 @@ I do not recommend change these options, if you don't know what you do
 
 
 ### Extention name
-If you don't like "Replacer" name of this extention, you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
+If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory. 
+```
+extensions/sd-webui-replacer/ExtensionName.txt:
+
+Fast Inpaint
+```
+
+Or you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
 
 For exaple: Linux
 ```sh

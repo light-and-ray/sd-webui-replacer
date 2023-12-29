@@ -1,9 +1,21 @@
 import os
+from pathlib import Path
 import gradio as gr
 from modules import shared
 from modules import script_callbacks
 
-EXT_NAME = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer").strip()
+EXT_NAME = None
+try:
+    extNameFilePath = str(Path(__file__).parent.parent.absolute()) + '/ExtensionName.txt'
+    if os.path.isfile(extNameFilePath):
+        with open(extNameFilePath, 'r') as f:
+            EXT_NAME = f.readline().strip()
+except :
+    EXT_NAME = None
+
+if EXT_NAME is None or EXT_NAME == "":
+    EXT_NAME = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer").strip()
+
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
 defaultOutputDirectory = f"outputs/{EXT_NAME_LOWER}"
