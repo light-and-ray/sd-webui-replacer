@@ -1,22 +1,21 @@
+import os
+import copy
+import random
+from contextlib import closing
 from PIL import Image
 from modules.processing import StableDiffusionProcessingImg2Img, process_images
 import modules.shared as shared
 from modules.shared import opts
-from contextlib import closing
-import os
-import copy
-import random
 from modules.ui import plaintext_to_html
-from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples, getNegativePromptExamples
-from scripts.replacer_options import useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
-from scripts.replacer_options import getHiresFixPositivePromptSuffixExamples
-from scripts.replacer_mask_creator import MasksCreator
-from scripts.replacer_generation_args import GenerationArgs
-from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
 from modules.images import save_image
+from replacer.mask_creator import MasksCreator
+from replacer.generation_args import GenerationArgs
+from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
+    getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
+    getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir,
+)
 
 
-    
 
 
 def inpaint(

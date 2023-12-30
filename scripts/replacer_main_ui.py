@@ -1,24 +1,21 @@
+import gradio as gr
 import modules.scripts as scripts
 from modules import script_callbacks
-import gradio as gr
 from modules import scripts, shared, sd_samplers, ui_toprow, ui
-from scripts.replacer_generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
-from modules.call_queue import wrap_gradio_gpu_call
-from modules.ui_common import create_output_panel, refresh_symbol
-from scripts.replacer_options import EXT_NAME, EXT_NAME_LOWER, getSaveDir
-from scripts.replacer_options import getDetectionPromptExamples, getPositivePromptExamples
-from scripts.replacer_options import getNegativePromptExamples, useFirstPositivePromptFromExamples
-from scripts.replacer_options import useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples
-from scripts.replacer_options import needHideSegmentAnythingAccordions
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton
+from modules.call_queue import wrap_gradio_gpu_call
+from modules.ui_common import create_output_panel, refresh_symbol
+from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
+from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
+    getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
+    useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
+    needHideSegmentAnythingAccordions
+)
 
 
 
 def hideSegmantAnythingAccordions(demo, app):
-    if not needHideSegmentAnythingAccordions():
-        return
-    
     try:
         for tab in ['txt2img', 'img2img']:
             samUseCpuPath = f"{tab}/Use CPU for SAM/value"
@@ -28,8 +25,7 @@ def hideSegmantAnythingAccordions(demo, app):
             accordion.render = False
         print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
     except Exception as e:
-        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions")
-        print(e)
+        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}")
 
 
 def getSubmitJsFunction(galleryId, buttonsId):
@@ -38,6 +34,7 @@ def getSubmitJsFunction(galleryId, buttonsId):
         f'arguments_.push("{buttonsId}", "{galleryId}");'\
         'return submit_replacer.apply(null, arguments_);'\
     '}'
+
 
 class Script(scripts.Script):
     def __init__(self) -> None:
@@ -51,8 +48,6 @@ class Script(scripts.Script):
 
     def ui(self, is_img2img):
         return ()
-
-
 
 
 
@@ -173,7 +168,7 @@ def on_ui_tabs():
                             minimum=0.0, maximum=1.0, step=0.01)
                         inpaint_padding = gr.Slider(label='Padding',
                             value=20, elem_id="replacer_inpaint_padding",
-                            minimum=0, maximum=100, step=1)
+                            minimum=0, maximum=250, step=1)
                         
                     with gr.Row():
                         inpainting_fill = gr.Radio(label='Masked content',
@@ -432,6 +427,8 @@ def on_ui_tabs():
 
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
-script_callbacks.on_app_started(hideSegmantAnythingAccordions)
+
+if needHideSegmentAnythingAccordions():
+    script_callbacks.on_app_started(hideSegmantAnythingAccordions)
 
 

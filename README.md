@@ -77,6 +77,11 @@ I recommend to use [EpicPhotoGasm - Z - Inpainting](https://civitai.com/models/1
 
 ![](images/img5.jpg)
 
+
+### How to change maximum values of sliders?
+
+In file `ui-config.json` in root of webui you can edit maximum and minimum values of sliders
+
 --------------------------
 
 ## Need to do:
