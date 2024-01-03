@@ -6,9 +6,11 @@ function submit_replacer() {
 
     var id = randomId();
 
-    requestProgress(id, gradioApp().getElementById(galleryId + '_gallery_container'), gradioApp().getElementById(galleryId + '_gallery'), function() {
-        showSubmitButtons(buttonsId, true);
-    });
+    requestProgress(id, 
+        gradioApp().getElementById(galleryId + "_gallery_container"),
+        gradioApp().getElementById(galleryId + "_gallery"),
+        function() { showSubmitButtons(buttonsId, true); }
+        );
 
     var res = create_submit_args(arguments_);
 

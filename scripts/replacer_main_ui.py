@@ -1,7 +1,5 @@
 import gradio as gr
-import modules.scripts as scripts
-from modules import script_callbacks
-from modules import scripts, shared, sd_samplers, ui_toprow, ui
+from modules import scripts, shared, sd_samplers, ui_toprow, ui, script_callbacks
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton
 from modules.call_queue import wrap_gradio_gpu_call
@@ -12,6 +10,14 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
     needHideSegmentAnythingAccordions
 )
+
+
+try:
+    from modules.ui_common import OutputPanel # webui 1.8+
+    OUTPUT_PANEL_AWALIABLE = True
+except Exception as e:
+    print(f'[{EXT_NAME}]: {e}')
+    OUTPUT_PANEL_AWALIABLE = False
 
 
 
@@ -55,7 +61,7 @@ class Script(scripts.Script):
 
 def on_ui_tabs():
     with gr.Blocks() as replacer:
-        
+
         tab_index = gr.State(value=0)
         dummy_component = gr.Label(visible=False)
 
@@ -65,12 +71,12 @@ def on_ui_tabs():
 
                 with gr.Row():
                     placeholder = getDetectionPromptExamples()[0]
-                    detectionPrompt = gr.Textbox(label="Detection prompt", 
-                                        show_label=True, 
-                                        lines=1, 
+                    detectionPrompt = gr.Textbox(label="Detection prompt",
+                                        show_label=True,
+                                        lines=1,
                                         elem_classes=["detectionPrompt"],
                                         placeholder=placeholder)
-                    
+
                     gr.Examples(
                         examples=getDetectionPromptExamples(),
                         inputs=detectionPrompt,
@@ -81,10 +87,10 @@ def on_ui_tabs():
                     placeholder = None
                     if (useFirstPositivePromptFromExamples()):
                         placeholder = getPositivePromptExamples()[0]
-                    
-                    positvePrompt = gr.Textbox(label="Positve prompt", 
-                                        show_label=True, 
-                                        lines=1, 
+
+                    positvePrompt = gr.Textbox(label="Positve prompt",
+                                        show_label=True,
+                                        lines=1,
                                         elem_classes=["positvePrompt"],
                                         placeholder=placeholder)
 
@@ -99,17 +105,17 @@ def on_ui_tabs():
                     if (useFirstNegativePromptFromExamples()):
                         placeholder = getNegativePromptExamples()[0]
 
-                    negativePrompt = gr.Textbox(label="Negative prompt", 
-                                        show_label=True, 
-                                        lines=1, 
+                    negativePrompt = gr.Textbox(label="Negative prompt",
+                                        show_label=True,
+                                        lines=1,
                                         elem_classes=["negativePrompt"],
                                         placeholder=placeholder)
 
-                    
+
                     gr.Examples(
                         examples=getNegativePromptExamples(),
                         inputs=negativePrompt,
-                        label="",  
+                        label="",
                     )
 
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=EXT_NAME_LOWER)
@@ -169,7 +175,7 @@ def on_ui_tabs():
                         inpaint_padding = gr.Slider(label='Padding',
                             value=20, elem_id="replacer_inpaint_padding",
                             minimum=0, maximum=250, step=1)
-                        
+
                     with gr.Row():
                         inpainting_fill = gr.Radio(label='Masked content',
                             choices=['fill', 'original', 'latent noise', 'latent nothing'],
@@ -202,7 +208,7 @@ def on_ui_tabs():
                             seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
                         else:
                             seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
-                        
+
                         random_seed = ToolButton(
                             ui.random_symbol,
                             elem_id="replacer_random_seed",
@@ -230,7 +236,7 @@ def on_ui_tabs():
                         input_batch_dir = gr.Textbox(label="Input directory", **shared.hide_dirs, placeholder="A directory on the same machine where the server is running.", elem_id="input_batch_dir")
                         output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="output_batch_dir")
                         show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
-                        
+
 
 
 
@@ -238,9 +244,16 @@ def on_ui_tabs():
 
             with gr.Column():
                 with gr.Row():
-                    img2img_gallery, generation_info, html_info, html_log = \
-                        create_output_panel(EXT_NAME_LOWER, getSaveDir())
-                    
+                    if OUTPUT_PANEL_AWALIABLE:
+                        outputPanel = create_output_panel(EXT_NAME_LOWER, getSaveDir())
+                        img2img_gallery = outputPanel.gallery
+                        generation_info = outputPanel.infotext
+                        html_info = outputPanel.html_info
+                        html_log = outputPanel.html_log
+                    else:
+                        img2img_gallery, generation_info, html_info, html_log = \
+                            create_output_panel(EXT_NAME_LOWER, getSaveDir())
+
                 with gr.Row():
                     toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{EXT_NAME_LOWER}_hf')
                     toprow.create_inline_toprow_image()
@@ -291,15 +304,15 @@ def on_ui_tabs():
                                 maximum=1.0,
                                 elem_id="hf_denoise"
                             )
-                        
+
                         with gr.Row():
                             placeholder = None
                             placeholder = getHiresFixPositivePromptSuffixExamples()[0]
 
                             hfPositivePromptSuffix = gr.Textbox(
-                                label="Suffix for positive prompt", 
-                                show_label=True, 
-                                lines=1, 
+                                label="Suffix for positive prompt",
+                                show_label=True,
+                                lines=1,
                                 elem_classes=["hfPositivePromptSuffix"],
                                 placeholder=placeholder
                             )
@@ -326,7 +339,7 @@ def on_ui_tabs():
 
         def tab_batch_on_select():
             return 1, gr.Button.update(visible=False)
-        
+
         def tab_batch_dir_on_select():
             return 2, gr.Button.update(visible=False)
 
@@ -334,7 +347,7 @@ def on_ui_tabs():
         tab_batch.select(fn=tab_batch_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
         tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
 
-        
+
         run_button.click(
             _js=getSubmitJsFunction(EXT_NAME_LOWER, EXT_NAME_LOWER),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),

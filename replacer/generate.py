@@ -3,8 +3,8 @@ import copy
 import random
 from contextlib import closing
 from PIL import Image
-from modules.processing import StableDiffusionProcessingImg2Img, process_images
 import modules.shared as shared
+from modules.processing import StableDiffusionProcessingImg2Img, process_images
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
