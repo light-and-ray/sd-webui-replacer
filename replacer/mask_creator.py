@@ -1,5 +1,19 @@
 from PIL import ImageChops
 import modules.shared as shared
+from replacer.options import needAutoUnloadModels
+sam_predict = None
+update_mask = None
+clear_cache = None
+
+def initSamDependencies():
+    global sam_predict, update_mask, clear_cache
+    if not sam_predict or not update_mask or not clear_cache:
+        from scripts.sam import sam_predict as sam_predict_
+        from scripts.sam import update_mask as update_mask_
+        from scripts.sam import clear_cache as clear_cache_
+        sam_predict = sam_predict_
+        update_mask = update_mask_
+        clear_cache = clear_cache_
 
 
 class NothingDetectedError(Exception):
@@ -48,13 +62,15 @@ class MasksCreator:
 
 
     def _createMasks(self):
-        from scripts.sam import sam_predict, update_mask
-
+        initSamDependencies()
         masks, samLog = sam_predict(self.samModel, self.image, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)
         if len(masks) == 0:
             raise NothingDetectedError()
+
+        if needAutoUnloadModels():
+            clear_cache()
 
         masks = [masks[3], masks[4], masks[5]]
 

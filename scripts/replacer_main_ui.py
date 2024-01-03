@@ -8,7 +8,7 @@ from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSe
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
-    needHideSegmentAnythingAccordions
+    needHideSegmentAnythingAccordions, needAutoUnloadModels
 )
 
 
@@ -16,7 +16,6 @@ try:
     from modules.ui_common import OutputPanel # webui 1.8+
     OUTPUT_PANEL_AWALIABLE = True
 except Exception as e:
-    print(f'[{EXT_NAME}]: {e}')
     OUTPUT_PANEL_AWALIABLE = False
 
 
@@ -222,6 +221,8 @@ def on_ui_tabs():
 
                     with gr.Row():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
+                        if not needAutoUnloadModels():
+                            unload = gr.Button(value="Unload all models")
 
 
 
@@ -432,7 +433,12 @@ def on_ui_tabs():
             ]
         )
 
-
+        if not needAutoUnloadModels():
+            from scripts.sam import clear_cache
+            unload.click(
+                fn=clear_cache,
+                inputs=[],
+                outputs=[])
 
 
     return [(replacer, EXT_NAME, EXT_NAME)]

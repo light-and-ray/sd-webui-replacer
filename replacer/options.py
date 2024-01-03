@@ -25,6 +25,10 @@ def getSaveDir():
     return shared.opts.data.get(EXT_NAME_LOWER + "_save_dir", defaultOutputDirectory)
 
 
+def needAutoUnloadModels():
+    return shared.cmd_opts.lowvram or shared.cmd_opts.medvram
+
+
 detectionPromptExamples_defaults = [
             "background",
             "hairstyle",

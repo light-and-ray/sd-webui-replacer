@@ -106,4 +106,3 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - extra mask expand for hires fix
 - copy `images` while appling hires fix
 - handle empty out dir in batch dir
-- turn sam_predict, update_mask into global functions

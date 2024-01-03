@@ -12,7 +12,7 @@ from replacer.mask_creator import MasksCreator
 from replacer.generation_args import GenerationArgs
 from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
     getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
-    getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir,
+    getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels
 )
 
 
@@ -267,6 +267,9 @@ def generate(
         except Exception as e:
             print(f'    [{EXT_NAME}]    Exception: {e}')
             i += 1
+            if needAutoUnloadModels():
+                from scripts.sam import clear_cache
+                clear_cache()
             if generationsN == 1:
                 raise
             shared.state.nextjob()
