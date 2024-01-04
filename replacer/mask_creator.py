@@ -49,7 +49,7 @@ masksCreatorCached = None
 
 class MasksCreator:
     def __init__(self, detectionPrompt, avoidancePrompt, image, samModel, grdinoModel, boxThreshold,
-            maskExpand, resolutionOnDetection):
+            maskExpand, maxResolutionOnDetection):
         self.detectionPrompt = detectionPrompt
         self.avoidancePrompt = avoidancePrompt
         self.image = image
@@ -57,7 +57,7 @@ class MasksCreator:
         self.grdinoModel = grdinoModel
         self.boxThreshold = boxThreshold
         self.maskExpand = maskExpand
-        self.resolutionOnDetection = resolutionOnDetection
+        self.maxResolutionOnDetection = maxResolutionOnDetection
 
         global masksCreatorCached
 
@@ -68,7 +68,7 @@ class MasksCreator:
                 self.grdinoModel == masksCreatorCached.grdinoModel and\
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
                 self.maskExpand == masksCreatorCached.maskExpand and\
-                self.resolutionOnDetection == masksCreatorCached.resolutionOnDetection and\
+                self.maxResolutionOnDetection == masksCreatorCached.maxResolutionOnDetection and\
                 areImagesTheSame(self.image, masksCreatorCached.image):
             self.previews = masksCreatorCached.previews
             self.masks = masksCreatorCached.masks
@@ -83,7 +83,7 @@ class MasksCreator:
 
     def _createMasks(self):
         initSamDependencies()
-        imageResized = limitSizeByOneDemention(self.image, self.resolutionOnDetection)
+        imageResized = limitSizeByOneDemention(self.image, self.maxResolutionOnDetection)
         masks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)

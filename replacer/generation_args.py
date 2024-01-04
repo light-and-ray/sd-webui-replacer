@@ -14,7 +14,7 @@ class GenerationArgs:
     grdinoModel: Any
     boxThreshold: Any
     maskExpand: Any
-    resolutionOnDetection: Any
+    maxResolutionOnDetection: Any
     steps: Any
     sampler_name: Any
     mask_blur: Any

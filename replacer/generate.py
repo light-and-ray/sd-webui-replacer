@@ -113,7 +113,7 @@ def generateSingle(
     extra_includes : list,
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
-        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.resolutionOnDetection)
+        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection)
 
     maskNum = gArgs.seed % len(masksCreator.previews)
 
@@ -158,7 +158,7 @@ def generate(
     box_threshold,
     mask_expand,
     mask_blur,
-    resolution_on_detection,
+    max_resolution_on_detection,
     sam_model_name,
     dino_model_name,
     cfg_scale,
@@ -240,7 +240,7 @@ def generate(
         dino_model_name,
         box_threshold,
         mask_expand,
-        resolution_on_detection,
+        max_resolution_on_detection,
         
         steps,
         sampler,
