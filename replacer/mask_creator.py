@@ -104,20 +104,21 @@ class MasksCreator:
             self.cutted.append(expanded[2])
 
         if self.avoidancePrompt != "":
-            negativeMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
+            avoidanceMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
                 self.grdinoModel, self.avoidancePrompt, self.boxThreshold, False, [])
             print(samLog)
-            if len(negativeMasks) == 0:
-                print('nothing has been detected by avoid prompt')
+            if len(avoidanceMasks) == 0:
+                print('nothing has been detected by avoidance prompt')
             else:
-                negativeMasks = [negativeMasks[3], negativeMasks[4], negativeMasks[5]]
+                avoidanceMasks = [avoidanceMasks[3], avoidanceMasks[4], avoidanceMasks[5]]
                 for i in range(len(self.masks)):
                     maskTmp = ImageOps.invert(self.masks[i].convert('L'))
-                    negativeMasks[i] = negativeMasks[i].convert('L')
-                    maskTmp.paste(negativeMasks[i], negativeMasks[i])
+                    avoidanceMasks[i] = avoidanceMasks[i].convert('L')
+                    maskTmp.paste(avoidanceMasks[i], avoidanceMasks[i])
                     self.masks[i] = ImageOps.invert(maskTmp)
-
-                    self.previews[i].paste(negativeMasks[i], negativeMasks[i])
+                    self.previews[i].paste(imageResized, avoidanceMasks[i])
+                    transparent = Image.new('RGBA', imageResized.size, (255, 0, 0, 0))
+                    self.cutted[i].paste(transparent, avoidanceMasks[i])
 
         for i in range(len(self.masks)):
             self.masks[i] = self.masks[i].resize(self.image.size)
