@@ -1,5 +1,4 @@
 from PIL import ImageChops, Image
-import modules.shared as shared
 from replacer.options import needAutoUnloadModels
 sam_predict = None
 update_mask = None
@@ -36,7 +35,7 @@ class NothingDetectedError(Exception):
         super().__init__("Nothing has been detected")
 
 
-def is_images_the_same(image_one, image_two):
+def areImagesTheSame(image_one, image_two):
     diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
 
     if diff.getbbox():
@@ -68,7 +67,7 @@ class MasksCreator:
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
                 self.maskExpand == masksCreatorCached.maskExpand and\
                 self.resolutionOnDetection == masksCreatorCached.resolutionOnDetection and\
-                is_images_the_same(self.image, masksCreatorCached.image):
+                areImagesTheSame(self.image, masksCreatorCached.image):
             self.previews = masksCreatorCached.previews
             self.masksExpanded = masksCreatorCached.masksExpanded
             self.cutted = masksCreatorCached.cutted
@@ -98,10 +97,7 @@ class MasksCreator:
         self.cutted = []
 
         for mask in masks:
-            if shared.state.interrupted or shared.state.skipped:
-                break
-
             expanded = update_mask(mask, 0, self.maskExpand, imageResized)
             self.previews.append(expanded[0])
             self.masksExpanded.append(expanded[1].resize(self.image.size))
-            self.cutted.append(expanded[2].resize(self.image.size))
+            self.cutted.append(expanded[2])

@@ -349,6 +349,8 @@ def on_ui_tabs():
                                 label='Unload detection models before hires fix',
                                 value=True
                             )
+                            if needAutoUnloadModels():
+                                hf_unload_detection_models.visible = False
 
 
         def tab_single_on_select():

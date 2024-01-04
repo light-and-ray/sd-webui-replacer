@@ -26,7 +26,10 @@ def getSaveDir():
 
 
 def needAutoUnloadModels():
-    return shared.cmd_opts.lowvram or shared.cmd_opts.medvram
+    res: bool = shared.cmd_opts.lowvram or shared.cmd_opts.medvram
+    if not res:
+        res = shared.opts.data.get(EXT_NAME_LOWER + "_always_unload_models", False)
+    return res
 
 
 detectionPromptExamples_defaults = [
@@ -128,6 +131,22 @@ def on_ui_settings():
             gr.Checkbox,
             section=section,
         ).needs_reload_ui()
+    )
+
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_always_unload_models",
+        shared.OptionInfo(
+            False,
+            f"Always unload detection models after generation",
+            gr.Checkbox,
+            {
+                "info" : "Significally increases detection time. "\
+                         "Doesn't have effect if webui is in --lowvram or --medvram mode. "\
+                         "In these modes this behavior is default.",
+            },
+            section=section,
+        )
     )
 
 
