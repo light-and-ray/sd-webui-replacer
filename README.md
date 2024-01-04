@@ -20,6 +20,8 @@ Be sure you are using inpainting model
 
 By default if a prompt is empty, it uses first prompt from examples. You can disable this behavior in settings for positive and negative prompts. Detection prompt can not be empty
 
+You can detect few objects, just using comma `,`
+
 ![](images/img3.jpg)
 
 ### HiresFix
