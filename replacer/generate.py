@@ -337,6 +337,7 @@ def applyHiresFix(
     hf_cfg_scale,
     hfPositivePromptSuffix,
     hf_size_limit,
+    hf_unload_detection_models,
 ):
     shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
     shared.state.job_count = 2
@@ -373,6 +374,9 @@ def applyHiresFix(
     processed_info = ""
     processed_comments = ""
 
+    if hf_unload_detection_models:
+        from scripts.sam import clear_cache
+        clear_cache()
 
     for image in gArgs.images:
         saveDir = getSaveDir()

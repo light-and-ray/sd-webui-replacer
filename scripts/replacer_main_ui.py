@@ -345,6 +345,11 @@ def on_ui_tabs():
                                 elem_id="hf_size_limit"
                             )
 
+                            hf_unload_detection_models = gr.Checkbox(
+                                label='Unload detection models before hires fix',
+                                value=True
+                            )
+
 
         def tab_single_on_select():
             return 0, gr.Button.update(visible=True)
@@ -416,6 +421,7 @@ def on_ui_tabs():
                 hf_cfg_scale,
                 hfPositivePromptSuffix,
                 hf_size_limit,
+                hf_unload_detection_models,
             ],
             outputs=[
                 img2img_gallery,
