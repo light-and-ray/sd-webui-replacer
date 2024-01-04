@@ -104,7 +104,7 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 
 ### small todo:
 - add detection parametres in metadata
-- add additional options: include mask or preview, and do exacly steps the slider specifies
+- add additional options: do exacly steps the slider specifies
 - extra mask expand for hires fix
 - copy `images` while appling hires fix
 - handle empty out dir in batch dir

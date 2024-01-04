@@ -235,6 +235,13 @@ def on_ui_tabs():
 
                     with gr.Row():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
+                        extra_includes = gr.CheckboxGroup(
+                            choices=["mask", "cutted", "preview"],
+                            label="Extra include in gallery",
+                            type="value",
+                            elem_id=f"replacer_extra_includes",
+                            value=[],
+                        )
 
 
                 with gr.Tabs(elem_id="mode_extras"):
@@ -400,6 +407,7 @@ def on_ui_tabs():
                 height,
                 batch_size,
                 save_grid,
+                extra_includes,
             ],
             outputs=[
                 img2img_gallery,

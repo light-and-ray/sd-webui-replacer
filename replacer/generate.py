@@ -100,7 +100,8 @@ def generateSingle(
     gArgs : GenerationArgs,
     savePath : str,
     saveSuffix : str,
-    save_to_dirs : bool
+    save_to_dirs : bool,
+    extra_includes : list,
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, image, gArgs.samModel,
         gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.resolutionOnDetection)
@@ -115,6 +116,13 @@ def generateSingle(
 
     resultImages, generation_info_js, processed_info, processed_comments = \
         inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs)
+    
+    if "mask" in extra_includes:
+        resultImages.append(gArgs.mask)
+    if "cutted" in extra_includes:
+        resultImages.append(maskCutted)
+    if "preview" in extra_includes:
+        resultImages.append(maskPreview)
 
     return resultImages, generation_info_js, processed_info, processed_comments
 
@@ -149,6 +157,7 @@ def generate(
     height,
     batch_size,
     save_grid,
+    extra_includes,
 ):
     shared.state.begin(job=EXT_NAME_LOWER)
     shared.total_tqdm.clear()
@@ -268,7 +277,7 @@ def generate(
 
         try:
             newImages, generation_info_js, processed_info, processed_comments = \
-                    generateSingle(image, gArgs, saveDir, "", save_to_dirs)
+                    generateSingle(image, gArgs, saveDir, "", save_to_dirs, extra_includes)
         except Exception as e:
             print(f'    [{EXT_NAME}]    Exception: {e}')
             i += 1
