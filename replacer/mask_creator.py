@@ -1,4 +1,4 @@
-from PIL import ImageChops
+from PIL import ImageChops, Image
 import modules.shared as shared
 from replacer.options import needAutoUnloadModels
 sam_predict = None
@@ -14,6 +14,21 @@ def initSamDependencies():
         sam_predict = sam_predict_
         update_mask = update_mask_
         clear_cache = clear_cache_
+
+
+def limitSizeByOneDemention(image: Image, size):
+    h, w = image.size
+    if h > w:
+        if h > size:
+            w = size / h * w
+            h = size
+    else:
+        if w > size:
+            h = size / w * h
+            w = size
+
+    return image.resize((int(h), int(w)))
+
 
 
 class NothingDetectedError(Exception):
@@ -34,13 +49,15 @@ masksCreatorCached = None
 
 
 class MasksCreator:
-    def __init__(self, detectionPrompt, image, samModel, grdinoModel, boxThreshold, maskExpand):
+    def __init__(self, detectionPrompt, image, samModel, grdinoModel, boxThreshold,
+            maskExpand, resolutionOnDetection):
         self.detectionPrompt = detectionPrompt
         self.image = image
         self.samModel = samModel
         self.grdinoModel = grdinoModel
         self.boxThreshold = boxThreshold
         self.maskExpand = maskExpand
+        self.resolutionOnDetection = resolutionOnDetection
 
         global masksCreatorCached
 
@@ -50,6 +67,7 @@ class MasksCreator:
                 self.grdinoModel == masksCreatorCached.grdinoModel and\
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
                 self.maskExpand == masksCreatorCached.maskExpand and\
+                self.resolutionOnDetection == masksCreatorCached.resolutionOnDetection and\
                 is_images_the_same(self.image, masksCreatorCached.image):
             self.previews = masksCreatorCached.previews
             self.masksExpanded = masksCreatorCached.masksExpanded
@@ -63,7 +81,8 @@ class MasksCreator:
 
     def _createMasks(self):
         initSamDependencies()
-        masks, samLog = sam_predict(self.samModel, self.image, [], [], True,
+        imageResized = limitSizeByOneDemention(self.image, self.resolutionOnDetection)
+        masks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)
         if len(masks) == 0:
@@ -82,8 +101,7 @@ class MasksCreator:
             if shared.state.interrupted or shared.state.skipped:
                 break
 
-            expanded = update_mask(mask, 0, self.maskExpand, self.image)
+            expanded = update_mask(mask, 0, self.maskExpand, imageResized)
             self.previews.append(expanded[0])
-            self.masksExpanded.append(expanded[1])
-            self.cutted.append(expanded[2])
-            
+            self.masksExpanded.append(expanded[1].resize(self.image.size))
+            self.cutted.append(expanded[2].resize(self.image.size))

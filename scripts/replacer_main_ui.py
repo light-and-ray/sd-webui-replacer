@@ -152,6 +152,20 @@ def on_ui_tabs():
                         mask_blur = gr.Slider(label='Mask Blur',
                             value=4, elem_id="replacer_mask_blur",
                             minimum=0, maximum=10, step=1)
+                        
+                    with gr.Row():
+
+                        if not needAutoUnloadModels():
+                            unload = gr.Button(value="Unload detection models")
+
+                        resolution_on_detection = gr.Slider(
+                            label='Resolution on detection',
+                            value=1024,
+                            step=1,
+                            minimum=64,
+                            maximum=2048,
+                            elem_id="replacer_resolution_on_detection"
+                        )
 
                     with gr.Row():
                         from scripts.sam import sam_model_list, refresh_sam_models
@@ -221,9 +235,6 @@ def on_ui_tabs():
 
                     with gr.Row():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
-                        if not needAutoUnloadModels():
-                            unload = gr.Button(value="Unload all models")
-
 
 
                 with gr.Tabs(elem_id="mode_extras"):
@@ -370,6 +381,7 @@ def on_ui_tabs():
                 box_threshold,
                 mask_expand,
                 mask_blur,
+                resolution_on_detection,
                 sam_model_name,
                 dino_model_name,
                 cfg_scale,

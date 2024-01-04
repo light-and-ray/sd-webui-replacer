@@ -103,7 +103,7 @@ def generateSingle(
     save_to_dirs : bool
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, image, gArgs.samModel,
-                gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand)
+        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.resolutionOnDetection)
 
     maskNum = gArgs.seed % len(masksCreator.previews)
 
@@ -137,6 +137,7 @@ def generate(
     box_threshold,
     mask_expand,
     mask_blur,
+    resolution_on_detection,
     sam_model_name,
     dino_model_name,
     cfg_scale,
@@ -213,6 +214,7 @@ def generate(
         dino_model_name,
         box_threshold,
         mask_expand,
+        resolution_on_detection,
         
         steps,
         sampler,
@@ -241,6 +243,9 @@ def generate(
 
     for image in images:
         if shared.state.interrupted:
+            if needAutoUnloadModels():
+                from scripts.sam import clear_cache
+                clear_cache()
             break
         
         progressInfo = "Generate mask"
