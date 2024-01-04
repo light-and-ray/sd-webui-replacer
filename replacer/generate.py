@@ -15,6 +15,15 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels
 )
 
+g_clear_cache = None
+
+def clearCache():
+    global g_clear_cache
+    if g_clear_cache is None:
+        from scripts.sam import clear_cache
+        g_clear_cache = clear_cache
+    g_clear_cache()
+
 
 
 
@@ -54,7 +63,7 @@ def inpaint(
         image_cfg_scale=1.5,
         inpaint_full_res=True,
         inpaint_full_res_padding=gArgs.inpaint_full_res_padding,
-        inpainting_mask_invert=False,
+        inpainting_mask_invert=gArgs.inpainting_mask_invert,
         override_settings=override_settings,
         do_not_save_samples=True,
     )
@@ -103,14 +112,15 @@ def generateSingle(
     save_to_dirs : bool,
     extra_includes : list,
 ):
-    masksCreator = MasksCreator(gArgs.detectionPrompt, image, gArgs.samModel,
+    masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
         gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.resolutionOnDetection)
 
     maskNum = gArgs.seed % len(masksCreator.previews)
 
     maskPreview = masksCreator.previews[maskNum]
-    gArgs.mask = masksCreator.masksExpanded[maskNum]
+    gArgs.mask = masksCreator.masks[maskNum]
     maskCutted = masksCreator.cutted[maskNum]
+    maskBox = masksCreator.boxes[maskNum]
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
 
@@ -119,6 +129,8 @@ def generateSingle(
     
     if "mask" in extra_includes:
         resultImages.append(gArgs.mask)
+    if "box" in extra_includes:
+        resultImages.append(maskBox)
     if "cutted" in extra_includes:
         resultImages.append(maskCutted)
     if "preview" in extra_includes:
@@ -130,6 +142,7 @@ def generateSingle(
 
 def generate(
     detectionPrompt: str,
+    avoidancePrompt: str,
     positvePrompt: str,
     negativePrompt: str,
     tab_index,
@@ -156,6 +169,7 @@ def generate(
     batch_count,
     height,
     batch_size,
+    inpainting_mask_invert,
     save_grid,
     extra_includes,
 ):
@@ -164,6 +178,7 @@ def generate(
 
     if detectionPrompt == '':
         detectionPrompt = getDetectionPromptExamples()[0]
+    detectionPrompt = detectionPrompt.strip()
 
     if positvePrompt == '' and useFirstPositivePromptFromExamples():
         positvePrompt = getPositivePromptExamples()[0]
@@ -174,6 +189,7 @@ def generate(
     if (seed == -1):
         seed = int(random.randrange(4294967294))
 
+    avoidancePrompt = avoidancePrompt.strip()
 
     images = []
     if tab_index == 0:
@@ -216,6 +232,7 @@ def generate(
         positvePrompt,
         negativePrompt,
         detectionPrompt,
+        avoidancePrompt,
         None,
         upscalerForImg2Img,
         seed,
@@ -237,6 +254,7 @@ def generate(
         width,
         inpaint_padding,
         img2img_fix_steps,
+        inpainting_mask_invert,
 
         images,
         generationsN,
@@ -253,8 +271,7 @@ def generate(
     for image in images:
         if shared.state.interrupted:
             if needAutoUnloadModels():
-                from scripts.sam import clear_cache
-                clear_cache()
+                clearCache()
             break
         
         progressInfo = "Generate mask"
@@ -282,8 +299,7 @@ def generate(
             print(f'    [{EXT_NAME}]    Exception: {e}')
             i += 1
             if needAutoUnloadModels():
-                from scripts.sam import clear_cache
-                clear_cache()
+                clearCache()
             if generationsN == 1:
                 raise
             shared.state.nextjob()
@@ -384,8 +400,7 @@ def applyHiresFix(
     processed_comments = ""
 
     if hf_unload_detection_models:
-        from scripts.sam import clear_cache
-        clear_cache()
+        clearCache()
 
     for image in gArgs.images:
         saveDir = getSaveDir()

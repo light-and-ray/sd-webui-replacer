@@ -1,4 +1,4 @@
-from PIL import ImageChops, Image
+from PIL import ImageChops, Image, ImageOps
 from replacer.options import needAutoUnloadModels
 sam_predict = None
 update_mask = None
@@ -48,9 +48,10 @@ masksCreatorCached = None
 
 
 class MasksCreator:
-    def __init__(self, detectionPrompt, image, samModel, grdinoModel, boxThreshold,
+    def __init__(self, detectionPrompt, avoidancePrompt, image, samModel, grdinoModel, boxThreshold,
             maskExpand, resolutionOnDetection):
         self.detectionPrompt = detectionPrompt
+        self.avoidancePrompt = avoidancePrompt
         self.image = image
         self.samModel = samModel
         self.grdinoModel = grdinoModel
@@ -62,6 +63,7 @@ class MasksCreator:
 
         if masksCreatorCached is not None and \
                 self.detectionPrompt == masksCreatorCached.detectionPrompt and\
+                self.avoidancePrompt == masksCreatorCached.avoidancePrompt and\
                 self.samModel == masksCreatorCached.samModel and\
                 self.grdinoModel == masksCreatorCached.grdinoModel and\
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
@@ -69,8 +71,9 @@ class MasksCreator:
                 self.resolutionOnDetection == masksCreatorCached.resolutionOnDetection and\
                 areImagesTheSame(self.image, masksCreatorCached.image):
             self.previews = masksCreatorCached.previews
-            self.masksExpanded = masksCreatorCached.masksExpanded
+            self.masks = masksCreatorCached.masks
             self.cutted = masksCreatorCached.cutted
+            self.boxes = masksCreatorCached.boxes
             print('MasksCreator restored from cache')
         else:
             self._createMasks()
@@ -86,18 +89,38 @@ class MasksCreator:
         print(samLog)
         if len(masks) == 0:
             raise NothingDetectedError()
-
-        if needAutoUnloadModels():
-            clear_cache()
-
+        boxes = [masks[0], masks[1], masks[2]]
         masks = [masks[3], masks[4], masks[5]]
 
         self.previews = []
-        self.masksExpanded = []
+        self.masks = []
         self.cutted = []
+        self.boxes = boxes
 
         for mask in masks:
             expanded = update_mask(mask, 0, self.maskExpand, imageResized)
             self.previews.append(expanded[0])
-            self.masksExpanded.append(expanded[1].resize(self.image.size))
+            self.masks.append(expanded[1])
             self.cutted.append(expanded[2])
+
+        if self.avoidancePrompt != "":
+            negativeMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
+                self.grdinoModel, self.avoidancePrompt, self.boxThreshold, False, [])
+            print(samLog)
+            if len(negativeMasks) == 0:
+                print('nothing has been detected by avoid prompt')
+            else:
+                negativeMasks = [negativeMasks[3], negativeMasks[4], negativeMasks[5]]
+                for i in range(len(self.masks)):
+                    maskTmp = ImageOps.invert(self.masks[i].convert('L'))
+                    negativeMasks[i] = negativeMasks[i].convert('L')
+                    maskTmp.paste(negativeMasks[i], negativeMasks[i])
+                    self.masks[i] = ImageOps.invert(maskTmp)
+
+                    self.previews[i].paste(negativeMasks[i], negativeMasks[i])
+
+        for i in range(len(self.masks)):
+            self.masks[i] = self.masks[i].resize(self.image.size)
+
+        if needAutoUnloadModels():
+            clear_cache()

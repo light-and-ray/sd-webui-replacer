@@ -38,6 +38,13 @@ detectionPromptExamples_defaults = [
             "t-shirt",
         ]
 
+avoidancePromptExamples_defaults = [
+            "",
+            "face",
+            "hairstyle",
+            "clothes",
+        ]
+
 positvePromptExamples_defaults = [
             "waterfall",
             "photo of blonde girl",
@@ -61,6 +68,13 @@ def getDetectionPromptExamples():
     res : str = shared.opts.data.get(EXT_NAME_LOWER + "_detection_prompt_examples", "")
     if res == "":
         return detectionPromptExamples_defaults
+    else:
+        return res.split("\n")
+    
+def getAvoidancePromptExamples():
+    res : str = shared.opts.data.get(EXT_NAME_LOWER + "_avoidance_prompt_examples", "")
+    if res == "":
+        return avoidancePromptExamples_defaults
     else:
         return res.split("\n")
     
@@ -159,6 +173,20 @@ def on_ui_settings():
             {
                 "lines" : 2,
                 "placeholder" : "\n".join(detectionPromptExamples_defaults),
+            },
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_avoidance_prompt_examples",
+        shared.OptionInfo(
+            "",
+            "Override Avoidance prompt examples",
+            gr.Textbox,
+            {
+                "lines" : 2,
+                "placeholder" : "\n".join(avoidancePromptExamples_defaults),
             },
             section=section,
         ).needs_reload_ui()

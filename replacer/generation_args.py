@@ -6,6 +6,7 @@ class GenerationArgs:
     positvePrompt: Any
     negativePrompt: Any
     detectionPrompt: Any
+    avoidancePrompt: Any
     mask: Any
     upscalerForImg2Img: Any
     seed: Any
@@ -26,6 +27,7 @@ class GenerationArgs:
     width: Any
     inpaint_full_res_padding: Any
     img2img_fix_steps: Any
+    inpainting_mask_invert : Any
     images: Any
     generationsN: Any
     save_grid : Any

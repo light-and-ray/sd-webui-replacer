@@ -8,7 +8,7 @@ from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSe
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
-    needHideSegmentAnythingAccordions, needAutoUnloadModels
+    needHideSegmentAnythingAccordions, needAutoUnloadModels, getAvoidancePromptExamples,
 )
 
 
@@ -79,6 +79,19 @@ def on_ui_tabs():
                     gr.Examples(
                         examples=getDetectionPromptExamples(),
                         inputs=detectionPrompt,
+                        label="",
+                    )
+
+                with gr.Row():
+                    avoidancePrompt = gr.Textbox(label="Avoidance prompt",
+                                        show_label=True,
+                                        lines=1,
+                                        elem_classes=["avoidancePrompt"],
+                                        placeholder=None)
+
+                    gr.Examples(
+                        examples=getAvoidancePromptExamples(),
+                        inputs=avoidancePrompt,
                         label="",
                     )
 
@@ -234,9 +247,17 @@ def on_ui_tabs():
                         )
 
                     with gr.Row():
+                        inpainting_mask_invert = gr.Radio(
+                            label='Mask mode',
+                            choices=['Inpaint masked', 'Inpaint not masked'],
+                            value='Inpaint masked',
+                            type="index",
+                            elem_id="replacer_mask_mode")
+
+                    with gr.Row():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
                         extra_includes = gr.CheckboxGroup(
-                            choices=["mask", "cutted", "preview"],
+                            choices=["mask", "box", "cutted", "preview"],
                             label="Extra include in gallery",
                             type="value",
                             elem_id=f"replacer_extra_includes",
@@ -380,6 +401,7 @@ def on_ui_tabs():
             inputs=[
                 dummy_component,
                 detectionPrompt,
+                avoidancePrompt,
                 positvePrompt,
                 negativePrompt,
                 tab_index,
@@ -406,6 +428,7 @@ def on_ui_tabs():
                 batch_count,
                 height,
                 batch_size,
+                inpainting_mask_invert,
                 save_grid,
                 extra_includes,
             ],
