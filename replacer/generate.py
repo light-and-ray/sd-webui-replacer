@@ -372,6 +372,7 @@ def applyHiresFix(
     hf_cfg_scale,
     hfPositivePromptSuffix,
     hf_size_limit,
+    hf_above_limit_upscaler,
     hf_unload_detection_models,
 ):
     shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
@@ -418,10 +419,10 @@ def applyHiresFix(
         hrArgs.height, hrArgs.width = image.size
         if hrArgs.height > hf_size_limit:
             hrArgs.height = hf_size_limit
-            hrArgs.upscalerForImg2Img = hf_upscaler
+            hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
         if hrArgs.width > hf_size_limit:
             hrArgs.width = hf_size_limit
-            hrArgs.upscalerForImg2Img = hf_upscaler
+            hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
 
         resultImages, generation_info_js, processed_info, processed_comments = \
             applyHiresFixSingle(image, gArgs, hrArgs, saveDir)

@@ -153,14 +153,10 @@ def on_ui_settings():
         shared.OptionInfo(
             False,
             f"Always unload detection models after generation",
-            gr.Checkbox,
-            {
-                "info" : "Significally increases detection time. "\
-                         "Doesn't have effect if webui is in --lowvram or --medvram mode. "\
-                         "In these modes this behavior is default.",
-            },
             section=section,
-        )
+        ).info("Significally increases detection time. "\
+               "Doesn't have effect if webui is in --lowvram or --medvram mode. "\
+               "In these modes this behavior is default.")
     )
 
 

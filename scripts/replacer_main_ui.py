@@ -373,6 +373,12 @@ def on_ui_tabs():
                                 elem_id="hf_size_limit"
                             )
 
+                            hf_above_limit_upscaler = gr.Dropdown(
+                                value="Lanczos",
+                                choices=[x.name for x in shared.sd_upscalers],
+                                label="Above limit upscaler",
+                            )
+
                             hf_unload_detection_models = gr.Checkbox(
                                 label='Unload detection models before hires fix',
                                 value=True
@@ -454,6 +460,7 @@ def on_ui_tabs():
                 hf_cfg_scale,
                 hfPositivePromptSuffix,
                 hf_size_limit,
+                hf_above_limit_upscaler,
                 hf_unload_detection_models,
             ],
             outputs=[
