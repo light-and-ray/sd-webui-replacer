@@ -394,7 +394,8 @@ def applyHiresFix(
     hrArgs.denoising_strength = hf_denoise
     if not hf_sampler == 'Use same sampler':
         hrArgs.sampler_name = hf_sampler
-    hrArgs.steps = hf_steps
+    if hf_steps != 0:
+        hrArgs.steps = hf_steps
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True

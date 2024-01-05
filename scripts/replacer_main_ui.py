@@ -314,7 +314,7 @@ def on_ui_tabs():
                                 label='Hires steps',
                                 value=4,
                                 step=1,
-                                minimum=1,
+                                minimum=0,
                                 maximum=150,
                                 elem_id="hf_steps"
                             )
