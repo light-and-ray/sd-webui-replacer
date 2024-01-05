@@ -1,7 +1,7 @@
 import gradio as gr
 from modules import scripts, shared, sd_samplers, ui_toprow, ui, script_callbacks
 from modules.shared import cmd_opts
-from modules.ui_components import ToolButton
+from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call
 from modules.ui_common import create_output_panel, refresh_symbol
 from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
@@ -64,7 +64,7 @@ def on_ui_tabs():
         tab_index = gr.State(value=0)
         dummy_component = gr.Label(visible=False)
 
-        with gr.Row():
+        with ResizeHandleRow():
 
             with gr.Column():
 
