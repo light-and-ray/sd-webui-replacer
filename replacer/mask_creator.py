@@ -16,7 +16,7 @@ def initSamDependencies():
 
 
 def limitSizeByOneDemention(image: Image, size):
-    h, w = image.size
+    w, h = image.size
     if h > w:
         if h > size:
             w = size / h * w
@@ -26,7 +26,7 @@ def limitSizeByOneDemention(image: Image, size):
             h = size / w * h
             w = size
 
-    return image.resize((int(h), int(w)))
+    return image.resize((int(w), int(h)))
 
 
 
@@ -36,6 +36,8 @@ class NothingDetectedError(Exception):
 
 
 def areImagesTheSame(image_one, image_two):
+    if image_one.size != image_two.size:
+        return False
     diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
 
     if diff.getbbox():

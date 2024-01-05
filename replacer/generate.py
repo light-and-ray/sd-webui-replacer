@@ -40,6 +40,16 @@ def inpaint(
     if gArgs.img2img_fix_steps is not None and gArgs.img2img_fix_steps != "":
         override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
+    inpainting_fill = gArgs.inpainting_fill
+    if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
+        inpainting_fill = 1 # original
+        try:
+            from lama_cleaner_masked_content.inpaint import lamaInpaint
+            from lama_cleaner_masked_content.options import getUpscaler
+            image = lamaInpaint(image, gArgs.mask, getUpscaler())
+        except Exception as e:
+            print(f'[{EXT_NAME}]: {e}')
+
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
         outpath_samples=opts.outdir_samples or opts.outdir_img2img_samples,
@@ -57,7 +67,7 @@ def inpaint(
         init_images=[image],
         mask=gArgs.mask,
         mask_blur=gArgs.mask_blur,
-        inpainting_fill=gArgs.inpainting_fill,
+        inpainting_fill=inpainting_fill,
         resize_mode=0,
         denoising_strength=gArgs.denoising_strength,
         image_cfg_scale=1.5,

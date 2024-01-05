@@ -36,6 +36,8 @@ I do not recommend change these options, if you don't know what you do
 
 ![](images/img2.jpg)
 
+It supports my other extension ["Lama cleaner as masked content"](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
+
 
 ### Extention name
 If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory. 
