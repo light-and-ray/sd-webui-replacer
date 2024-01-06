@@ -46,7 +46,7 @@ def inpaint(
         try:
             from lama_cleaner_masked_content.inpaint import lamaInpaint
             from lama_cleaner_masked_content.options import getUpscaler
-            image = lamaInpaint(image, gArgs.mask, getUpscaler())
+            image = lamaInpaint(image, gArgs.mask, gArgs.inpainting_mask_invert, getUpscaler())
         except Exception as e:
             print(f'[{EXT_NAME}]: {e}')
 
