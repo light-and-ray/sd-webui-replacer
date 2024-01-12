@@ -1,4 +1,6 @@
 import os
+import subprocess
+import cv2
 import copy
 import random
 from contextlib import closing
@@ -161,6 +163,8 @@ def generate(
     input_batch_dir,
     output_batch_dir,
     show_batch_dir_results,
+    input_batch_video,
+    input_batch_video_fps,
     upscalerForImg2Img,
     seed,
     sampler,
@@ -183,6 +187,7 @@ def generate(
     save_grid,
     extra_includes,
 ):
+    global fps_in, fps_out
     shared.state.begin(job=EXT_NAME_LOWER)
     shared.total_tqdm.clear()
 
@@ -202,6 +207,7 @@ def generate(
     avoidancePrompt = avoidancePrompt.strip()
 
     images = []
+    print(tab_index)
     if tab_index == 0:
         images = [image_single]
         generationsN = 1
@@ -220,6 +226,7 @@ def generate(
 
 
     if tab_index == 2:
+        print("wtf",input_batch_dir)
         def readImages(input_dir):
             assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
             assert input_dir, 'input directory not selected'
@@ -232,7 +239,77 @@ def generate(
                     continue
                 yield image
         images = readImages(input_batch_dir)
+        print("wtffff")
         generationsN = len(shared.listfiles(input_batch_dir))
+
+    fps_in = 0
+    fps_out = 0
+    if tab_index == 3:
+        print("video",input_batch_dir)
+        def separate_video_into_frames(video_path, fps, temp_folder):
+            global fps_in, fps_out
+            assert video_path, 'video not selected'
+            assert temp_folder, 'temp folder not specified'
+
+            # Create the temporary folder if it doesn't exist
+            os.makedirs(temp_folder, exist_ok=True)
+
+            # Open the video file
+            video = cv2.VideoCapture(video_path)
+            fps_in = video.get(cv2.CAP_PROP_FPS)
+            fps_out = fps
+            print(fps_in, fps_out)
+            
+            index_in = -1
+            index_out = -1
+
+            # Read frames from the video and save them as images
+            frame_count = 0
+            while True:
+                success = video.grab()
+                if not success: break
+                index_in += 1
+
+                out_due = int(index_in / fps_in * fps_out)
+                print(index_in, out_due, index_out)
+                if out_due > index_out:
+                    success, frame = video.retrieve()
+                    if not success: break
+                    index_out += 1
+                    # Save the frame as an image in the temporary folder
+                    frame_path = os.path.join(temp_folder, f"frame_{frame_count}.jpg")
+                    cv2.imwrite(frame_path, frame)
+
+                    frame_count += 1
+
+            # Release the video file
+            video.release()
+        def readImages(input_dir):
+            assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
+            assert input_dir, 'input directory not selected'
+
+            image_list = shared.listfiles(input_dir)
+            for filename in image_list:
+                try:
+                    image = Image.open(filename).convert('RGBA')
+                except Exception:
+                    continue
+                yield image
+        def getVideoFrames(video_path, fps):
+            assert video_path, 'video not selected'
+            assert fps, 'fps not specified'
+            temp_folder = os.path.join(os.path.dirname(video_path), 'temp')
+            if os.path.exists(temp_folder):
+                for file in os.listdir(temp_folder):
+                    os.remove(os.path.join(temp_folder, file))
+            separate_video_into_frames(video_path, fps, temp_folder)
+            return readImages(temp_folder)
+        video_batch_path = input_batch_video
+        temp_batch_folder = os.path.join(os.path.dirname(video_batch_path), 'temp')
+        images = getVideoFrames(video_batch_path, input_batch_video_fps)
+        generationsN = len(shared.listfiles(temp_batch_folder))
+        output_batch_dir = output_batch_dir + f'_{seed}'
+            
 
     shared.state.job_count = generationsN*batch_count
 
@@ -296,7 +373,7 @@ def generate(
 
         saveDir = ""
         save_to_dirs = True
-        if tab_index == 2:
+        if tab_index == 2 or tab_index == 3:
             saveDir = output_batch_dir
             save_to_dirs = False
         else:
@@ -315,17 +392,42 @@ def generate(
             shared.state.nextjob()
             continue
 
-        if not (tab_index == 2 and not show_batch_dir_results):
+        if not ((tab_index == 2 or tab_index == 3) and not show_batch_dir_results):
             resultImages += newImages
 
         i += 1
 
+    print(resultImages)
 
     if tab_index == 1:
         gArgs.images = getImages(image_batch)
     if tab_index == 2:
         gArgs.images = readImages(input_batch_dir)
+    print("generate done, generating video")
+    if tab_index == 3:
+        def generate_video(frames_dir, frames_fps, org_video, output_path, target_fps):
+            ffmpeg_cmd = [
+                'ffmpeg',
+                '-framerate', str(frames_fps),
+                '-i', os.path.join(frames_dir, '%5d-' + f'{seed}' + '.png'),
+                '-r', str(frames_fps),
+                '-i', org_video,
+                '-map', '0:v:0',
+                '-map', '1:a:0',
+                '-c:v', 'libx264',
+                '-c:a', 'aac',
+                '-vf', f'fps={target_fps}',
+                '-shortest',
+                '-y',
+                output_path
+            ]
+            print(' '.join(str(v) for v in ffmpeg_cmd))
+            subprocess.run(ffmpeg_cmd)
+        # Example usage
+        output_path = os.path.join(output_batch_dir, f'output_{os.path.basename(input_batch_video)}_{seed}.mp4')
+        generate_video(output_batch_dir, fps_out, input_batch_video, output_path, fps_in)
 
+        
     global lastGenerationArgs
     lastGenerationArgs = gArgs
     shared.state.end()
