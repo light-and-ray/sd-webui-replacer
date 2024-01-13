@@ -277,10 +277,10 @@ def on_ui_tabs():
                         output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="output_batch_dir")
                         show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
 
-
-
-
-
+                    with gr.TabItem('Video', id="batch_from_video", elem_id="batch_video_tab") as tab_batch_video:
+                        input_batch_video = gr.Textbox(label="Input video", **shared.hide_dirs, placeholder="A video on the same machine where the server is running.", elem_id="input_batch_dir")
+                        input_batch_video_fps = gr.Number(label='FPS', value=10, elem_id="input_batch_video_fps", min_width=100, precision=0)
+                        output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="output_batch_dir")
 
             with gr.Column():
                 with gr.Row():
@@ -395,10 +395,15 @@ def on_ui_tabs():
 
         def tab_batch_dir_on_select():
             return 2, gr.Button.update(visible=False)
+        
+        def tab_batch_video_on_select():
+            print("video selected")
+            return 3, gr.Button.update(visible=False)
 
         tab_single.select(fn=tab_single_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
         tab_batch.select(fn=tab_batch_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
         tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
+        tab_batch_video.select(fn=tab_batch_video_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
 
 
         run_button.click(
@@ -416,6 +421,8 @@ def on_ui_tabs():
                 input_batch_dir,
                 output_batch_dir,
                 show_batch_dir_results,
+                input_batch_video,
+                input_batch_video_fps,
                 upscalerForImg2Img,
                 seed,
                 sampler,
