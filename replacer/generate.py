@@ -344,10 +344,6 @@ def generate(
             continue
         
         batch_processed = processed
-
-        if not ((tab_index == 2 or tab_index == 3) and not show_batch_dir_results):
-            allExtraImages += extraImages
-
         i += 1
 
     if tab_index == 1:
@@ -363,6 +359,9 @@ def generate(
     global lastGenerationArgs
     lastGenerationArgs = gArgs
     shared.state.end()
+
+    if (tab_index == 2 and not show_batch_dir_results) or tab_index == 3:
+        return [], "", plaintext_to_html(f"Saved into {output_path}"), ""
 
     processed.images += allExtraImages
     processed.infotexts += [processed.info] * len(allExtraImages)
