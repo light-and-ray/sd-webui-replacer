@@ -27,4 +27,11 @@ titles = {
     "Max resolution on detection": "If one side of the image is smaller than that, it will be resized before detection. It doesn't have effect on inpainting. Reduces vram usage and mask generation time.",
     "Mask Expand": "Mask dilation, px, releative to \"Max resolution on detection\"",
 };
-  
+
+
+let replacer_gallery = undefined;
+onAfterUiUpdate(function() {
+    if (!replacer_gallery) {
+        replacer_gallery = attachGalleryListeners("replacer");
+    }
+});

@@ -102,7 +102,6 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - ☑️ "hide segment anything extention" option
 - txt2img script
 - allow multiply instances
-- ADetiler as method for mask generation
 
 ### small todo:
 - add detection parametres in metadata

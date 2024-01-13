@@ -3,7 +3,7 @@ from modules import scripts, shared, sd_samplers, ui_toprow, ui, script_callback
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call
-from modules.ui_common import create_output_panel, refresh_symbol
+from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
 from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
@@ -61,7 +61,7 @@ class Script(scripts.Script):
 def on_ui_tabs():
     with gr.Blocks() as replacer:
 
-        tab_index = gr.State(value=0)
+        tab_index = gr.Number(value=0, visible=False)
         dummy_component = gr.Label(visible=False)
 
         with ResizeHandleRow():
@@ -130,7 +130,7 @@ def on_ui_tabs():
                         label="",
                     )
 
-                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=EXT_NAME_LOWER)
+                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit
                 run_button.variant = 'secondary'
@@ -285,17 +285,25 @@ def on_ui_tabs():
             with gr.Column():
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
-                        outputPanel = create_output_panel(EXT_NAME_LOWER, getSaveDir())
+                        outputPanel = create_output_panel('replacer', getSaveDir())
                         img2img_gallery = outputPanel.gallery
                         generation_info = outputPanel.infotext
                         html_info = outputPanel.html_info
                         html_log = outputPanel.html_log
                     else:
                         img2img_gallery, generation_info, html_info, html_log = \
-                            create_output_panel(EXT_NAME_LOWER, getSaveDir())
+                            create_output_panel('replacer', getSaveDir())
+                    generation_info_button = gr.Button(visible=False, elem_id=f"replacer_generation_info_button")
+                    generation_info_button.click(
+                        fn=update_generation_info,
+                        _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
+                        inputs=[generation_info, html_info, html_info],
+                        outputs=[html_info, html_info],
+                        show_progress=False,
+                    )
 
                 with gr.Row():
-                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{EXT_NAME_LOWER}_hf')
+                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'replacer_hf')
                     toprow.create_inline_toprow_image()
                     apply_hires_fix_button = toprow.submit
                     apply_hires_fix_button.variant = 'secondary'
@@ -397,7 +405,6 @@ def on_ui_tabs():
             return 2, gr.Button.update(visible=False)
         
         def tab_batch_video_on_select():
-            print("video selected")
             return 3, gr.Button.update(visible=False)
 
         tab_single.select(fn=tab_single_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
@@ -407,7 +414,7 @@ def on_ui_tabs():
 
 
         run_button.click(
-            _js=getSubmitJsFunction(EXT_NAME_LOWER, EXT_NAME_LOWER),
+            _js=getSubmitJsFunction('replacer', 'replacer'),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -456,7 +463,7 @@ def on_ui_tabs():
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction(EXT_NAME_LOWER, f'{EXT_NAME_LOWER}_hf'),
+            _js=getSubmitJsFunction('replacer', f'replacer_hf'),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,

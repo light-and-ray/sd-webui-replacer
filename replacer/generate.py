@@ -4,7 +4,7 @@ import random
 from contextlib import closing
 from PIL import Image
 import modules.shared as shared
-from modules.processing import StableDiffusionProcessingImg2Img, process_images
+from modules.processing import StableDiffusionProcessingImg2Img, process_images, Processed
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
@@ -33,13 +33,17 @@ def inpaint(
     gArgs : GenerationArgs,
     savePath : str = "",
     saveSuffix : str = "",
-    save_to_dirs : bool = True
+    save_to_dirs : bool = True,
+    samples_filename_pattern : str = "",
+    batch_processed : Processed = None
 ):
     override_settings = {}
     if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
     if gArgs.img2img_fix_steps is not None and gArgs.img2img_fix_steps != "":
         override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
+    if samples_filename_pattern != "":
+        override_settings["samples_filename_pattern"] = samples_filename_pattern
 
     inpainting_fill = gArgs.inpainting_fill
     if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
@@ -81,7 +85,6 @@ def inpaint(
 
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
     p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
-    is_batch = (gArgs.n_iter > 1 or gArgs.batch_size > 1)
     p.seed = gArgs.seed
     p.do_not_save_grid = not gArgs.save_grid
     
@@ -90,18 +93,21 @@ def inpaint(
     with closing(p):
         processed = process_images(p)
 
-    generation_info_js = processed.js()
-
 
     if savePath != "":
-        for imageToSave in processed.images:
-            save_image(imageToSave, savePath, "", gArgs.seed, gArgs.positvePrompt, opts.samples_format,
-                    info=processed.info, p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
+        for i in range(len(processed.images)):
+            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
+                    info=processed.infotext(p, i), p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
         processed.images = []
 
-    return processed.images, generation_info_js, plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+    if batch_processed:
+        batch_processed.images += processed.images
+        batch_processed.infotexts += processed.infotexts
+        processed = batch_processed
+
+    return processed
 
 
 
@@ -122,6 +128,8 @@ def generateSingle(
     saveSuffix : str,
     save_to_dirs : bool,
     extra_includes : list,
+    samples_filename_pattern : str,
+    batch_processed : list,
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
         gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection)
@@ -135,19 +143,20 @@ def generateSingle(
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
 
-    resultImages, generation_info_js, processed_info, processed_comments = \
-        inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs)
-    
-    if "mask" in extra_includes:
-        resultImages.append(gArgs.mask)
-    if "box" in extra_includes:
-        resultImages.append(maskBox)
-    if "cutted" in extra_includes:
-        resultImages.append(maskCutted)
-    if "preview" in extra_includes:
-        resultImages.append(maskPreview)
+    processed = inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs,
+        samples_filename_pattern, batch_processed)
 
-    return resultImages, generation_info_js, processed_info, processed_comments
+    extraImages = []
+    if "mask" in extra_includes:
+        extraImages.append(gArgs.mask)
+    if "box" in extra_includes:
+        extraImages.append(maskBox)
+    if "cutted" in extra_includes:
+        extraImages.append(maskCutted)
+    if "preview" in extra_includes:
+        extraImages.append(maskPreview)
+
+    return processed, extraImages
 
 
 
@@ -285,12 +294,10 @@ def generate(
         save_grid,
         )
 
-    resultImages = []
-    generation_info_js = ""
-    processed_info = ""
-    processed_comments = ""
     i = 1
     n = generationsN
+    allExtraImages = []
+    batch_processed = None
 
     for image in images:
         if shared.state.interrupted:
@@ -316,9 +323,13 @@ def generate(
         else:
             saveDir = getSaveDir()
 
+        samples_filename_pattern = ""
+        if tab_index == 3:
+            samples_filename_pattern = "[seed]"
+
         try:
-            newImages, generation_info_js, processed_info, processed_comments = \
-                    generateSingle(image, gArgs, saveDir, "", save_to_dirs, extra_includes)
+            processed, extraImages = generateSingle(image, gArgs, saveDir, "", save_to_dirs, extra_includes,
+                    samples_filename_pattern, batch_processed)
         except Exception as e:
             print(f'    [{EXT_NAME}]    Exception: {e}')
             i += 1
@@ -331,9 +342,11 @@ def generate(
                         opts.samples_format, save_to_dirs=False)
             shared.state.nextjob()
             continue
+        
+        batch_processed = processed
 
         if not ((tab_index == 2 or tab_index == 3) and not show_batch_dir_results):
-            resultImages += newImages
+            allExtraImages += extraImages
 
         i += 1
 
@@ -351,7 +364,10 @@ def generate(
     lastGenerationArgs = gArgs
     shared.state.end()
 
-    return resultImages, generation_info_js, processed_info, processed_comments
+    processed.images += allExtraImages
+    processed.infotexts += [processed.info] * len(allExtraImages)
+
+    return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
 
 
 
@@ -364,23 +380,18 @@ def applyHiresFixSingle(
     saveDir : str,
 ):
     shared.state.textinfo = "inpaint with upscaler"
-    generatedImages, _, _, _ = inpaint(image, gArgs)
+    processed = inpaint(image, gArgs)
+    generatedImages = processed.images
 
-    resultImages = []
-    generation_info_js = ""
-    processed_info = ""
-    processed_comments = ""
     n = len(generatedImages)
     if n > 1: 
         print(f'    [{EXT_NAME}]    hiresfix batch count*size {n} for single image')
 
     for generatedImage in generatedImages:
         shared.state.textinfo = "hiresfix"
-        newImages, generation_info_js, processed_info, processed_comments = \
-            inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
-        resultImages += newImages
+        processed = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
 
-    return resultImages, generation_info_js, processed_info, processed_comments
+    return processed
 
 
 
@@ -445,12 +456,11 @@ def applyHiresFix(
             hrArgs.width = hf_size_limit
             hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
 
-        resultImages, generation_info_js, processed_info, processed_comments = \
-            applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
+        processed : Processed = applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
 
     shared.state.end()
 
-    return resultImages, generation_info_js, processed_info, processed_comments
+    return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
 
 
 def generate_webui(id_task, *args, **kwargs):

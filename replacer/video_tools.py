@@ -74,7 +74,7 @@ def save_video(frames_dir, frames_fps, org_video, output_path, target_fps, seed)
     ffmpeg_cmd = [
         'ffmpeg',
         '-framerate', str(frames_fps),
-        '-i', os.path.join(frames_dir, f'%5d-{seed}.png'),
+        '-i', os.path.join(frames_dir, f'%5d-{seed}.{shared.opts.samples_format}'),
         '-r', str(frames_fps),
         '-i', org_video,
         '-map', '0:v:0',
