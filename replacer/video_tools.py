@@ -1,7 +1,6 @@
 import subprocess
 import cv2
 import os
-import glob
 import modules.shared as shared
 from PIL import Image
 
@@ -72,12 +71,10 @@ def getVideoFrames(video_path, fps):
 
 
 def save_video(frames_dir, frames_fps, org_video, output_path, target_fps, seed):
-    # frames = glob.glob(os.path.join(frames_dir, f'*{seed}*'))
-    # frames.sort()
     ffmpeg_cmd = [
         'ffmpeg',
         '-framerate', str(frames_fps),
-        '-i', os.path.join(frames_dir, '%5d-' + f'{seed}' + '.png'),
+        '-i', os.path.join(frames_dir, f'%5d-{seed}.png'),
         '-r', str(frames_fps),
         '-i', org_video,
         '-map', '0:v:0',

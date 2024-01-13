@@ -326,6 +326,9 @@ def generate(
                 clearCache()
             if generationsN == 1:
                 raise
+            if tab_index == 3:
+                save_image(image, saveDir, "", gArgs.seed, gArgs.positvePrompt,
+                        opts.samples_format, save_to_dirs=False)
             shared.state.nextjob()
             continue
 

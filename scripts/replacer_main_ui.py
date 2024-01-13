@@ -14,9 +14,9 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
 
 try:
     from modules.ui_common import OutputPanel # webui 1.8+
-    OUTPUT_PANEL_AWALIABLE = True
+    OUTPUT_PANEL_AVALIABLE = True
 except Exception as e:
-    OUTPUT_PANEL_AWALIABLE = False
+    OUTPUT_PANEL_AVALIABLE = False
 
 
 
@@ -284,7 +284,7 @@ def on_ui_tabs():
 
             with gr.Column():
                 with gr.Row():
-                    if OUTPUT_PANEL_AWALIABLE:
+                    if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel(EXT_NAME_LOWER, getSaveDir())
                         img2img_gallery = outputPanel.gallery
                         generation_info = outputPanel.infotext
