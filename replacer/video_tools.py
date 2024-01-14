@@ -69,7 +69,7 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
         '-r', str(fps),
         '-i', org_video,
         '-map', '0:v:0',
-        '-map', '1:a:0',
+        '-map', '1:a:0?',
         '-c:v', 'libx264',
         '-c:a', 'aac',
         '-vf', f'fps={fps}',
