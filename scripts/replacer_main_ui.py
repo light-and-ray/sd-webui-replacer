@@ -283,7 +283,7 @@ def on_ui_tabs():
                             placeholder="A video on the same machine where the server is running.",
                             elem_id="replacer_input_video")
                         input_batch_video_fps = gr.Slider(
-                            label='FPS', value=25.0, min=0.0, step=0.1, max=240.0,
+                            label='FPS', value=10.0, min=0.0, step=0.1, max=60.0,
                             info="(0 = fps from input video)",
                             elem_id="replacer_video_fps")
                         output_batch_dir = gr.Textbox(
@@ -292,6 +292,13 @@ def on_ui_tabs():
                             placeholder="Leave blank to save images to the default path.",
                             info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
                             elem_id="replacer_output_batch_dir")
+                        gr.Markdown("To increase consistency it's better to inpaint clear "\
+                            "objects on video with good quality and enough context. "\
+                            "To suppress flickering you can generate in little fps (e.g. 10), "\
+                            "then interpolate (x2) it with ai interpolation algorithm "\
+                            "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
+                            "[frame interpolation in deforum sd-webui extension]("\
+                            "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))")
 
             with gr.Column():
                 with gr.Row():
