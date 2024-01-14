@@ -353,7 +353,7 @@ def generate(
     if tab_index == 3:
         print("generate done, generating video")
         output_path = os.path.join(output_batch_dir, f'output_{os.path.basename(input_batch_video)}_{seed}.mp4')
-        save_video(output_batch_dir, fps_out, input_batch_video, output_path, fps_in, seed)
+        save_video(output_batch_dir, fps_out, input_batch_video, output_path, seed)
 
         
     global lastGenerationArgs

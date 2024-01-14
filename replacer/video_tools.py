@@ -70,18 +70,18 @@ def getVideoFrames(video_path, fps):
     return readImages(temp_folder), fps_in, fps_out
 
 
-def save_video(frames_dir, frames_fps, org_video, output_path, target_fps, seed):
+def save_video(frames_dir, fps, org_video, output_path, seed):
     ffmpeg_cmd = [
         'ffmpeg',
-        '-framerate', str(frames_fps),
+        '-framerate', str(fps),
         '-i', os.path.join(frames_dir, f'%5d-{seed}.{shared.opts.samples_format}'),
-        '-r', str(frames_fps),
+        '-r', str(fps),
         '-i', org_video,
         '-map', '0:v:0',
         '-map', '1:a:0',
         '-c:v', 'libx264',
         '-c:a', 'aac',
-        '-vf', f'fps={target_fps}',
+        '-vf', f'fps={fps}',
         '-shortest',
         '-y',
         output_path

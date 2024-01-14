@@ -173,10 +173,10 @@ def on_ui_tabs():
 
                         max_resolution_on_detection = gr.Slider(
                             label='Max resolution on detection',
-                            value=1024,
+                            value=1280,
                             step=1,
                             minimum=64,
-                            maximum=2048,
+                            maximum=2560,
                             elem_id="replacer_max_resolution_on_detection"
                         )
 
@@ -199,7 +199,7 @@ def on_ui_tabs():
                             value=1.0, elem_id="replacer_denoise",
                             minimum=0.0, maximum=1.0, step=0.01)
                         inpaint_padding = gr.Slider(label='Padding',
-                            value=20, elem_id="replacer_inpaint_padding",
+                            value=40, elem_id="replacer_inpaint_padding",
                             minimum=0, maximum=250, step=1)
 
                     with gr.Row():
@@ -278,9 +278,21 @@ def on_ui_tabs():
                         show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
 
                     with gr.TabItem('Video', id="batch_from_video", elem_id="batch_video_tab") as tab_batch_video:
-                        input_batch_video = gr.Textbox(label="Input video", placeholder="A video on the same machine where the server is running.", elem_id="replacer_input_batch_dir")
-                        input_batch_video_fps = gr.Number(label='FPS', value=10, elem_id="input_batch_video_fps", info="(0 = fps from input video)", min_width=100, precision=0)
-                        output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="replacer_output_batch_dir")
+                        input_batch_video = gr.Textbox(
+                            label="Input video",
+                            placeholder="A video on the same machine where the server is running.",
+                            elem_id="replacer_input_video")
+                        input_batch_video_fps = gr.Number(
+                            label='FPS', value=25.0, min=0.0, step=0.1,
+                            info="(0 = fps from input video)",
+                            elem_id="replacer_video_fps")
+                        output_batch_dir = gr.Textbox(
+                            label="Output directory",
+                            **shared.hide_dirs,
+                            placeholder="Leave blank to save images to the default path.",
+                            info='default is "output_seed" in the same directory with input video',
+                            elem_id="replacer_output_batch_dir")
+                        gr.Markdown("You need to have installed `ffmpeg` in path to generate video")
 
             with gr.Column():
                 with gr.Row():
