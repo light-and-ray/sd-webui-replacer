@@ -343,6 +343,7 @@ def generate(
             shared.state.nextjob()
             continue
         
+        allExtraImages += extraImages
         batch_processed = processed
         i += 1
 
