@@ -3,6 +3,12 @@ import cv2
 import os
 import modules.shared as shared
 from PIL import Image
+try:
+    from imageio_ffmpeg import get_ffmpeg_exe
+    FFMPEG = get_ffmpeg_exe()
+except Exception as e:
+    FFMPEG = 'ffmpeg'
+
 
 def separate_video_into_frames(video_path, fps_out, temp_folder):
     assert video_path, 'video not selected'
@@ -20,7 +26,7 @@ def separate_video_into_frames(video_path, fps_out, temp_folder):
     video.release()
 
     ffmpeg_cmd = [
-        'ffmpeg',
+        FFMPEG,
         '-i', video_path,
         '-vf', f'fps={fps_out}',
         '-y',
@@ -57,7 +63,7 @@ def getVideoFrames(video_path, fps):
 
 def save_video(frames_dir, fps, org_video, output_path, seed):
     ffmpeg_cmd = [
-        'ffmpeg',
+        FFMPEG,
         '-framerate', str(fps),
         '-i', os.path.join(frames_dir, f'%5d-{seed}.{shared.opts.samples_format}'),
         '-r', str(fps),

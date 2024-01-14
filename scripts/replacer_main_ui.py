@@ -292,7 +292,6 @@ def on_ui_tabs():
                             placeholder="Leave blank to save images to the default path.",
                             info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
                             elem_id="replacer_output_batch_dir")
-                        gr.Markdown("You need to have installed `ffmpeg` in path to generate video")
 
             with gr.Column():
                 with gr.Row():
