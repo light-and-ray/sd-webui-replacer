@@ -26,10 +26,14 @@ def getSaveDir():
 
 
 def needAutoUnloadModels():
-    res: bool = shared.cmd_opts.lowvram or shared.cmd_opts.medvram
-    if not res:
-        res = shared.opts.data.get(EXT_NAME_LOWER + "_always_unload_models", False)
-    return res
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_always_unload_models", 'Automatic')
+
+    if opt == 'Enabled':
+        return True
+    if opt == 'Disabled':
+        return False
+
+    return shared.cmd_opts.lowvram or shared.cmd_opts.medvram
 
 
 detectionPromptExamples_defaults = [
@@ -151,12 +155,16 @@ def on_ui_settings():
     shared.opts.add_option(
         EXT_NAME_LOWER + "_always_unload_models",
         shared.OptionInfo(
-            False,
+            'Automatic',
             f"Always unload detection models after generation",
+            gr.Radio,
+            {
+                'choices' : ['Automatic', 'Enabled', 'Disabled'],
+            },
             section=section,
-        ).info("Significally increases detection time. "\
-               "Doesn't have effect if webui is in --lowvram or --medvram mode. "\
-               "In these modes this behavior is default.")
+        ).info("Significally increases detection time but reduces vram usage. "\
+               "Automatic means enable only for --lowvram and --medvram mode. "\
+            )
     )
 
 
