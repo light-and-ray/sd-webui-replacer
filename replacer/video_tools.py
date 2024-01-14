@@ -82,6 +82,8 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
         '-c:v', 'libx264',
         '-c:a', 'aac',
         '-vf', f'fps={fps}',
+        '-profile:v', 'main',
+        '-pix_fmt', 'yuv420p',
         '-shortest',
         '-y',
         output_path

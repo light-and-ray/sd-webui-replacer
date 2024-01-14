@@ -248,9 +248,10 @@ def generate(
 
 
     if tab_index == 3:
+        shared.state.textinfo = 'video preparing'
         video_batch_path = input_batch_video
         temp_batch_folder = os.path.join(os.path.dirname(video_batch_path), 'temp')
-        if len(output_batch_dir) == 0:
+        if output_batch_dir == "":
             output_batch_dir = os.path.join(os.path.dirname(video_batch_path), f'out_{seed}')
         else:
             output_batch_dir = os.path.join(output_batch_dir, f'out_{seed}')
@@ -362,6 +363,7 @@ def generate(
     if tab_index == 2:
         gArgs.images = readImages(input_batch_dir)
     if tab_index == 3:
+        shared.state.textinfo = 'video saving'
         print("generate done, generating video")
         output_path = os.path.join(output_batch_dir, f'output_{os.path.basename(input_batch_video)}_{seed}.mp4')
         save_video(output_batch_dir, fps_out, input_batch_video, output_path, seed)
@@ -448,10 +450,6 @@ def applyHiresFix(
         print(errorText)
         return None, "", errorText, ""
 
-    resultImages = []
-    generation_info_js = ""
-    processed_info = ""
-    processed_comments = ""
 
     if hf_unload_detection_models:
         clearCache()
