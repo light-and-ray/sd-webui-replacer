@@ -213,6 +213,8 @@ def generate(
 
     avoidancePrompt = avoidancePrompt.strip()
 
+    output_batch_dir.strip()
+
     images = []
 
     if tab_index == 0:
@@ -248,13 +250,21 @@ def generate(
     if tab_index == 3:
         video_batch_path = input_batch_video
         temp_batch_folder = os.path.join(os.path.dirname(video_batch_path), 'temp')
-        output_batch_dir = os.path.join(os.path.dirname(video_batch_path), f'out_{seed}')
+        if len(output_batch_dir) == 0:
+            output_batch_dir = os.path.join(os.path.dirname(video_batch_path), f'out_{seed}')
+        else:
+            output_batch_dir = os.path.join(output_batch_dir, f'out_{seed}')
         if os.path.exists(output_batch_dir):
             for file in os.listdir(output_batch_dir):
                 if file.endswith('.png'):
                     os.remove(os.path.join(output_batch_dir, file))
         images, fps_in, fps_out = getVideoFrames(video_batch_path, input_batch_video_fps)
         generationsN = len(shared.listfiles(temp_batch_folder))
+
+        batch_count = 1
+        batch_size = 1
+        extra_includes = []
+        save_grid = False
 
 
     shared.state.job_count = generationsN*batch_count
@@ -356,7 +366,7 @@ def generate(
         output_path = os.path.join(output_batch_dir, f'output_{os.path.basename(input_batch_video)}_{seed}.mp4')
         save_video(output_batch_dir, fps_out, input_batch_video, output_path, seed)
 
-        
+
     global lastGenerationArgs
     lastGenerationArgs = gArgs
     shared.state.end()
