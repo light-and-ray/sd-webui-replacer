@@ -294,6 +294,7 @@ def on_ui_tabs():
                             elem_id="replacer_output_batch_dir")
                         gr.Markdown("To increase consistency it's better to inpaint clear "\
                             "objects on video with good quality and enough context. "\
+                            "Your prompts need to produce consistent results\n\n"\
                             "To suppress flickering you can generate in little fps (e.g. 10), "\
                             "then interpolate (x2) it with ai interpolation algorithm "\
                             "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
