@@ -282,7 +282,7 @@ def on_ui_tabs():
                             label="Input video",
                             placeholder="A video on the same machine where the server is running.",
                             elem_id="replacer_input_video")
-                        input_batch_video_fps = gr.Number(
+                        input_batch_video_fps = gr.Slider(
                             label='FPS', value=25.0, min=0.0, step=0.1, max=240.0,
                             info="(0 = fps from input video)",
                             elem_id="replacer_video_fps")

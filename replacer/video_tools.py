@@ -4,7 +4,7 @@ import os
 import modules.shared as shared
 from PIL import Image
 
-def separate_video_into_frames(video_path, fps, temp_folder):
+def separate_video_into_frames(video_path, fps_out, temp_folder):
     assert video_path, 'video not selected'
     assert temp_folder, 'temp folder not specified'
 
@@ -14,36 +14,21 @@ def separate_video_into_frames(video_path, fps, temp_folder):
     # Open the video file
     video = cv2.VideoCapture(video_path)
     fps_in = video.get(cv2.CAP_PROP_FPS)
-    if fps == 0:
+    if fps_out == 0:
         fps_out = fps_in
-    else:
-        fps_out = fps
-    print(fps_in, fps_out)
-    
-    index_in = -1
-    index_out = -1
-
-    # Read frames from the video and save them as images
-    frame_count = 0
-    while True:
-        success = video.grab()
-        if not success: break
-        index_in += 1
-
-        out_due = int(index_in / fps_in * fps_out)
-        # print(index_in, out_due, index_out)
-        if out_due > index_out:
-            success, frame = video.retrieve()
-            if not success: break
-            index_out += 1
-            # Save the frame as an image in the temporary folder
-            frame_path = os.path.join(temp_folder, f"frame_{frame_count}.jpg")
-            cv2.imwrite(frame_path, frame)
-
-            frame_count += 1
-
-    # Release the video file
+    print('fps_in:', fps_in, 'fps_out:', fps_out)
     video.release()
+
+    ffmpeg_cmd = [
+        'ffmpeg',
+        '-i', video_path,
+        '-vf', f'fps={fps_out}',
+        '-y',
+        os.path.join(temp_folder, 'frame_%05d.png'),
+    ]
+    print(' '.join(str(v) for v in ffmpeg_cmd))
+    subprocess.run(ffmpeg_cmd)
+
     return fps_in, fps_out
 
 
