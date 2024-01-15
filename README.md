@@ -1,16 +1,41 @@
 # Replacer
 
-Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-webui. The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. Aka "Fast Inpaint"
+Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-webui. The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion
 
 ![](images/img1.jpg)
 
 
 ## Installation
-1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings
-2. Put model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth) (or others) into `extensions/sd-webui-segment-anything/models/sam`
+1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
+2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
 3. _(Optional)_ For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`
-4. Install this extention. Be sure your sd-webui version is >= 1.7.0. For 1.6.x last compatiable version is 9a20cb2 (run `git checkout 9a20cb2` inside extension's directory for downgrade)
+4. Install this extention. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For 1.6.x last compatiable version is 9a20cb2 (run `git checkout 9a20cb2` inside extension's directory for downgrade)
 5. Reload UI
+
+### SAM models list:
+
+SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model size with dino model size (600-900MB)
+
+<blockquote>
+
+1. [SAM](https://github.com/facebookresearch/segment-anything) from Meta AI.
+    - [2.56GB sam_vit_h](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth)
+    - [1.25GB sam_vit_l](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth)
+    - [375MB sam_vit_b](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth)
+
+    I myself tested vit_h on NVIDIA 3090 Ti which is good. If you encounter VRAM problem, you should switch to smaller models.
+
+2. [SAM-HQ](https://github.com/SysCV/sam-hq) from SysCV.
+    - [2.57GB sam_hq_vit_h](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_h.pth)
+    - [1.25GB sam_hq_vit_l](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth)
+    - [379MB sam_hq_vit_b](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_b.pth)
+
+3. [MobileSAM](https://github.com/ChaoningZhang/MobileSAM) from Kyung Hee University.
+    - [39MB mobile_sam](https://github.com/ChaoningZhang/MobileSAM/blob/master/weights/mobile_sam.pt)
+
+</blockquote>
+
+_FastSAM_ and _Matting-Anything_ aren't currently supported
 
 ## Usage
 ### General
@@ -39,13 +64,17 @@ I do not recommend change these options, if you don't know what you do
 It supports my other extension ["Lama cleaner as masked content"](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
 
-### Extention name
-If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory. 
-```
-extensions/sd-webui-replacer/ExtensionName.txt:
+### Video inpainting
 
-Fast Inpaint
-```
+You can use Replacer to inpaint video with regular stable diffusion inpaint method. It is very inconsistant, but in few cases it can produces good enought results
+
+To increase consistency it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
+
+To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
+
+
+### Extention name
+If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
 Or you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
 
