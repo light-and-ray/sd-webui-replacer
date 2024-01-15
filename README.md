@@ -68,6 +68,26 @@ It supports my other extension ["Lama cleaner as masked content"](https://github
 
 You can use Replacer to inpaint video with regular stable diffusion inpaint method. It is very inconsistant, but in few cases it can produces good enought results
 
+Example:
+```
+size: 768x512
+detection prompt: hands
+positive prompt: photo of dog in yellow clothes
+fps: 10
+postprocessed with RIFE
+```
+
+**Before:**
+
+https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/a9816404-fea3-4d9d-ac82-81ed596a86f4
+
+**After:**
+
+https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/eea3ae5d-bd6c-4934-a1f2-3ebbcf2a9218
+
+
+
+
 To increase consistency it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
 
 To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
