@@ -3,6 +3,7 @@ import cv2
 import os
 import modules.shared as shared
 from PIL import Image
+from shutil import rmtree
 try:
     from imageio_ffmpeg import get_ffmpeg_exe
     FFMPEG = get_ffmpeg_exe()
@@ -33,7 +34,9 @@ def separate_video_into_frames(video_path, fps_out, temp_folder):
         os.path.join(temp_folder, 'frame_%05d.png'),
     ]
     print(' '.join(str(v) for v in ffmpeg_cmd))
-    subprocess.run(ffmpeg_cmd)
+    rc = subprocess.run(ffmpeg_cmd).returncode
+    if rc != 0:
+        raise Exception(f'ffmpeg exited with code {rc}. See console for details')
 
     return fps_in, fps_out
 
@@ -55,8 +58,7 @@ def getVideoFrames(video_path, fps):
     assert video_path, 'video not selected'
     temp_folder = os.path.join(os.path.dirname(video_path), 'temp')
     if os.path.exists(temp_folder):
-        for file in os.listdir(temp_folder):
-            os.remove(os.path.join(temp_folder, file))
+        rmtree(temp_folder)
     fps_in, fps_out = separate_video_into_frames(video_path, fps, temp_folder)
     return readImages(temp_folder), fps_in, fps_out
 
@@ -80,4 +82,6 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
         output_path
     ]
     print(' '.join(str(v) for v in ffmpeg_cmd))
-    subprocess.run(ffmpeg_cmd)
+    rc = subprocess.run(ffmpeg_cmd).returncode
+    if rc != 0:
+        raise Exception(f'ffmpeg exited with code {rc}. See console for details')

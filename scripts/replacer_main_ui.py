@@ -278,11 +278,11 @@ def on_ui_tabs():
                         show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
 
                     with gr.TabItem('Video', id="batch_from_video", elem_id="batch_video_tab") as tab_batch_video:
-                        input_batch_video = gr.Textbox(
+                        input_video = gr.Textbox(
                             label="Input video",
                             placeholder="A video on the same machine where the server is running.",
                             elem_id="replacer_input_video")
-                        input_batch_video_fps = gr.Slider(
+                        target_video_fps = gr.Slider(
                             label='FPS', value=10.0, min=0.0, step=0.1, max=60.0,
                             info="(0 = fps from input video)",
                             elem_id="replacer_video_fps")
@@ -447,8 +447,8 @@ def on_ui_tabs():
                 input_batch_dir,
                 output_batch_dir,
                 show_batch_dir_results,
-                input_batch_video,
-                input_batch_video_fps,
+                input_video,
+                target_video_fps,
                 upscalerForImg2Img,
                 seed,
                 sampler,
