@@ -14,7 +14,7 @@ Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-w
 
 ### SAM models list:
 
-SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model size with dino model size (600-900MB)
+SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model size with dino model size (694MB-938MB)
 
 <blockquote>
 
@@ -22,8 +22,6 @@ SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model siz
     - [2.56GB sam_vit_h](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth)
     - [1.25GB sam_vit_l](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth)
     - [375MB sam_vit_b](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth)
-
-    I myself tested vit_h on NVIDIA 3090 Ti which is good. If you encounter VRAM problem, you should switch to smaller models.
 
 2. [SAM-HQ](https://github.com/SysCV/sam-hq) from SysCV.
     - [2.57GB sam_hq_vit_h](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_h.pth)
