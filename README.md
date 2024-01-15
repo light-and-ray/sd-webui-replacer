@@ -83,9 +83,7 @@ https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/a9816404-fea3
 
 **After:**
 
-https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/eea3ae5d-bd6c-4934-a1f2-3ebbcf2a9218
-
-
+https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/4d045298-1c16-46d5-8a65-661d39a0d834
 
 
 To increase consistency it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
