@@ -218,8 +218,11 @@ def generate(
     images = []
 
     if tab_index == 0:
-        images = [image_single]
-        generationsN = 1
+        if image_single is None:
+            generationsN = 0
+        else:
+            images = [image_single]
+            generationsN = 1
 
 
     if tab_index == 1:
@@ -230,8 +233,11 @@ def generate(
                 else:
                     image = Image.open(os.path.abspath(img.name)).convert('RGBA')
                 yield image
-        images = getImages(image_batch)
-        generationsN = len(image_batch)
+        if image_batch is None:
+            generationsN = 0
+        else:
+            images = getImages(image_batch)
+            generationsN = len(image_batch)
 
 
     if tab_index == 2:
@@ -266,7 +272,8 @@ def generate(
         extra_includes = []
         save_grid = False
 
-
+    if generationsN == 0:
+        return [], "", plaintext_to_html(f"no input images"), ""
     shared.state.job_count = generationsN*batch_count
 
     img2img_fix_steps = False
@@ -306,6 +313,7 @@ def generate(
 
     i = 1
     n = generationsN
+    processed = None
     allExtraImages = []
     batch_processed = None
 
@@ -327,7 +335,7 @@ def generate(
 
         saveDir = ""
         save_to_dirs = True
-        if tab_index == 2 or tab_index == 3:
+        if (tab_index == 2 or tab_index == 3) and output_batch_dir != "":
             saveDir = output_batch_dir
             save_to_dirs = False
         else:
@@ -352,10 +360,13 @@ def generate(
                         opts.samples_format, save_to_dirs=False)
             shared.state.nextjob()
             continue
-        
+
         allExtraImages += extraImages
         batch_processed = processed
         i += 1
+
+    if processed is None:
+        return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
     if tab_index == 1:
         gArgs.images = getImages(image_batch)
@@ -372,8 +383,11 @@ def generate(
     lastGenerationArgs = gArgs
     shared.state.end()
 
-    if (tab_index == 2 and not show_batch_dir_results) or tab_index == 3:
+    if tab_index == 3:
         return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""
+    
+    if tab_index == 2 and not show_batch_dir_results:
+        return [], "", plaintext_to_html(f"Saved into {output_batch_dir}"), ""
 
     processed.images += allExtraImages
     processed.infotexts += [processed.info] * len(allExtraImages)
