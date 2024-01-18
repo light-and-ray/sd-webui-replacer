@@ -165,7 +165,7 @@ def on_ui_tabs():
                         mask_blur = gr.Slider(label='Mask Blur',
                             value=4, elem_id="replacer_mask_blur",
                             minimum=0, maximum=10, step=1)
-                        
+
                     with gr.Row():
 
                         if not needAutoUnloadModels():
@@ -306,8 +306,8 @@ def on_ui_tabs():
                     if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel('replacer', getSaveDir())
                         img2img_gallery = outputPanel.gallery
-                        generation_info = outputPanel.infotext
-                        html_info = outputPanel.html_info
+                        generation_info = outputPanel.generation_info
+                        html_info = outputPanel.infotext
                         html_log = outputPanel.html_log
                     else:
                         img2img_gallery, generation_info, html_info, html_log = \
@@ -422,7 +422,7 @@ def on_ui_tabs():
 
         def tab_batch_dir_on_select():
             return 2, gr.Button.update(visible=False)
-        
+
         def tab_batch_video_on_select():
             return 3, gr.Button.update(visible=False)
 
