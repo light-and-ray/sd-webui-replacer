@@ -161,7 +161,7 @@ def on_ui_tabs():
                             minimum=0.0, maximum=1.0, step=0.05)
                         mask_expand = gr.Slider(label='Mask Expand',
                             value=35, elem_id="replacer_mask_expand",
-                            minimum=0, maximum=100, step=1)
+                            minimum=-100, maximum=100, step=1)
                         mask_blur = gr.Slider(label='Mask Blur',
                             value=4, elem_id="replacer_mask_blur",
                             minimum=0, maximum=10, step=1)

@@ -100,7 +100,14 @@ class MasksCreator:
         self.boxes = boxes
 
         for mask in masks:
-            expanded = update_mask(mask, 0, self.maskExpand, imageResized)
+            if self.maskExpand >= 0:
+                expanded = update_mask(mask, 0, self.maskExpand, imageResized)
+            else:
+                mask = ImageOps.invert(mask.convert('L'))
+                expanded = update_mask(mask, 0, -self.maskExpand, imageResized)
+                mask = ImageOps.invert(expanded[1])
+                expanded = update_mask(mask, 0, 0, imageResized)
+                
             self.previews.append(expanded[0])
             self.masks.append(expanded[1])
             self.cutted.append(expanded[2])
