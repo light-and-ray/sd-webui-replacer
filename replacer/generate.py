@@ -469,7 +469,7 @@ def applyHiresFix(
 
     for image in gArgs.images:
         saveDir = getSaveDir()
-        hrArgs.height, hrArgs.width = image.size
+        hrArgs.width, hrArgs.height = image.size
         if hrArgs.height > hf_size_limit:
             hrArgs.height = hf_size_limit
             hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
