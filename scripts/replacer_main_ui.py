@@ -74,12 +74,14 @@ def on_ui_tabs():
                                         show_label=True,
                                         lines=1,
                                         elem_classes=["detectionPrompt"],
-                                        placeholder=placeholder)
+                                        placeholder=placeholder,
+                                        elem_id="replacer_detectionPrompt")
 
                     gr.Examples(
                         examples=getDetectionPromptExamples(),
                         inputs=detectionPrompt,
                         label="",
+                        elem_id="replacer_detectionPrompt_examples",
                     )
 
                 with gr.Row():
@@ -87,12 +89,14 @@ def on_ui_tabs():
                                         show_label=True,
                                         lines=1,
                                         elem_classes=["avoidancePrompt"],
-                                        placeholder=None)
+                                        placeholder=None,
+                                        elem_id="replacer_avoidancePrompt")
 
                     gr.Examples(
                         examples=getAvoidancePromptExamples(),
                         inputs=avoidancePrompt,
                         label="",
+                        elem_id="replacer_avoidancePrompt_examples",
                     )
 
                 with gr.Row():
@@ -104,12 +108,14 @@ def on_ui_tabs():
                                         show_label=True,
                                         lines=1,
                                         elem_classes=["positvePrompt"],
-                                        placeholder=placeholder)
+                                        placeholder=placeholder,
+                                        elem_id="replacer_positvePrompt")
 
                     gr.Examples(
                         examples=getPositivePromptExamples(),
                         inputs=positvePrompt,
                         label="",
+                        elem_id="replacer_positvePrompt_examples",
                     )
 
                 with gr.Row():
@@ -121,13 +127,15 @@ def on_ui_tabs():
                                         show_label=True,
                                         lines=1,
                                         elem_classes=["negativePrompt"],
-                                        placeholder=placeholder)
+                                        placeholder=placeholder,
+                                        elem_id="replacer_negativePrompt")
 
 
                     gr.Examples(
                         examples=getNegativePromptExamples(),
                         inputs=negativePrompt,
                         label="",
+                        elem_id="replacer_negativePrompt_examples",
                     )
 
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
@@ -169,7 +177,9 @@ def on_ui_tabs():
                     with gr.Row():
 
                         if not needAutoUnloadModels():
-                            unload = gr.Button(value="Unload detection models")
+                            unload = gr.Button(
+                                value="Unload detection models",
+                                elem_id="replacer_unload_detection_models")
 
                         max_resolution_on_detection = gr.Slider(
                             label='Max resolution on detection',
@@ -228,6 +238,7 @@ def on_ui_tabs():
                             value=None,
                             choices=[x.name for x in shared.sd_upscalers],
                             label="Upscaler for img2Img",
+                            elem_id="replacer_upscalerForImg2Img",
                         )
 
                         if cmd_opts.use_textbox_seed:
@@ -255,29 +266,37 @@ def on_ui_tabs():
                             elem_id="replacer_mask_mode")
 
                     with gr.Row():
-                        save_grid = gr.Checkbox(label='Save grid for batch size/count', value=False)
+                        save_grid = gr.Checkbox(label='Save grid for batch size/count',
+                            value=False, elem_id="replacer_save_grid")
                         extra_includes = gr.CheckboxGroup(
                             choices=["mask", "box", "cutted", "preview"],
                             label="Extra include in gallery",
                             type="value",
-                            elem_id=f"replacer_extra_includes",
+                            elem_id="replacer_extra_includes",
                             value=[],
                         )
 
 
-                with gr.Tabs(elem_id="mode_extras"):
-                    with gr.TabItem('Single Image', id="single_image", elem_id="single_tab") as tab_single:
+                with gr.Tabs(elem_id="replacer_input_modes"):
+                    with gr.TabItem('Single Image', id="single_image", elem_id="replacer_single_tab") as tab_single:
                         image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="image", image_mode="RGBA")
 
-                    with gr.TabItem('Batch Process', id="batch_process", elem_id="batch_process_tab") as tab_batch:
-                        image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="extras_image_batch")
+                    with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as tab_batch:
+                        image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
 
-                    with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="batch_directory_tab") as tab_batch_dir:
-                        input_batch_dir = gr.Textbox(label="Input directory", **shared.hide_dirs, placeholder="A directory on the same machine where the server is running.", elem_id="input_batch_dir")
-                        output_batch_dir = gr.Textbox(label="Output directory", **shared.hide_dirs, placeholder="Leave blank to save images to the default path.", elem_id="output_batch_dir")
-                        show_batch_dir_results = gr.Checkbox(label='Show result images', value=False, elem_id="show_batch_dir_results")
+                    with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="replacer_batch_directory_tab") as tab_batch_dir:
+                        input_batch_dir = gr.Textbox(
+                            label="Input directory", **shared.hide_dirs,
+                            placeholder="A directory on the same machine where the server is running.",
+                            elem_id="replacer_input_batch_dir")
+                        output_batch_dir = gr.Textbox(
+                            label="Output directory", **shared.hide_dirs,
+                            placeholder="Leave blank to save images to the default path.",
+                            elem_id="replacer_output_batch_dir")
+                        show_batch_dir_results = gr.Checkbox(
+                            label='Show result images', value=False, elem_id="replacer_show_batch_dir_results")
 
-                    with gr.TabItem('Video', id="batch_from_video", elem_id="batch_video_tab") as tab_batch_video:
+                    with gr.TabItem('Video', id="batch_from_video", elem_id="replacer_batch_video_tab") as tab_batch_video:
                         input_video = gr.Textbox(
                             label="Input video",
                             placeholder="A video on the same machine where the server is running.",
@@ -287,8 +306,7 @@ def on_ui_tabs():
                             info="(0 = fps from input video)",
                             elem_id="replacer_video_fps")
                         output_batch_dir = gr.Textbox(
-                            label="Output directory",
-                            **shared.hide_dirs,
+                            label="Output directory", **shared.hide_dirs,
                             placeholder="Leave blank to save images to the default path.",
                             info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
                             elem_id="replacer_output_batch_dir")
@@ -312,7 +330,7 @@ def on_ui_tabs():
                     else:
                         img2img_gallery, generation_info, html_info, html_log = \
                             create_output_panel('replacer', getSaveDir())
-                    generation_info_button = gr.Button(visible=False, elem_id=f"replacer_generation_info_button")
+                    generation_info_button = gr.Button(visible=False, elem_id="replacer_generation_info_button")
                     generation_info_button.click(
                         fn=update_generation_info,
                         _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
@@ -343,7 +361,7 @@ def on_ui_tabs():
                                 step=1,
                                 minimum=0,
                                 maximum=150,
-                                elem_id="hf_steps"
+                                elem_id="replacer_hf_steps"
                             )
 
                             hf_cfg_scale = gr.Slider(
@@ -352,13 +370,13 @@ def on_ui_tabs():
                                 step=0.5,
                                 minimum=1.0,
                                 maximum=30.0,
-                                elem_id="hf_cfg_scale"
+                                elem_id="replacer_hf_cfg_scale"
                             )
 
                         with gr.Row():
                             hf_sampler = gr.Dropdown(
                                 label='Hires sampling method',
-                                elem_id="hf_sampler",
+                                elem_id="replacer_hf_sampler",
                                 choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
                                 value="Use same sampler"
                             )
@@ -369,7 +387,7 @@ def on_ui_tabs():
                                 step=0.01,
                                 minimum=0.0,
                                 maximum=1.0,
-                                elem_id="hf_denoise"
+                                elem_id="replacer_hf_denoise",
                             )
 
                         with gr.Row():
@@ -381,13 +399,15 @@ def on_ui_tabs():
                                 show_label=True,
                                 lines=1,
                                 elem_classes=["hfPositivePromptSuffix"],
-                                placeholder=placeholder
+                                placeholder=placeholder,
+                                elem_id="replacer_hfPositivePromptSuffix",
                             )
 
                             gr.Examples(
                                 examples=getHiresFixPositivePromptSuffixExamples(),
                                 inputs=hfPositivePromptSuffix,
                                 label="",
+                                elem_id="replacer_hfPositivePromptSuffix_examples",
                             )
 
                         with gr.Row():
@@ -397,7 +417,7 @@ def on_ui_tabs():
                                 step=1,
                                 minimum=1000,
                                 maximum=10000,
-                                elem_id="hf_size_limit"
+                                elem_id="replacer_hf_size_limit",
                             )
 
                             hf_above_limit_upscaler = gr.Dropdown(
@@ -408,7 +428,8 @@ def on_ui_tabs():
 
                             hf_unload_detection_models = gr.Checkbox(
                                 label='Unload detection models before hires fix',
-                                value=True
+                                value=True,
+                                elem_id="replacer_hf_unload_detection_models",
                             )
                             if needAutoUnloadModels():
                                 hf_unload_detection_models.visible = False

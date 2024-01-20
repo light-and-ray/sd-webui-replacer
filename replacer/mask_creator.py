@@ -107,7 +107,7 @@ class MasksCreator:
                 expanded = update_mask(mask, 0, -self.maskExpand, imageResized)
                 mask = ImageOps.invert(expanded[1])
                 expanded = update_mask(mask, 0, 0, imageResized)
-                
+
             self.previews.append(expanded[0])
             self.masks.append(expanded[1])
             self.cutted.append(expanded[2])
