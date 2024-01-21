@@ -9,7 +9,10 @@ function submit_replacer() {
     requestProgress(id, 
         gradioApp().getElementById(galleryId + "_gallery_container"),
         gradioApp().getElementById(galleryId + "_gallery"),
-        function() { showSubmitButtons(buttonsId, true); }
+        function() { 
+            showSubmitButtons('replacer', true);
+            showSubmitButtons('replacer_hf', true);
+        }
         );
 
     var res = create_submit_args(arguments_);
