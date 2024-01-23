@@ -74,7 +74,10 @@ Example:
 ```
 size: 768x512
 detection prompt: hands
-positive prompt: photo of dog in yellow clothes
+positive prompt: photo of dog
+negative prompt: clothes, cartoon, painting, illustration, (worst quality, low quality, normal quality:2)
+denoising: 0.3
+masked content: lama cleaner
 fps: 10
 postprocessed with RIFE
 ```

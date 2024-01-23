@@ -389,7 +389,9 @@ def generate(
     if tab_index == 3:
         shared.state.textinfo = 'video saving'
         print("generate done, generating video")
-        save_video_path = os.path.join(output_batch_dir, f'output_{os.path.basename(input_video)}_{seed}.mp4')
+        save_video_path = os.path.join(output_batch_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
+        if len(save_video_path) > 260:
+            save_video_path = os.path.join(output_batch_dir, f'output_{seed}.mp4')
         save_video(output_batch_dir, fps_out, input_video, save_video_path, seed)
 
 
