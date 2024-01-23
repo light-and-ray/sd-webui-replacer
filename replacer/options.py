@@ -117,6 +117,21 @@ def needHideSegmentAnythingAccordions():
     return res
 
 
+def getDetectionPromptExamplesNumber():
+    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_detection_prompt", 10)
+    return res
+
+def getAvoidancePromptExamplesNumber():
+    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_avoidance_prompt", 10)
+    return res
+
+def getPositivePromptExamplesNumber():
+    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_positive_prompt", 10)
+    return res
+
+def getNegativePromptExamplesNumber():
+    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_negative_prompt", 10)
+    return res
 
 def on_ui_settings():
     section = (EXT_NAME_LOWER, EXT_NAME)
@@ -237,6 +252,47 @@ def on_ui_settings():
             section=section,
         ).needs_reload_ui()
     )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_examples_per_page_for_detection_prompt",
+        shared.OptionInfo(
+            10,
+            "Override number of examples per pages for detection prompt",
+            gr.Number,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_examples_per_page_for_avoidance_prompt",
+        shared.OptionInfo(
+            10,
+            "Override number of examples per pages for avoidance prompt",
+            gr.Number,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_examples_per_page_for_positive_prompt",
+        shared.OptionInfo(
+            10,
+            "Override number of examples per pages for positive prompt",
+            gr.Number,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_examples_per_page_for_negative_prompt",
+        shared.OptionInfo(
+            10,
+            "Override number of examples per pages for negative prompt",
+            gr.Number,
+            section=section,
+        ).needs_reload_ui()
+    )
+
 
     shared.opts.add_option(
         EXT_NAME_LOWER + "_save_dir",

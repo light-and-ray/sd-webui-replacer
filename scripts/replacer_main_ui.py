@@ -9,6 +9,8 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
     needHideSegmentAnythingAccordions, needAutoUnloadModels, getAvoidancePromptExamples,
+    getDetectionPromptExamplesNumber, getAvoidancePromptExamplesNumber,
+    getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
 from replacer import replacer_scripts
 
@@ -84,6 +86,7 @@ def on_ui_tabs():
                         inputs=detectionPrompt,
                         label="",
                         elem_id="replacer_detectionPrompt_examples",
+                        examples_per_page=getDetectionPromptExamplesNumber(),
                     )
 
                 with gr.Row():
@@ -99,6 +102,7 @@ def on_ui_tabs():
                         inputs=avoidancePrompt,
                         label="",
                         elem_id="replacer_avoidancePrompt_examples",
+                        examples_per_page=getAvoidancePromptExamplesNumber(),
                     )
 
                 with gr.Row():
@@ -118,6 +122,7 @@ def on_ui_tabs():
                         inputs=positvePrompt,
                         label="",
                         elem_id="replacer_positvePrompt_examples",
+                        examples_per_page=getPositivePromptExamplesNumber(),
                     )
 
                 with gr.Row():
@@ -138,6 +143,7 @@ def on_ui_tabs():
                         inputs=negativePrompt,
                         label="",
                         elem_id="replacer_negativePrompt_examples",
+                        examples_per_page=getNegativePromptExamplesNumber(),
                     )
 
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
