@@ -61,6 +61,10 @@ I do not recommend change these options, if you don't know what you do
 
 It supports my other extension ["Lama cleaner as masked content"](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
+It also supports [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
+
+![](images/img6.jpg)
+
 
 ### Video inpainting
 
@@ -142,7 +146,7 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - ☑️ progress bar + interrupt
 - option for pass into hires fix automatically
 - batch get options from png info
-- control net
+- ☑️ control net
 - tiled vae
 - ☑️ "hide segment anything extention" option
 - txt2img script
@@ -153,4 +157,3 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - add additional options: do exacly steps the slider specifies
 - extra mask expand for hires fix
 - copy `images` while appling hires fix
-- handle empty out dir in batch dir

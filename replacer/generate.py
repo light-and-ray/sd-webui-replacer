@@ -8,13 +8,15 @@ from modules.processing import StableDiffusionProcessingImg2Img, process_images,
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
+from modules import scripts
 from replacer.mask_creator import MasksCreator
 from replacer.generation_args import GenerationArgs
 from replacer.video_tools import getVideoFrames, save_video
 from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
     getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
-    getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels
+    getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
+from replacer import replacer_scripts
 
 g_clear_cache = None
 
@@ -87,12 +89,19 @@ def inpaint(
     p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
     p.seed = gArgs.seed
     p.do_not_save_grid = not gArgs.save_grid
+    if replacer_scripts.script_controlnet and gArgs.cn_args is not None and gArgs.cn_args != []:
+        replacer_scripts.enableInpaintModeForCN(gArgs.cn_args)
+        p.scripts = copy.copy(scripts.scripts_img2img)
+        p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
+        p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
     
 
 
     with closing(p):
         processed = process_images(p)
 
+    scriptImages = processed.images[len(processed.all_seeds):]
+    processed.images = processed.images[:len(processed.all_seeds)]
 
     if savePath != "":
         for i in range(len(processed.images)):
@@ -107,7 +116,7 @@ def inpaint(
         batch_processed.infotexts += processed.infotexts
         processed = batch_processed
 
-    return processed
+    return processed, scriptImages
 
 
 
@@ -143,7 +152,7 @@ def generateSingle(
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
 
-    processed = inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs,
+    processed, scriptImages = inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs,
         samples_filename_pattern, batch_processed)
 
     extraImages = []
@@ -155,6 +164,8 @@ def generateSingle(
         extraImages.append(maskCutted)
     if "preview" in extra_includes:
         extraImages.append(maskPreview)
+    if "script" in extra_includes:
+        extraImages.extend(scriptImages)
 
     return processed, extraImages
 
@@ -194,6 +205,7 @@ def generate(
     inpainting_mask_invert,
     save_grid,
     extra_includes,
+    *scripts_args,
 ):
     shared.state.begin(job=EXT_NAME_LOWER)
     shared.total_tqdm.clear()
@@ -309,6 +321,8 @@ def generate(
         images,
         generationsN,
         save_grid,
+
+        scripts_args,
         )
 
     i = 1
@@ -405,7 +419,7 @@ def applyHiresFixSingle(
     saveDir : str,
 ):
     shared.state.textinfo = "inpaint with upscaler"
-    processed = inpaint(image, gArgs)
+    processed, scriptImages = inpaint(image, gArgs)
     generatedImages = processed.images
 
     n = len(generatedImages)
@@ -414,7 +428,7 @@ def applyHiresFixSingle(
 
     for generatedImage in generatedImages:
         shared.state.textinfo = "hiresfix"
-        processed = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
+        processed, scriptImages = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
 
     return processed
 
@@ -431,6 +445,7 @@ def applyHiresFix(
     hf_size_limit,
     hf_above_limit_upscaler,
     hf_unload_detection_models,
+    hf_disable_cn,
 ):
     shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
     shared.state.job_count = 2
@@ -457,6 +472,8 @@ def applyHiresFix(
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True
+    if hf_disable_cn:
+        hrArgs.cn_args = None
 
     if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"

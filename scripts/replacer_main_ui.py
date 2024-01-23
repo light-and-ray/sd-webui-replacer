@@ -10,6 +10,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
     needHideSegmentAnythingAccordions, needAutoUnloadModels, getAvoidancePromptExamples,
 )
+from replacer import replacer_scripts
 
 
 try:
@@ -63,6 +64,7 @@ def on_ui_tabs():
 
         tab_index = gr.Number(value=0, visible=False)
         dummy_component = gr.Label(visible=False)
+        replacer_scripts.initCNScript()
 
         with ResizeHandleRow():
 
@@ -269,7 +271,7 @@ def on_ui_tabs():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count',
                             value=False, elem_id="replacer_save_grid")
                         extra_includes = gr.CheckboxGroup(
-                            choices=["mask", "box", "cutted", "preview"],
+                            choices=["mask", "box", "cutted", "preview", "script"],
                             label="Extra include in gallery",
                             type="value",
                             elem_id="replacer_extra_includes",
@@ -318,6 +320,10 @@ def on_ui_tabs():
                             "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
                             "[frame interpolation in deforum sd-webui extension]("\
                             "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))")
+                
+                cn_inputs = []
+                if replacer_scripts.script_controlnet:
+                    cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
 
             with gr.Column():
                 with gr.Row():
@@ -434,6 +440,16 @@ def on_ui_tabs():
                             if needAutoUnloadModels():
                                 hf_unload_detection_models.visible = False
 
+                        with gr.Row():
+                            hf_disable_cn = gr.Checkbox(
+                                label='Disable ControlNet while hires. fix',
+                                value=True,
+                                elem_id="replacer_hf_disable_cn",
+                            )
+                            if not replacer_scripts.script_controlnet:
+                                hf_disable_cn.visible = False
+
+
 
         def tab_single_on_select():
             return 0, gr.Button.update(visible=True)
@@ -491,7 +507,7 @@ def on_ui_tabs():
                 inpainting_mask_invert,
                 save_grid,
                 extra_includes,
-            ],
+            ] + cn_inputs,
             outputs=[
                 img2img_gallery,
                 generation_info,
@@ -516,6 +532,7 @@ def on_ui_tabs():
                 hf_size_limit,
                 hf_above_limit_upscaler,
                 hf_unload_detection_models,
+                hf_disable_cn,
             ],
             outputs=[
                 img2img_gallery,

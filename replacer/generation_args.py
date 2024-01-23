@@ -31,3 +31,4 @@ class GenerationArgs:
     images: Any
     generationsN: Any
     save_grid : Any
+    cn_args : Any
