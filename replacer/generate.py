@@ -94,7 +94,7 @@ def inpaint(
         p.scripts = copy.copy(scripts.scripts_img2img)
         p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
         p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
-    
+
 
 
     with closing(p):
@@ -447,10 +447,6 @@ def applyHiresFix(
     hf_unload_detection_models,
     hf_disable_cn,
 ):
-    shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
-    shared.state.job_count = 2
-    shared.total_tqdm.clear()
-
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
 
@@ -469,6 +465,7 @@ def applyHiresFix(
         hrArgs.sampler_name = hf_sampler
     if hf_steps != 0:
         hrArgs.steps = hf_steps
+
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True
@@ -483,6 +480,11 @@ def applyHiresFix(
 
     if hf_unload_detection_models:
         clearCache()
+
+    shared.state.begin(job=f'{EXT_NAME_LOWER}_hf')
+    shared.state.job_count = 2
+    shared.total_tqdm.clear()
+    shared.total_tqdm.updateTotal(gArgs.steps + hrArgs.steps)
 
     for image in gArgs.images:
         saveDir = getSaveDir()
