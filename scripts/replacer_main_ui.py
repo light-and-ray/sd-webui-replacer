@@ -275,7 +275,7 @@ def on_ui_tabs():
                             label="Extra include in gallery",
                             type="value",
                             elem_id="replacer_extra_includes",
-                            value=[],
+                            value=["script"],
                         )
 
 
