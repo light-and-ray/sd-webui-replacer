@@ -1,6 +1,6 @@
 # Replacer
 
-Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-webui. The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion
+Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-webui. The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion and controlnet
 
 ![](images/img1.jpg)
 
@@ -8,7 +8,7 @@ Replacer is an extention for https://github.com/AUTOMATIC1111/stable-diffusion-w
 ## Installation
 1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
 2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
-3. _(Optional)_ For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`
+3. For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`. Or if you have already lcm lora, then change hires suffix in the extension options
 4. Install this extention. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For 1.6.x last compatiable version is 9a20cb2 (run `git checkout 9a20cb2` inside extension's directory for downgrade)
 5. Reload UI
 
@@ -91,6 +91,8 @@ https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/4d045298-1c16
 To increase consistency it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
 
 To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
+
+You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
 
 
 ### Extention name

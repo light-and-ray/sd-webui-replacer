@@ -171,7 +171,7 @@ def on_ui_tabs():
                             minimum=0.0, maximum=1.0, step=0.05)
                         mask_expand = gr.Slider(label='Mask Expand',
                             value=35, elem_id="replacer_mask_expand",
-                            minimum=-100, maximum=100, step=1)
+                            minimum=-50, maximum=100, step=1)
                         mask_blur = gr.Slider(label='Mask Blur',
                             value=4, elem_id="replacer_mask_blur",
                             minimum=0, maximum=10, step=1)
@@ -319,7 +319,10 @@ def on_ui_tabs():
                             "then interpolate (x2) it with ai interpolation algorithm "\
                             "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
                             "[frame interpolation in deforum sd-webui extension]("\
-                            "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))")
+                            "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
+                            "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
+                            "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
+                            "extensions to increase consistency, if it fits to your scenario")
                 
                 cn_inputs = []
                 if replacer_scripts.script_controlnet:
