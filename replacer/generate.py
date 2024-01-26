@@ -183,6 +183,7 @@ def generate(
     output_batch_dir,
     show_batch_dir_results,
     input_video,
+    video_output_dir,
     target_video_fps,
     upscalerForImg2Img,
     seed,
@@ -226,6 +227,7 @@ def generate(
     avoidancePrompt = avoidancePrompt.strip()
 
     output_batch_dir.strip()
+    video_output_dir.strip()
 
     images = []
 
@@ -268,14 +270,14 @@ def generate(
     if tab_index == 3:
         shared.state.textinfo = 'video preparing'
         temp_batch_folder = os.path.join(os.path.dirname(input_video), 'temp')
-        if output_batch_dir == "":
-            output_batch_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}')
+        if video_output_dir == "":
+            video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}')
         else:
-            output_batch_dir = os.path.join(output_batch_dir, f'out_{seed}')
-        if os.path.exists(output_batch_dir):
-            for file in os.listdir(output_batch_dir):
+            video_output_dir = os.path.join(video_output_dir, f'out_{seed}')
+        if os.path.exists(video_output_dir):
+            for file in os.listdir(video_output_dir):
                 if file.endswith(f'.{shared.opts.samples_format}'):
-                    os.remove(os.path.join(output_batch_dir, file))
+                    os.remove(os.path.join(video_output_dir, file))
         images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
         generationsN = len(shared.listfiles(temp_batch_folder))
 
@@ -349,8 +351,11 @@ def generate(
 
         saveDir = ""
         save_to_dirs = True
-        if (tab_index == 2 or tab_index == 3) and output_batch_dir != "":
+        if tab_index == 2 and output_batch_dir != "":
             saveDir = output_batch_dir
+            save_to_dirs = False
+        elif tab_index == 3:
+            saveDir = video_output_dir
             save_to_dirs = False
         else:
             saveDir = getSaveDir()
@@ -389,10 +394,10 @@ def generate(
     if tab_index == 3:
         shared.state.textinfo = 'video saving'
         print("generate done, generating video")
-        save_video_path = os.path.join(output_batch_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
+        save_video_path = os.path.join(video_output_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
         if len(save_video_path) > 260:
-            save_video_path = os.path.join(output_batch_dir, f'output_{seed}.mp4')
-        save_video(output_batch_dir, fps_out, input_video, save_video_path, seed)
+            save_video_path = os.path.join(video_output_dir, f'output_{seed}.mp4')
+        save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
 
 
     global lastGenerationArgs

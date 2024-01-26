@@ -272,10 +272,10 @@ def on_ui_tabs():
                             value='Inpaint masked',
                             type="index",
                             elem_id="replacer_mask_mode")
-
-                    with gr.Row():
                         save_grid = gr.Checkbox(label='Save grid for batch size/count',
                             value=False, elem_id="replacer_save_grid")
+
+                    with gr.Row():
                         extra_includes = gr.CheckboxGroup(
                             choices=["mask", "box", "cutted", "preview", "script"],
                             label="Extra include in gallery",
@@ -313,11 +313,11 @@ def on_ui_tabs():
                             label='FPS', value=10.0, min=0.0, step=0.1, max=60.0,
                             info="(0 = fps from input video)",
                             elem_id="replacer_video_fps")
-                        output_batch_dir = gr.Textbox(
+                        video_output_dir = gr.Textbox(
                             label="Output directory", **shared.hide_dirs,
                             placeholder="Leave blank to save images to the default path.",
                             info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
-                            elem_id="replacer_output_batch_dir")
+                            elem_id="replacer_video_output_dir")
                         gr.Markdown("To increase consistency it's better to inpaint clear "\
                             "objects on video with good quality and enough context. "\
                             "Your prompts need to produce consistent results\n\n"\
@@ -494,6 +494,7 @@ def on_ui_tabs():
                 output_batch_dir,
                 show_batch_dir_results,
                 input_video,
+                video_output_dir,
                 target_video_fps,
                 upscalerForImg2Img,
                 seed,
