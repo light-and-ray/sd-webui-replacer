@@ -44,8 +44,6 @@ def inpaint(
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
     if gArgs.img2img_fix_steps is not None and gArgs.img2img_fix_steps != "":
         override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
-    if samples_filename_pattern != "":
-        override_settings["samples_filename_pattern"] = samples_filename_pattern
 
     inpainting_fill = gArgs.inpainting_fill
     if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
@@ -105,7 +103,9 @@ def inpaint(
 
     if savePath != "":
         for i in range(len(processed.images)):
-            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
+            if samples_filename_pattern == "":
+                samples_filename_pattern = opts.samples_format
+            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, samples_filename_pattern,
                     info=processed.infotext(p, i), p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
