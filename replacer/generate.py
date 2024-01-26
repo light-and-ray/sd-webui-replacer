@@ -213,7 +213,6 @@ def generate(
 
     if detectionPrompt == '':
         detectionPrompt = getDetectionPromptExamples()[0]
-    detectionPrompt = detectionPrompt.strip()
 
     if positvePrompt == '' and useFirstPositivePromptFromExamples():
         positvePrompt = getPositivePromptExamples()[0]
@@ -224,10 +223,10 @@ def generate(
     if (seed == -1):
         seed = int(random.randrange(4294967294))
 
+    detectionPrompt = detectionPrompt.strip()
     avoidancePrompt = avoidancePrompt.strip()
-
-    output_batch_dir.strip()
-    video_output_dir.strip()
+    output_batch_dir = output_batch_dir.strip()
+    video_output_dir = video_output_dir.strip()
 
     images = []
 
