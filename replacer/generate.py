@@ -102,8 +102,12 @@ def inpaint(
 
     if savePath != "":
         for i in range(len(processed.images)):
+            additional_save_suffix = getattr(image, 'additional_save_suffix', None)
+            suffix = saveSuffix
+            if additional_save_suffix:
+                suffix = additional_save_suffix + '-' + suffix
             save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
-                    info=processed.infotext(p, i), p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
+                    info=processed.infotext(p, i), p=p, suffix=suffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
         processed.images = []
@@ -175,8 +179,10 @@ def generate(
     tab_index,
     image_single,
     image_batch,
+    keep_original_filenames,
     input_batch_dir,
     output_batch_dir,
+    keep_original_filenames_from_dir,
     show_batch_dir_results,
     input_video,
     video_output_dir,
@@ -243,6 +249,8 @@ def generate(
                         image = img
                     else:
                         image = Image.open(os.path.abspath(img.name)).convert('RGBA')
+                        if keep_original_filenames:
+                            image.additional_save_suffix = os.path.basename(os.path.abspath(img.name))
                     yield image
             if image_batch is None:
                 generationsN = 0
@@ -257,6 +265,8 @@ def generate(
                 for filename in image_list:
                     try:
                         image = Image.open(filename).convert('RGBA')
+                        if keep_original_filenames_from_dir:
+                            image.additional_save_suffix = os.path.basename(filename)
                     except Exception:
                         continue
                     yield image
@@ -397,7 +407,7 @@ def generate(
         if tab_index == 3:
             shared.state.textinfo = 'video saving'
             print("generate done, generating video")
-            save_video_path = os.path.join(video_output_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
+            save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}.mp4')
             if len(save_video_path) > 260:
                 save_video_path = os.path.join(video_output_dir, f'output_{seed}.mp4')
             save_video(video_output_dir, fps_out, input_video, save_video_path, seed)

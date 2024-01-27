@@ -303,6 +303,8 @@ def on_ui_tabs():
 
                     with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as tab_batch:
                         image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
+                        keep_original_filenames = gr.Checkbox(
+                            label='Keep original filenames', value=True, elem_id="replacer_keep_original_filenames")
 
                     with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="replacer_batch_directory_tab") as tab_batch_dir:
                         input_batch_dir = gr.Textbox(
@@ -313,6 +315,8 @@ def on_ui_tabs():
                             label="Output directory", **shared.hide_dirs,
                             placeholder="Leave blank to save images to the default path.",
                             elem_id="replacer_output_batch_dir")
+                        keep_original_filenames_from_dir = gr.Checkbox(
+                            label='Keep original filenames (batch from dir)', value=True, elem_id="replacer_keep_original_filenames_from_dir")
                         show_batch_dir_results = gr.Checkbox(
                             label='Show result images', value=False, elem_id="replacer_show_batch_dir_results")
 
@@ -502,8 +506,10 @@ def on_ui_tabs():
                 tab_index,
                 image,
                 image_batch,
+                keep_original_filenames,
                 input_batch_dir,
                 output_batch_dir,
+                keep_original_filenames_from_dir,
                 show_batch_dir_results,
                 input_video,
                 video_output_dir,
