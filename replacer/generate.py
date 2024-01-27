@@ -36,7 +36,6 @@ def inpaint(
     savePath : str = "",
     saveSuffix : str = "",
     save_to_dirs : bool = True,
-    samples_filename_pattern : str = "",
     batch_processed : Processed = None
 ):
     override_settings = {}
@@ -103,9 +102,7 @@ def inpaint(
 
     if savePath != "":
         for i in range(len(processed.images)):
-            if samples_filename_pattern == "":
-                samples_filename_pattern = opts.samples_format
-            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, samples_filename_pattern,
+            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
                     info=processed.infotext(p, i), p=p, suffix=saveSuffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
@@ -137,7 +134,6 @@ def generateSingle(
     saveSuffix : str,
     save_to_dirs : bool,
     extra_includes : list,
-    samples_filename_pattern : str,
     batch_processed : list,
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
@@ -153,7 +149,7 @@ def generateSingle(
     shared.state.textinfo = "inpaint"
 
     processed, scriptImages = inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs,
-        samples_filename_pattern, batch_processed)
+        batch_processed)
 
     extraImages = []
     if "mask" in extra_includes:
@@ -208,211 +204,223 @@ def generate(
     extra_includes,
     *scripts_args,
 ):
-    shared.state.begin(job=EXT_NAME_LOWER)
-    shared.total_tqdm.clear()
+    restoreList = []
+    try:
+        shared.state.begin(job=EXT_NAME_LOWER)
+        shared.total_tqdm.clear()
 
-    if detectionPrompt == '':
-        detectionPrompt = getDetectionPromptExamples()[0]
+        if detectionPrompt == '':
+            detectionPrompt = getDetectionPromptExamples()[0]
 
-    if positvePrompt == '' and useFirstPositivePromptFromExamples():
-        positvePrompt = getPositivePromptExamples()[0]
+        if positvePrompt == '' and useFirstPositivePromptFromExamples():
+            positvePrompt = getPositivePromptExamples()[0]
 
-    if negativePrompt == '' and useFirstNegativePromptFromExamples():
-        negativePrompt = getNegativePromptExamples()[0]
+        if negativePrompt == '' and useFirstNegativePromptFromExamples():
+            negativePrompt = getNegativePromptExamples()[0]
 
-    if (seed == -1):
-        seed = int(random.randrange(4294967294))
+        if (seed == -1):
+            seed = int(random.randrange(4294967294))
 
-    detectionPrompt = detectionPrompt.strip()
-    avoidancePrompt = avoidancePrompt.strip()
-    output_batch_dir = output_batch_dir.strip()
-    video_output_dir = video_output_dir.strip()
+        detectionPrompt = detectionPrompt.strip()
+        avoidancePrompt = avoidancePrompt.strip()
+        output_batch_dir = output_batch_dir.strip()
+        video_output_dir = video_output_dir.strip()
 
-    images = []
+        images = []
 
-    if tab_index == 0:
-        if image_single is None:
-            generationsN = 0
-        else:
-            images = [image_single]
-            generationsN = 1
-
-
-    if tab_index == 1:
-        def getImages(image_folder):
-            for img in image_folder:
-                if isinstance(img, Image.Image):
-                    image = img
-                else:
-                    image = Image.open(os.path.abspath(img.name)).convert('RGBA')
-                yield image
-        if image_batch is None:
-            generationsN = 0
-        else:
-            images = getImages(image_batch)
-            generationsN = len(image_batch)
+        if tab_index == 0:
+            if image_single is None:
+                generationsN = 0
+            else:
+                images = [image_single]
+                generationsN = 1
 
 
-    if tab_index == 2:
-        def readImages(input_dir):
-            image_list = shared.listfiles(input_dir)
-            for filename in image_list:
-                try:
-                    image = Image.open(filename).convert('RGBA')
-                except Exception:
-                    continue
-                yield image
-        images = readImages(input_batch_dir)
-        generationsN = len(shared.listfiles(input_batch_dir))
+        if tab_index == 1:
+            def getImages(image_folder):
+                for img in image_folder:
+                    if isinstance(img, Image.Image):
+                        image = img
+                    else:
+                        image = Image.open(os.path.abspath(img.name)).convert('RGBA')
+                    yield image
+            if image_batch is None:
+                generationsN = 0
+            else:
+                images = getImages(image_batch)
+                generationsN = len(image_batch)
 
 
-    if tab_index == 3:
-        shared.state.textinfo = 'video preparing'
-        temp_batch_folder = os.path.join(os.path.dirname(input_video), 'temp')
-        if video_output_dir == "":
-            video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}')
-        else:
-            video_output_dir = os.path.join(video_output_dir, f'out_{seed}')
-        if os.path.exists(video_output_dir):
-            for file in os.listdir(video_output_dir):
-                if file.endswith(f'.{shared.opts.samples_format}'):
-                    os.remove(os.path.join(video_output_dir, file))
-        images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
-        generationsN = len(shared.listfiles(temp_batch_folder))
+        if tab_index == 2:
+            def readImages(input_dir):
+                image_list = shared.listfiles(input_dir)
+                for filename in image_list:
+                    try:
+                        image = Image.open(filename).convert('RGBA')
+                    except Exception:
+                        continue
+                    yield image
+            images = readImages(input_batch_dir)
+            generationsN = len(shared.listfiles(input_batch_dir))
 
-        batch_count = 1
-        batch_size = 1
-        extra_includes = []
-        save_grid = False
 
-    if generationsN == 0:
-        return [], "", plaintext_to_html(f"no input images"), ""
-    shared.state.job_count = generationsN*batch_count
-
-    img2img_fix_steps = False
-
-    gArgs = GenerationArgs(
-        positvePrompt,
-        negativePrompt,
-        detectionPrompt,
-        avoidancePrompt,
-        None,
-        upscalerForImg2Img,
-        seed,
-        sam_model_name,
-        dino_model_name,
-        box_threshold,
-        mask_expand,
-        max_resolution_on_detection,
-        
-        steps,
-        sampler,
-        mask_blur,
-        inpainting_fill,
-        batch_count,
-        batch_size,
-        cfg_scale,
-        denoise,
-        height,
-        width,
-        inpaint_padding,
-        img2img_fix_steps,
-        inpainting_mask_invert,
-
-        images,
-        generationsN,
-        save_grid,
-
-        scripts_args,
-        )
-
-    i = 1
-    n = generationsN
-    processed = None
-    allExtraImages = []
-    batch_processed = None
-
-    for image in images:
-        if shared.state.interrupted:
-            if needAutoUnloadModels():
-                clearCache()
-            break
-        
-        progressInfo = "Generate mask"
-        if n > 1: 
-            print(flush=True)
-            print()
-            print(f'    [{EXT_NAME}]    processing {i}/{n}')
-            progressInfo += f" {i}/{n}"
-
-        shared.state.textinfo = progressInfo
-        shared.state.skipped = False
-
-        saveDir = ""
-        save_to_dirs = True
-        if tab_index == 2 and output_batch_dir != "":
-            saveDir = output_batch_dir
-            save_to_dirs = False
-        elif tab_index == 3:
-            saveDir = video_output_dir
-            save_to_dirs = False
-        else:
-            saveDir = getSaveDir()
-
-        samples_filename_pattern = ""
         if tab_index == 3:
-            samples_filename_pattern = "[seed]"
+            shared.state.textinfo = 'video preparing'
+            temp_batch_folder = os.path.join(os.path.dirname(input_video), 'temp')
+            if video_output_dir == "":
+                video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}')
+            else:
+                video_output_dir = os.path.join(video_output_dir, f'out_{seed}')
+            if os.path.exists(video_output_dir):
+                for file in os.listdir(video_output_dir):
+                    if file.endswith(f'.{shared.opts.samples_format}'):
+                        os.remove(os.path.join(video_output_dir, file))
+            images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
+            generationsN = len(shared.listfiles(temp_batch_folder))
 
-        try:
-            processed, extraImages = generateSingle(image, gArgs, saveDir, "", save_to_dirs, extra_includes,
-                    samples_filename_pattern, batch_processed)
-        except Exception as e:
-            print(f'    [{EXT_NAME}]    Exception: {e}')
+            batch_count = 1
+            batch_size = 1
+            extra_includes = []
+            save_grid = False
+            old_samples_filename_pattern = opts.samples_filename_pattern
+            old_save_images_add_number = opts.save_images_add_number
+            def restoreOpts():
+                opts.samples_filename_pattern = old_samples_filename_pattern
+                opts.save_images_add_number = old_save_images_add_number
+            restoreList.append(restoreOpts)
+            opts.samples_filename_pattern = "[seed]"
+            opts.save_images_add_number = True
+
+
+        if generationsN == 0:
+            return [], "", plaintext_to_html(f"no input images"), ""
+        shared.state.job_count = generationsN*batch_count
+
+        img2img_fix_steps = False
+
+        gArgs = GenerationArgs(
+            positvePrompt,
+            negativePrompt,
+            detectionPrompt,
+            avoidancePrompt,
+            None,
+            upscalerForImg2Img,
+            seed,
+            sam_model_name,
+            dino_model_name,
+            box_threshold,
+            mask_expand,
+            max_resolution_on_detection,
+            
+            steps,
+            sampler,
+            mask_blur,
+            inpainting_fill,
+            batch_count,
+            batch_size,
+            cfg_scale,
+            denoise,
+            height,
+            width,
+            inpaint_padding,
+            img2img_fix_steps,
+            inpainting_mask_invert,
+
+            images,
+            generationsN,
+            save_grid,
+
+            scripts_args,
+            )
+
+        i = 1
+        n = generationsN
+        processed = None
+        allExtraImages = []
+        batch_processed = None
+
+        for image in images:
+            if shared.state.interrupted:
+                if needAutoUnloadModels():
+                    clearCache()
+                break
+            
+            progressInfo = "Generate mask"
+            if n > 1: 
+                print(flush=True)
+                print()
+                print(f'    [{EXT_NAME}]    processing {i}/{n}')
+                progressInfo += f" {i}/{n}"
+
+            shared.state.textinfo = progressInfo
+            shared.state.skipped = False
+
+            saveDir = ""
+            save_to_dirs = True
+            if tab_index == 2 and output_batch_dir != "":
+                saveDir = output_batch_dir
+                save_to_dirs = False
+            elif tab_index == 3:
+                saveDir = video_output_dir
+                save_to_dirs = False
+            else:
+                saveDir = getSaveDir()
+
+            try:
+                processed, extraImages = generateSingle(image, gArgs, saveDir, "", save_to_dirs,
+                    extra_includes, batch_processed)
+            except Exception as e:
+                print(f'    [{EXT_NAME}]    Exception: {e}')
+
+                i += 1
+                if needAutoUnloadModels():
+                    clearCache()
+                if generationsN == 1:
+                    raise
+                if tab_index == 3:
+                    save_image(image, saveDir, "", gArgs.seed, gArgs.positvePrompt,
+                            opts.samples_format, save_to_dirs=False)
+                shared.state.nextjob()
+                continue
+
+            allExtraImages += extraImages
+            batch_processed = processed
             i += 1
-            if needAutoUnloadModels():
-                clearCache()
-            if generationsN == 1:
-                raise
-            if tab_index == 3:
-                save_image(image, saveDir, "", gArgs.seed, gArgs.positvePrompt,
-                        opts.samples_format, save_to_dirs=False)
-            shared.state.nextjob()
-            continue
 
-        allExtraImages += extraImages
-        batch_processed = processed
-        i += 1
+        if processed is None:
+            return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
-    if processed is None:
-        return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
-
-    if tab_index == 1:
-        gArgs.images = getImages(image_batch)
-    if tab_index == 2:
-        gArgs.images = readImages(input_batch_dir)
-    if tab_index == 3:
-        shared.state.textinfo = 'video saving'
-        print("generate done, generating video")
-        save_video_path = os.path.join(video_output_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
-        if len(save_video_path) > 260:
-            save_video_path = os.path.join(video_output_dir, f'output_{seed}.mp4')
-        save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
+        if tab_index == 1:
+            gArgs.images = getImages(image_batch)
+        if tab_index == 2:
+            gArgs.images = readImages(input_batch_dir)
+        if tab_index == 3:
+            shared.state.textinfo = 'video saving'
+            print("generate done, generating video")
+            save_video_path = os.path.join(video_output_dir, f'output_{os.path.splitext((os.path.basename(input_video)))[0]}_{seed}.mp4')
+            if len(save_video_path) > 260:
+                save_video_path = os.path.join(video_output_dir, f'output_{seed}.mp4')
+            save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
 
 
-    global lastGenerationArgs
-    lastGenerationArgs = gArgs
-    shared.state.end()
+        global lastGenerationArgs
+        lastGenerationArgs = gArgs
+        shared.state.end()
 
-    if tab_index == 3:
-        return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""
-    
-    if tab_index == 2 and not show_batch_dir_results:
-        return [], "", plaintext_to_html(f"Saved into {output_batch_dir}"), ""
+        if tab_index == 3:
+            return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""
+        
+        if tab_index == 2 and not show_batch_dir_results:
+            return [], "", plaintext_to_html(f"Saved into {output_batch_dir}"), ""
 
-    processed.images += allExtraImages
-    processed.infotexts += [processed.info] * len(allExtraImages)
+        processed.images += allExtraImages
+        processed.infotexts += [processed.info] * len(allExtraImages)
 
-    return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+        return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+    finally:
+        for restore in restoreList:
+            restore()
+
 
 
 
