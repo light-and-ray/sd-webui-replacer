@@ -1,5 +1,6 @@
-from PIL import ImageChops, Image, ImageOps
+from PIL import Image, ImageOps
 from replacer.options import needAutoUnloadModels
+from replacer.tools import areImagesTheSame
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -34,16 +35,6 @@ class NothingDetectedError(Exception):
     def __init__(self):
         super().__init__("Nothing has been detected")
 
-
-def areImagesTheSame(image_one, image_two):
-    if image_one.size != image_two.size:
-        return False
-    diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
-
-    if diff.getbbox():
-        return False
-    else:
-        return True
 
 
 masksCreatorCached = None

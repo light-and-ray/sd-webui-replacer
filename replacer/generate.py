@@ -17,6 +17,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
+from replacer.tools import addReplacerMetadata
 
 g_clear_cache = None
 
@@ -26,8 +27,6 @@ def clearCache():
         from scripts.sam import clear_cache
         g_clear_cache = clear_cache
     g_clear_cache()
-
-
 
 
 def inpaint(
@@ -83,7 +82,7 @@ def inpaint(
     )
 
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
-    p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
+    addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed
     p.do_not_save_grid = not gArgs.save_grid
     if replacer_scripts.script_controlnet and gArgs.cn_args is not None and gArgs.cn_args != []:
