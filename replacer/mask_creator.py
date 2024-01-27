@@ -120,8 +120,5 @@ class MasksCreator:
                     transparent = Image.new('RGBA', imageResized.size, (255, 0, 0, 0))
                     self.cutted[i].paste(transparent, avoidanceMasks[i])
 
-        for i in range(len(self.masks)):
-            self.masks[i] = self.masks[i].resize(self.image.size)
-
         if needAutoUnloadModels():
             clear_cache()

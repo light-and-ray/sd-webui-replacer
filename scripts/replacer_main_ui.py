@@ -476,6 +476,15 @@ def on_ui_tabs():
                             if not replacer_scripts.script_controlnet:
                                 hf_disable_cn.visible = False
 
+                            hf_extra_mask_expand = gr.Slider(
+                                label='Extra mask expand',
+                                value=0,
+                                step=1,
+                                minimum=0,
+                                maximum=200,
+                                elem_id="replacer_hf_extra_mask_expand",
+                            )
+
 
 
         def tab_single_on_select():
@@ -564,6 +573,7 @@ def on_ui_tabs():
                 hf_above_limit_upscaler,
                 hf_unload_detection_models,
                 hf_disable_cn,
+                hf_extra_mask_expand,
             ],
             outputs=[
                 img2img_gallery,

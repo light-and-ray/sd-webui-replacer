@@ -157,6 +157,4 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - allow multiply instances
 
 ### small todo:
-- add additional options: do exacly steps the slider specifies
-- extra mask expand for hires fix
 - copy `images` while appling hires fix

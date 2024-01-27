@@ -17,7 +17,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata
+from replacer.tools import addReplacerMetadata, extraMaskExpand
 
 g_clear_cache = None
 
@@ -68,7 +68,7 @@ def inpaint(
         width=gArgs.width,
         height=gArgs.height,
         init_images=[image],
-        mask=gArgs.mask,
+        mask=gArgs.mask.resize(image.size),
         mask_blur=gArgs.mask_blur,
         inpainting_fill=inpainting_fill,
         resize_mode=0,
@@ -469,6 +469,7 @@ def applyHiresFix(
     hf_above_limit_upscaler,
     hf_unload_detection_models,
     hf_disable_cn,
+    hf_extra_mask_expand,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -488,6 +489,8 @@ def applyHiresFix(
         hrArgs.sampler_name = hf_sampler
     if hf_steps != 0:
         hrArgs.steps = hf_steps
+    if hf_extra_mask_expand != 0:
+        hrArgs.mask = extraMaskExpand(hrArgs.mask, hf_extra_mask_expand)
 
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original

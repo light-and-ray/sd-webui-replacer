@@ -1,4 +1,5 @@
-from PIL import ImageChops
+from PIL import ImageChops, Image
+from dataclasses import dataclass
 from replacer.generation_args import GenerationArgs
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):
@@ -23,3 +24,30 @@ def areImagesTheSame(image_one, image_two):
     else:
         return True
 
+
+
+@dataclass
+class CashedExtraMaskExpand:
+    mask: Image
+    expand: int
+    result: Image
+cashedExtraMaskExpand: CashedExtraMaskExpand = None
+
+update_mask = None
+
+def extraMaskExpand(mask: Image, expand: int):
+    global cashedExtraMaskExpand, update_mask
+
+    if cashedExtraMaskExpand is not None and\
+            cashedExtraMaskExpand.expand == expand and\
+            areImagesTheSame(cashedExtraMaskExpand.mask, mask):
+        print('extraMaskExpand restored from cache')
+        return cashedExtraMaskExpand.result
+    else:
+        if update_mask is None:
+            from scripts.sam import update_mask as update_mask_
+            update_mask = update_mask_
+        expandedMask = update_mask(mask, 0, expand, mask.convert('RGBA'))[1]
+        cashedExtraMaskExpand = CashedExtraMaskExpand(mask, expand, expandedMask)
+        print('extraMaskExpand cached')
+        return expandedMask
