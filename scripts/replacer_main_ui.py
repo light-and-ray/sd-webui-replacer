@@ -295,6 +295,8 @@ def on_ui_tabs():
                             elem_id="replacer_extra_includes",
                             value=["script"],
                         )
+                        fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
+                            value=False, elem_id="replacer_fix_steps")
 
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
@@ -535,6 +537,7 @@ def on_ui_tabs():
                 inpainting_mask_invert,
                 save_grid,
                 extra_includes,
+                fix_steps,
             ] + cn_inputs,
             outputs=[
                 img2img_gallery,

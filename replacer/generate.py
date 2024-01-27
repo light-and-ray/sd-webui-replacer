@@ -207,6 +207,7 @@ def generate(
     inpainting_mask_invert,
     save_grid,
     extra_includes,
+    fix_steps,
     *scripts_args,
 ):
     restoreList = []
@@ -306,8 +307,6 @@ def generate(
             return [], "", plaintext_to_html(f"no input images"), ""
         shared.state.job_count = generationsN*batch_count
 
-        img2img_fix_steps = False
-
         gArgs = GenerationArgs(
             positvePrompt,
             negativePrompt,
@@ -333,7 +332,7 @@ def generate(
             height,
             width,
             inpaint_padding,
-            img2img_fix_steps,
+            fix_steps,
             inpainting_mask_invert,
 
             images,
