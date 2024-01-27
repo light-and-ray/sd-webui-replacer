@@ -2,7 +2,7 @@ import gradio as gr
 from modules import scripts, shared, sd_samplers, ui_toprow, ui, script_callbacks
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton, ResizeHandleRow
-from modules.call_queue import wrap_gradio_gpu_call
+from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
 from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
@@ -21,6 +21,18 @@ try:
 except Exception as e:
     OUTPUT_PANEL_AVALIABLE = False
 
+
+def unloadModels():
+    mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
+    memBefore = mem_stats['reserved']
+    from scripts.sam import clear_cache
+    clear_cache()
+    mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
+    memAfter = mem_stats['reserved']
+    
+    text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM freed'
+    print(text)
+    gr.Info(text)
 
 
 def hideSegmantAnythingAccordions(demo, app):
@@ -573,9 +585,8 @@ def on_ui_tabs():
         )
 
         if not needAutoUnloadModels():
-            from scripts.sam import clear_cache
             unload.click(
-                fn=clear_cache,
+                fn=wrap_queued_call(unloadModels),
                 inputs=[],
                 outputs=[])
 
