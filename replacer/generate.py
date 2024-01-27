@@ -105,7 +105,7 @@ def inpaint(
             additional_save_suffix = getattr(image, 'additional_save_suffix', None)
             suffix = saveSuffix
             if additional_save_suffix:
-                suffix = additional_save_suffix + '-' + suffix
+                suffix = additional_save_suffix + suffix
             save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
                     info=processed.infotext(p, i), p=p, suffix=suffix, save_to_dirs=save_to_dirs)
 
@@ -248,9 +248,10 @@ def generate(
                     if isinstance(img, Image.Image):
                         image = img
                     else:
-                        image = Image.open(os.path.abspath(img.name)).convert('RGBA')
+                        filename = os.path.abspath(img.name)
+                        image = Image.open(filename).convert('RGBA')
                         if keep_original_filenames:
-                            image.additional_save_suffix = os.path.basename(os.path.abspath(img.name))
+                            image.additional_save_suffix = '-' + os.path.basename(filename)
                     yield image
             if image_batch is None:
                 generationsN = 0
@@ -266,7 +267,7 @@ def generate(
                     try:
                         image = Image.open(filename).convert('RGBA')
                         if keep_original_filenames_from_dir:
-                            image.additional_save_suffix = os.path.basename(filename)
+                            image.additional_save_suffix = '-' + os.path.basename(filename)
                     except Exception:
                         continue
                     yield image
