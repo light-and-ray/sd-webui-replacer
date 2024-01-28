@@ -35,18 +35,6 @@ def unloadModels():
     gr.Info(text)
 
 
-def hideSegmantAnythingAccordions(demo, app):
-    try:
-        for tab in ['txt2img', 'img2img']:
-            samUseCpuPath = f"{tab}/Use CPU for SAM/value"
-            samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
-            accordion = samUseCpu.parent.parent.parent.parent
-            accordion.visible = False
-            accordion.render = False
-        print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
-    except Exception as e:
-        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}")
-
 
 def getSubmitJsFunction(galleryId, buttonsId):
     return 'function(){'\
@@ -54,21 +42,6 @@ def getSubmitJsFunction(galleryId, buttonsId):
         f'arguments_.push("{buttonsId}", "{galleryId}");'\
         'return submit_replacer.apply(null, arguments_);'\
     '}'
-
-
-class Script(scripts.Script):
-    def __init__(self) -> None:
-        super().__init__()
-
-    def title(self):
-        return EXT_NAME
-
-    def show(self, is_img2img):
-        return scripts.AlwaysVisible
-
-    def ui(self, is_img2img):
-        return ()
-
 
 
 
@@ -615,6 +588,21 @@ def on_ui_tabs():
 
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
+
+
+
+def hideSegmantAnythingAccordions(demo, app):
+    try:
+        for tab in ['txt2img', 'img2img']:
+            samUseCpuPath = f"{tab}/Use CPU for SAM/value"
+            samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
+            accordion = samUseCpu.parent.parent.parent.parent
+            accordion.visible = False
+            accordion.render = False
+        print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
+    except Exception as e:
+        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}")
+
 
 if needHideSegmentAnythingAccordions():
     script_callbacks.on_app_started(hideSegmantAnythingAccordions)

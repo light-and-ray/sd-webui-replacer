@@ -434,30 +434,6 @@ def generate(
 
 
 
-
-def applyHiresFixSingle(
-    image : Image,
-    gArgs : GenerationArgs,
-    hrArgs : GenerationArgs,
-    saveDir : str,
-):
-    shared.state.textinfo = "inpaint with upscaler"
-    processed, scriptImages = inpaint(image, gArgs)
-    generatedImages = processed.images
-
-    n = len(generatedImages)
-    if n > 1: 
-        print(f'    [{EXT_NAME}]    hiresfix batch count*size {n} for single image')
-
-    for generatedImage in generatedImages:
-        shared.state.textinfo = "hiresfix"
-        processed, scriptImages = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
-
-    return processed
-
-
-
-
 def applyHiresFix(
     hf_upscaler,
     hf_steps,
@@ -511,21 +487,36 @@ def applyHiresFix(
     shared.total_tqdm.clear()
     shared.total_tqdm.updateTotal(gArgs.steps + hrArgs.steps)
 
-    for image in gArgs.images:
-        saveDir = getSaveDir()
-        hrArgs.width, hrArgs.height = image.size
-        if hrArgs.height > hf_size_limit:
-            hrArgs.height = hf_size_limit
-            hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
-        if hrArgs.width > hf_size_limit:
-            hrArgs.width = hf_size_limit
-            hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
+    image = None
+    for image_ in gArgs.images:
+        image = image_
+        break
 
-        processed : Processed = applyHiresFixSingle(image, gArgs, hrArgs, saveDir)
+    saveDir = getSaveDir()
+    hrArgs.width, hrArgs.height = image.size
+    if hrArgs.height > hf_size_limit:
+        hrArgs.height = hf_size_limit
+        hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
+    if hrArgs.width > hf_size_limit:
+        hrArgs.width = hf_size_limit
+        hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
+
+    shared.state.textinfo = "inpaint with upscaler"
+    processed, scriptImages = inpaint(image, gArgs)
+    generatedImages = processed.images
+    generatedImage = None
+    for generatedImage_ in generatedImages:
+        generatedImage = generatedImage_
+        break
+
+    shared.state.textinfo = "hiresfix"
+    processed, scriptImages = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
 
     shared.state.end()
 
     return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+
+
 
 
 def generate_webui(id_task, *args, **kwargs):
