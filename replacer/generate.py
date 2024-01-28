@@ -491,7 +491,6 @@ def applyHiresFix(
         hrArgs.steps = hf_steps
     if hf_extra_mask_expand != 0:
         hrArgs.mask = extraMaskExpand(hrArgs.mask, hf_extra_mask_expand)
-
     hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True
@@ -501,7 +500,7 @@ def applyHiresFix(
     if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
         print(errorText)
-        return None, "", errorText, ""
+        return None, "", plaintext_to_html(errorText), ""
 
 
     if hf_unload_detection_models:

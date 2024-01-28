@@ -284,8 +284,8 @@ def on_ui_tabs():
                             value='Inpaint masked',
                             type="index",
                             elem_id="replacer_mask_mode")
-                        save_grid = gr.Checkbox(label='Save grid for batch size/count',
-                            value=False, elem_id="replacer_save_grid")
+                        fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
+                            value=False, elem_id="replacer_fix_steps")
 
                     with gr.Row():
                         extra_includes = gr.CheckboxGroup(
@@ -295,8 +295,8 @@ def on_ui_tabs():
                             elem_id="replacer_extra_includes",
                             value=["script"],
                         )
-                        fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
-                            value=False, elem_id="replacer_fix_steps")
+                        save_grid = gr.Checkbox(label='Save grid for batch size/count',
+                            value=False, elem_id="replacer_save_grid")
 
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
