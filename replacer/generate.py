@@ -40,8 +40,7 @@ def inpaint(
     override_settings = {}
     if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
-    if gArgs.img2img_fix_steps is not None and gArgs.img2img_fix_steps != "":
-        override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
+    override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
     inpainting_fill = gArgs.inpainting_fill
     if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)

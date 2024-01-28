@@ -30,7 +30,7 @@ def unloadModels():
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
     memAfter = mem_stats['reserved']
     
-    text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM freed'
+    text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM were freed'
     print(text)
     gr.Info(text)
 
