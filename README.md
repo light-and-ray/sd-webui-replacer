@@ -53,6 +53,8 @@ Default settings designed for using lcm lora for fast upscale. It requires lcm l
 
 Despite in txt2img for lcm lora DPM++ samplers produses awful results, while hires fix it produces a way better result. So I recommend to "Use the same sampler" option
 
+Note: hires fix is designed for single-user server
+
 ### Advanced options
 
 I do not recommend change these options, if you don't know what you do

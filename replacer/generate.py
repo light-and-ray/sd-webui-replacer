@@ -304,7 +304,7 @@ def generate(
 
 
         if generationsN == 0:
-            return [], "", plaintext_to_html(f"no input images"), ""
+            return [], "", plaintext_to_html("no input images"), ""
         shared.state.job_count = generationsN*batch_count
 
         gArgs = GenerationArgs(
@@ -453,7 +453,7 @@ def applyHiresFix(
 
     global lastGenerationArgs
     if lastGenerationArgs is None:
-        return [], "", "", ""
+        return [], "", plaintext_to_html("no last generation data"), ""
 
     gArgs = copy.copy(lastGenerationArgs)
     gArgs.upscalerForImg2Img = hf_upscaler
@@ -503,11 +503,7 @@ def applyHiresFix(
 
     shared.state.textinfo = "inpaint with upscaler"
     processed, scriptImages = inpaint(image, gArgs)
-    generatedImages = processed.images
-    generatedImage = None
-    for generatedImage_ in generatedImages:
-        generatedImage = generatedImage_
-        break
+    generatedImage = processed.images[0]
 
     shared.state.textinfo = "hiresfix"
     processed, scriptImages = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
