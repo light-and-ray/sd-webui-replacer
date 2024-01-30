@@ -1,7 +1,5 @@
 import os
 from typing import Any
-
-import gradio as gr
 import numpy as np
 from PIL import Image
 from fastapi import FastAPI, Body
@@ -42,8 +40,9 @@ def encode_to_base64(image):
         raise Exception("Invalid type")
 
 
-def replacer_api(_: gr.Blocks, app: FastAPI):
+def replacer_api(_, app: FastAPI):
     from scripts.sam import sam_model_list
+    from scripts.dino import dino_model_list
 
     class ReplaceRequest(BaseModel):
         input_image: str
@@ -54,7 +53,7 @@ def replacer_api(_: gr.Blocks, app: FastAPI):
         width: int = 512
         height: int = 512
         sam_model_name: str = sam_model_list[0] if sam_model_list else ""
-        dino_model_name: str = "GroundingDINO_SwinT_OGC (694MB)"
+        dino_model_name: str = dino_model_list[0]
         seed: int = -1
         sampler: str = "DPM++ 2M SDE Karras"
         steps: int = 20
@@ -66,6 +65,8 @@ def replacer_api(_: gr.Blocks, app: FastAPI):
         denoise: int = 1
         inpaint_padding = 40
         inpainting_mask_invert: bool = False
+        upscaler_for_img2img : str = None
+        fix_steps : bool = False
 
         @validator("detection_prompt", "avoidance_prompt", "positive_prompt", "negative_prompt")
         def validate_prompts(cls, value: str, field) -> str:
@@ -85,11 +86,13 @@ def replacer_api(_: gr.Blocks, app: FastAPI):
     @app.post("/replacer/replace")
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_to_pil(data.input_image).convert("RGBA")
-        args = GenerationArgs(data.positive_prompt, data.negative_prompt, data.detection_prompt, data.avoidance_prompt,
-                              None, None, data.seed, data.sam_model_name, data.dino_model_name, data.box_threshold,
-                              data.mask_expand, data.max_resolution_on_detection, data.steps, data.sampler,
-                              data.mask_blur, 1, 1, 1, data.cfg_scale, data.denoise, data.height, data.width,
-                              data.inpaint_padding, False, data.inpainting_mask_invert, [image], 1, False, [])
+        args = GenerationArgs(
+            data.positive_prompt, data.negative_prompt, data.detection_prompt, data.avoidance_prompt,
+            None, data.upscaler_for_img2img, data.seed, data.sam_model_name, data.dino_model_name, data.box_threshold,
+            data.mask_expand, data.max_resolution_on_detection, data.steps, data.sampler,
+            data.mask_blur, 1, 1, 1, data.cfg_scale, data.denoise, data.height, data.width,
+            data.inpaint_padding, data.fix_steps, data.inpainting_mask_invert, [image], 1, False, []
+        )
         processed, _ = generateSingle(image, args, "", "", False, [], [])
 
         return {"image": encode_to_base64(processed.images[0])}
@@ -100,4 +103,4 @@ try:
 
     script_callbacks.on_app_started(replacer_api)
 except:
-    print("SAM Web UI API failed to initialize")
+    print("Replacer Web UI API failed to initialize")

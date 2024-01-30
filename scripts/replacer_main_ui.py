@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import scripts, shared, sd_samplers, ui_toprow, ui, script_callbacks
+from modules import shared, sd_samplers, ui_toprow, ui, script_callbacks
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
@@ -227,11 +227,11 @@ def on_ui_tabs():
                                 minimum=1, maximum=10, step=1)
 
                     with gr.Row():
-                        upscalerForImg2Img = gr.Dropdown(
+                        upscaler_for_img2img = gr.Dropdown(
                             value=None,
                             choices=[x.name for x in shared.sd_upscalers],
                             label="Upscaler for img2Img",
-                            elem_id="replacer_upscalerForImg2Img",
+                            elem_id="replacer_upscaler_for_img2img",
                         )
 
                         if cmd_opts.use_textbox_seed:
@@ -498,7 +498,7 @@ def on_ui_tabs():
                 input_video,
                 video_output_dir,
                 target_video_fps,
-                upscalerForImg2Img,
+                upscaler_for_img2img,
                 seed,
                 sampler,
                 steps,
