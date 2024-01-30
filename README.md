@@ -125,6 +125,7 @@ API is avaliable on `/replacer/replace`
     inpainting_mask_invert: bool = False
     upscaler_for_img2img : str = ""
     fix_steps : bool = False
+    inpainting_fill : int = 0
 ```
 
 http://127.0.0.1:7860/docs#/default/api_replacer_replace_replacer_replace_post
