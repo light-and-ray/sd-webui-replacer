@@ -111,7 +111,7 @@ API is avaliable on `/replacer/replace`
     width: int = 512
     height: int = 512
     sam_model_name: str = sam_model_list[0] if sam_model_list else ""
-    dino_model_name: str = "GroundingDINO_SwinT_OGC (694MB)"
+    dino_model_name: str = dino_model_list[0]
     seed: int = -1
     sampler: str = "DPM++ 2M SDE Karras"
     steps: int = 20
@@ -182,7 +182,6 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - ☑️ additional options
 - ☑️ progress bar + interrupt
 - option for pass into hires fix automatically
-- batch get options from png info
 - ☑️ control net
 - tiled vae
 - ☑️ "hide segment anything extention" option
