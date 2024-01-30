@@ -95,7 +95,7 @@ def on_ui_tabs():
                     if (useFirstPositivePromptFromExamples()):
                         placeholder = getPositivePromptExamples()[0]
 
-                    positvePrompt = gr.Textbox(label="Positve prompt",
+                    positvePrompt = gr.Textbox(label="Positive prompt",
                                         show_label=True,
                                         lines=1,
                                         elem_classes=["positvePrompt"],
@@ -442,7 +442,7 @@ def on_ui_tabs():
 
                         with gr.Row():
                             hf_disable_cn = gr.Checkbox(
-                                label='Disable ControlNet while hires. fix',
+                                label='Disable ControlNet while hires fix',
                                 value=True,
                                 elem_id="replacer_hf_disable_cn",
                             )
@@ -591,7 +591,7 @@ script_callbacks.on_ui_tabs(on_ui_tabs)
 
 
 
-def hideSegmantAnythingAccordions(demo, app):
+def hideSegmentAnythingAccordions(demo, app):
     try:
         for tab in ['txt2img', 'img2img']:
             samUseCpuPath = f"{tab}/Use CPU for SAM/value"
@@ -605,6 +605,6 @@ def hideSegmantAnythingAccordions(demo, app):
 
 
 if needHideSegmentAnythingAccordions():
-    script_callbacks.on_app_started(hideSegmantAnythingAccordions)
+    script_callbacks.on_app_started(hideSegmentAnythingAccordions)
 
 
