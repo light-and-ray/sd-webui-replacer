@@ -8,10 +8,11 @@ from fastapi import FastAPI, Body
 from pydantic import BaseModel, validator
 from replacer.generate import generateSingle
 from replacer.generation_args import GenerationArgs
-from replacer.options import (getDetectionPromptExamples, getAvoidancePromptExamples, getPositivePromptExamples,
-                              getNegativePromptExamples, useFirstPositivePromptFromExamples,
-                              useFirstNegativePromptFromExamples,
-                              )
+from replacer.options import (
+    getDetectionPromptExamples, getAvoidancePromptExamples, getPositivePromptExamples,
+    getNegativePromptExamples, useFirstPositivePromptFromExamples,
+    useFirstNegativePromptFromExamples,
+)
 
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 
@@ -26,7 +27,7 @@ def decode_to_pil(image):
     elif type(image) is np.ndarray:
         return Image.fromarray(image)
     else:
-        Exception("Not an image")
+        raise Exception("Not an image")
 
 
 def encode_to_base64(image):
@@ -38,7 +39,7 @@ def encode_to_base64(image):
         pil = Image.fromarray(image)
         return encode_pil_to_base64(pil).decode()
     else:
-        Exception("Invalid type")
+        raise Exception("Invalid type")
 
 
 def replacer_api(_: gr.Blocks, app: FastAPI):

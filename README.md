@@ -99,6 +99,33 @@ To suppress flickering you can generate in little fps (e.g. 10), then interpolat
 You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
 
 
+### API
+API is avaliable on `/replacer/replace`
+
+```python
+    input_image: str
+    detection_prompt: str = ""
+    avoidance_prompt: str = ""
+    positive_prompt: str = ""
+    negative_prompt: str = ""
+    width: int = 512
+    height: int = 512
+    sam_model_name: str = sam_model_list[0] if sam_model_list else ""
+    dino_model_name: str = "GroundingDINO_SwinT_OGC (694MB)"
+    seed: int = -1
+    sampler: str = "DPM++ 2M SDE Karras"
+    steps: int = 20
+    box_threshold: float = 0.3
+    mask_expand: int = 35
+    mask_blur: int = 4
+    max_resolution_on_detection = 1280
+    cfg_scale: float = 5.5
+    denoise: int = 1
+    inpaint_padding = 40
+    inpainting_mask_invert: bool = False
+```
+
+
 ### Extention name
 If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
