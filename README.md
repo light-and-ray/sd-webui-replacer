@@ -129,6 +129,8 @@ API is avaliable on `/replacer/replace`
 
 http://127.0.0.1:7860/docs#/default/api_replacer_replace_replacer_replace_post
 
+See an example of usage in [apiExample.py](apiExample.py) script
+
 
 ### Extention name
 If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory.
