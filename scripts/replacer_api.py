@@ -45,7 +45,7 @@ def replacer_api(_, app: FastAPI):
     from scripts.dino import dino_model_list
 
     class ReplaceRequest(BaseModel):
-        input_image: str
+        input_image: str = "base64 or path on machine here"
         detection_prompt: str = ""
         avoidance_prompt: str = ""
         positive_prompt: str = ""
@@ -65,7 +65,7 @@ def replacer_api(_, app: FastAPI):
         denoise: int = 1
         inpaint_padding = 40
         inpainting_mask_invert: bool = False
-        upscaler_for_img2img : str = None
+        upscaler_for_img2img : str = ""
         fix_steps : bool = False
 
         @validator("detection_prompt", "avoidance_prompt", "positive_prompt", "negative_prompt")

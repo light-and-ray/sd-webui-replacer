@@ -103,7 +103,7 @@ You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-cont
 API is avaliable on `/replacer/replace`
 
 ```python
-    input_image: str
+    input_image: str = "base64 or path on server here"
     detection_prompt: str = ""
     avoidance_prompt: str = ""
     positive_prompt: str = ""
@@ -123,7 +123,7 @@ API is avaliable on `/replacer/replace`
     denoise: int = 1
     inpaint_padding = 40
     inpainting_mask_invert: bool = False
-    upscaler_for_img2img : str = None
+    upscaler_for_img2img : str = ""
     fix_steps : bool = False
 ```
 
