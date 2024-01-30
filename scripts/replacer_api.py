@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 from fastapi import FastAPI, Body
 from pydantic import BaseModel, validator
+import modules.script_callbacks as script_callbacks
+from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generateSingle
 from replacer.generation_args import GenerationArgs
 from replacer.options import (
@@ -11,8 +13,6 @@ from replacer.options import (
     getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples,
 )
-
-from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 
 
 def decode_to_pil(image):
@@ -45,7 +45,7 @@ def replacer_api(_, app: FastAPI):
     from scripts.dino import dino_model_list
 
     class ReplaceRequest(BaseModel):
-        input_image: str = "base64 or path on machine here"
+        input_image: str = "base64 or path on server here"
         detection_prompt: str = ""
         avoidance_prompt: str = ""
         positive_prompt: str = ""
@@ -97,10 +97,4 @@ def replacer_api(_, app: FastAPI):
 
         return {"image": encode_to_base64(processed.images[0])}
 
-
-try:
-    import modules.script_callbacks as script_callbacks
-
-    script_callbacks.on_app_started(replacer_api)
-except:
-    print("Replacer Web UI API failed to initialize")
+script_callbacks.on_app_started(replacer_api)
