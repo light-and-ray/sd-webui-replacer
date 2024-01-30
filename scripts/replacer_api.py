@@ -3,16 +3,10 @@ from typing import Any
 import numpy as np
 from PIL import Image
 from fastapi import FastAPI, Body
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from replacer.generate import generate
 import modules.script_callbacks as script_callbacks
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
-from replacer.generate import generateSingle
-from replacer.generation_args import GenerationArgs
-from replacer.options import (
-    getDetectionPromptExamples, getAvoidancePromptExamples, getPositivePromptExamples,
-    getNegativePromptExamples, useFirstPositivePromptFromExamples,
-    useFirstNegativePromptFromExamples,
-)
 
 
 def decode_to_pil(image):
@@ -67,34 +61,24 @@ def replacer_api(_, app: FastAPI):
         inpainting_mask_invert: bool = False
         upscaler_for_img2img : str = ""
         fix_steps : bool = False
+        inpainting_fill : int = 0
 
-        @validator("detection_prompt", "avoidance_prompt", "positive_prompt", "negative_prompt")
-        def validate_prompts(cls, value: str, field) -> str:
-            value = value.strip()
-            if value:
-                return value
-
-            if field.name == "detection_prompt":
-                return getDetectionPromptExamples()[0]
-            if field.name == "avoidance_prompt":
-                return getAvoidancePromptExamples()[0]
-            if field.name == "positive_prompt" and useFirstPositivePromptFromExamples():
-                return getPositivePromptExamples()[0]
-            if field.name == "negative_prompt" and useFirstNegativePromptFromExamples():
-                return getNegativePromptExamples()[0]
 
     @app.post("/replacer/replace")
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_to_pil(data.input_image).convert("RGBA")
-        args = GenerationArgs(
-            data.positive_prompt, data.negative_prompt, data.detection_prompt, data.avoidance_prompt,
-            None, data.upscaler_for_img2img, data.seed, data.sam_model_name, data.dino_model_name, data.box_threshold,
-            data.mask_expand, data.max_resolution_on_detection, data.steps, data.sampler,
-            data.mask_blur, 1, 1, 1, data.cfg_scale, data.denoise, data.height, data.width,
-            data.inpaint_padding, data.fix_steps, data.inpainting_mask_invert, [image], 1, False, []
-        )
-        processed, _ = generateSingle(image, args, "", "", False, [], [])
+        
+        result = generate(
+            data.detection_prompt, data.avoidance_prompt, data.positive_prompt, data.negative_prompt,
+            0, image, [], False, "", "", False, False, "", "", 0, data.upscaler_for_img2img,
+            data.seed, data.sampler, data.steps, data.box_threshold, data.mask_expand, data.mask_blur, 
+            data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
+            data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, 1, data.height, 1,
+            data.inpainting_mask_invert, False, [], data.fix_steps,
+        )[0][0]
 
-        return {"image": encode_to_base64(processed.images[0])}
+        return {"image": encode_to_base64(result)}
+
 
 script_callbacks.on_app_started(replacer_api)
+

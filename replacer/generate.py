@@ -84,7 +84,7 @@ def inpaint(
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed
     p.do_not_save_grid = not gArgs.save_grid
-    if replacer_scripts.script_controlnet and gArgs.cn_args is not None and gArgs.cn_args != []:
+    if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
         replacer_scripts.enableInpaintModeForCN(gArgs.cn_args)
         p.scripts = copy.copy(scripts.scripts_img2img)
         p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
