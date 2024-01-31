@@ -22,7 +22,7 @@ def mountDedicatedPage(demo, app):
             progress.progressapi, methods=["POST"],
             response_model=progress.ProgressResponse)
 
-        with gr.Blocks() as replacerUi:
+        with gr.Blocks(title=EXT_NAME) as replacerUi:
             gr.Textbox(elem_id="txt2img_prompt", visible=False) # triggers onUiLoaded
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME}_dedicated"):
