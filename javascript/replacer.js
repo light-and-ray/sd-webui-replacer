@@ -2,6 +2,7 @@ function submit_replacer() {
     var arguments_ = Array.from(arguments);
     galleryId = arguments_.pop();
     buttonsId = arguments_.pop();
+    extraShowButtonsId = arguments_.pop();
     showSubmitButtons(buttonsId, false);
 
     var id = randomId();
@@ -9,9 +10,9 @@ function submit_replacer() {
     requestProgress(id, 
         gradioApp().getElementById(galleryId + "_gallery_container"),
         gradioApp().getElementById(galleryId + "_gallery"),
-        function() { 
-            showSubmitButtons('replacer', true);
-            showSubmitButtons('replacer_hf', true);
+        function() {
+            showSubmitButtons(buttonsId, true);
+            showSubmitButtons(extraShowButtonsId, true);
         }
         );
 

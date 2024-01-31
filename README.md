@@ -99,6 +99,10 @@ To suppress flickering you can generate in little fps (e.g. 10), then interpolat
 You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
 
 
+### Dedicated page
+Dedicated page (replacer tab only) is avaliable on url `/replacer-dedicated`
+
+
 ### API
 API is avaliable on `/replacer/replace`
 

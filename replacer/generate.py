@@ -40,6 +40,8 @@ def inpaint(
     override_settings = {}
     if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
+    if (gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != ""):
+        override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
     inpainting_fill = gArgs.inpainting_fill
@@ -207,6 +209,7 @@ def generate(
     save_grid,
     extra_includes,
     fix_steps,
+    sd_model_checkpoint,
     *scripts_args,
 ):
     restoreList = []
@@ -337,6 +340,7 @@ def generate(
             images,
             generationsN,
             save_grid,
+            sd_model_checkpoint,
 
             scripts_args,
             )
