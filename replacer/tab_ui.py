@@ -37,10 +37,14 @@ def unloadModels():
 
 
 
-def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
-    show_progressbar = 'true' if shared.opts.show_progressbar else 'false'
+def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, isDeicatedPage):
+    if isDeicatedPage:
+        applyOptions = f'opts = {shared.opts.dumpjson()};'
+    else:
+        applyOptions = ''
+
     return 'function(){'\
-        f'opts.show_progressbar = {show_progressbar};'\
+        f'{applyOptions}'\
         'var arguments_ = Array.from(arguments);'\
         f'arguments_.push("{extraShowButtonsId}", "{buttonsId}", "{galleryId}");'\
         'return submit_replacer.apply(null, arguments_);'\
@@ -493,7 +497,7 @@ def getReplacerTabUI(isDeicatedPage):
 
 
         run_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf'),
+            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf', isDeicatedPage),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -547,7 +551,7 @@ def getReplacerTabUI(isDeicatedPage):
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart),
+            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart, isDeicatedPage),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
