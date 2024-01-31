@@ -137,7 +137,7 @@ def getReplacerTabUI(isDeicatedPage):
                 if not isDeicatedPage:
                     runButtonIdPart='replacer'
                 else:
-                    runButtonIdPart='replacer_dedicated'
+                    runButtonIdPart='replacer-dedicated'
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit

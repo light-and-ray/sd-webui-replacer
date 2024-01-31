@@ -30,7 +30,7 @@ def mountDedicatedPage(demo, app):
         
         loadsave = copy.copy(demo.ui_loadsave)  
         loadsave.finalized_ui = False
-        loadsave.add_block(replacerUi, f'{EXT_NAME}')
+        loadsave.add_block(replacerUi, EXT_NAME)
         loadsave.dump_defaults()
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)
