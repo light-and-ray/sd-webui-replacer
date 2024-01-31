@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from replacer.generate import generate
 import modules.script_callbacks as script_callbacks
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
+from modules import shared
 
 
 def decode_to_pil(image):
@@ -37,6 +38,11 @@ def encode_to_base64(image):
 def replacer_api(_, app: FastAPI):
     from scripts.sam import sam_model_list
     from scripts.dino import dino_model_list
+    try:
+        from lama_cleaner_masked_content.inpaint import lamaInpaint
+        lama_cleaner_avaliable = True
+    except Exception as e:
+        lama_cleaner_avaliable = False
 
     class ReplaceRequest(BaseModel):
         input_image: str = "base64 or path on server here"
@@ -78,6 +84,16 @@ def replacer_api(_, app: FastAPI):
         )[0][0]
 
         return {"image": encode_to_base64(result)}
+
+
+    @app.post("/replacer/avaliable_options")
+    async def api_replacer_avaliable_options() -> Any:
+        return {
+            "sam_model_name": sam_model_list,
+            "dino_model_name": dino_model_list,
+            "upscalers": [""] + [x.name for x in shared.sd_upscalers],
+            "lama_cleaner_avaliable": lama_cleaner_avaliable,
+            }
 
 
 script_callbacks.on_app_started(replacer_api)

@@ -23,6 +23,6 @@ response = requests.post(url=f'{SD_WEBUI}/replacer/replace', json=payload)
 if response.status_code == 200:
     response = response.json()
     if response['image']:
-        image = Image.open(io.BytesIO(base64.b64decode(response['image']))).show()
+        Image.open(io.BytesIO(base64.b64decode(response['image']))).show()
 else:
     print(response.json())

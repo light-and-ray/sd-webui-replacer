@@ -128,6 +128,8 @@ API is avaliable on `/replacer/replace`
     inpainting_fill : int = 0
 ```
 
+Avaliable options on `/replacer/avaliable_options`
+
 http://127.0.0.1:7860/docs#/default/api_replacer_replace_replacer_replace_post
 
 See an example of usage in [apiExample.py](apiExample.py) script
