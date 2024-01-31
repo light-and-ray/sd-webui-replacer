@@ -130,6 +130,7 @@ API is avaliable on `/replacer/replace`
     upscaler_for_img2img : str = ""
     fix_steps : bool = False
     inpainting_fill : int = 0
+    sd_model_checkpoint : str = ""
 ```
 
 Avaliable options on `/replacer/avaliable_options`

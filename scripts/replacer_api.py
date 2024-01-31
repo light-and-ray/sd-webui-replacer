@@ -68,6 +68,7 @@ def replacer_api(_, app: FastAPI):
         upscaler_for_img2img : str = ""
         fix_steps : bool = False
         inpainting_fill : int = 0
+        sd_model_checkpoint : str = ""
 
 
     @app.post("/replacer/replace")
@@ -80,7 +81,7 @@ def replacer_api(_, app: FastAPI):
             data.seed, data.sampler, data.steps, data.box_threshold, data.mask_expand, data.mask_blur, 
             data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
             data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, 1, data.height, 1,
-            data.inpainting_mask_invert, False, [], data.fix_steps,
+            data.inpainting_mask_invert, False, [], data.fix_steps, data.sd_model_checkpoint,
         )[0][0]
 
         return {"image": encode_to_base64(result)}
