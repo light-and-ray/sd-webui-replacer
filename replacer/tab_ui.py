@@ -82,22 +82,6 @@ def getReplacerTabUI(isDeicatedPage):
                     )
 
                 with gr.Row():
-                    avoidancePrompt = gr.Textbox(label="Avoidance prompt",
-                                        show_label=True,
-                                        lines=1,
-                                        elem_classes=["avoidancePrompt"],
-                                        placeholder=None,
-                                        elem_id="replacer_avoidancePrompt")
-
-                    gr.Examples(
-                        examples=getAvoidancePromptExamples(),
-                        inputs=avoidancePrompt,
-                        label="",
-                        elem_id="replacer_avoidancePrompt_examples",
-                        examples_per_page=getAvoidancePromptExamplesNumber(),
-                    )
-
-                with gr.Row():
                     placeholder = None
                     if (useFirstPositivePromptFromExamples()):
                         placeholder = getPositivePromptExamples()[0]
@@ -225,6 +209,44 @@ def getReplacerTabUI(isDeicatedPage):
 
                         with gr.Tab('Inpainting'):
                             with gr.Row():
+                                denoise = gr.Slider(label='Denoising',
+                                    value=1.0, elem_id="replacer_denoise",
+                                    minimum=0.0, maximum=1.0, step=0.01)
+                                inpaint_padding = gr.Slider(label='Padding',
+                                    value=40, elem_id="replacer_inpaint_padding",
+                                    minimum=0, maximum=250, step=1)
+
+                            with gr.Row():
+                                with gr.Column(scale=2):
+                                    inpainting_fill = gr.Radio(label='Masked content',
+                                        choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                                        value='fill', type="index", elem_id="replacer_inpainting_fill")
+
+                                with gr.Column():
+                                    inpainting_mask_invert = gr.Radio(
+                                        label='Mask mode',
+                                        choices=['Inpaint masked', 'Inpaint not masked'],
+                                        value='Inpaint masked',
+                                        type="index",
+                                        elem_id="replacer_mask_mode")
+
+
+                            with gr.Row():
+                                with gr.Column(scale=2):
+                                    extra_includes = gr.CheckboxGroup(
+                                        choices=["mask", "box", "cutted", "preview", "script"],
+                                        label="Extra include in gallery",
+                                        type="value",
+                                        elem_id="replacer_extra_includes",
+                                        value=["script"],
+                                    )
+                                
+                                with gr.Column():
+                                    save_grid = gr.Checkbox(label='Save grid for batch size/count',
+                                        value=False, elem_id="replacer_save_grid")
+
+                        with gr.Tab('Detection'):
+                            with gr.Row():
                                 box_threshold = gr.Slider(label='Box Threshold',
                                     value=0.3, elem_id="replacer_box_threshold",
                                     minimum=0.0, maximum=1.0, step=0.05)
@@ -261,37 +283,22 @@ def getReplacerTabUI(isDeicatedPage):
 
                                 dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
 
+                        with gr.Tab('Avoidance'):
                             with gr.Row():
-                                denoise = gr.Slider(label='Denoising',
-                                    value=1.0, elem_id="replacer_denoise",
-                                    minimum=0.0, maximum=1.0, step=0.01)
-                                inpaint_padding = gr.Slider(label='Padding',
-                                    value=40, elem_id="replacer_inpaint_padding",
-                                    minimum=0, maximum=250, step=1)
+                                avoidancePrompt = gr.Textbox(label="Avoidance prompt",
+                                                    show_label=True,
+                                                    lines=1,
+                                                    elem_classes=["avoidancePrompt"],
+                                                    placeholder=None,
+                                                    elem_id="replacer_avoidancePrompt")
 
-                            with gr.Row():
-                                inpainting_fill = gr.Radio(label='Masked content',
-                                    choices=['fill', 'original', 'latent noise', 'latent nothing'],
-                                    value='fill', type="index", elem_id="replacer_inpainting_fill")
-
-                                inpainting_mask_invert = gr.Radio(
-                                    label='Mask mode',
-                                    choices=['Inpaint masked', 'Inpaint not masked'],
-                                    value='Inpaint masked',
-                                    type="index",
-                                    elem_id="replacer_mask_mode")
-
-
-                            with gr.Row():
-                                extra_includes = gr.CheckboxGroup(
-                                    choices=["mask", "box", "cutted", "preview", "script"],
-                                    label="Extra include in gallery",
-                                    type="value",
-                                    elem_id="replacer_extra_includes",
-                                    value=["script"],
+                                gr.Examples(
+                                    examples=getAvoidancePromptExamples(),
+                                    inputs=avoidancePrompt,
+                                    label="",
+                                    elem_id="replacer_avoidancePrompt_examples",
+                                    examples_per_page=getAvoidancePromptExamplesNumber(),
                                 )
-                                save_grid = gr.Checkbox(label='Save grid for batch size/count',
-                                    value=False, elem_id="replacer_save_grid")
 
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
