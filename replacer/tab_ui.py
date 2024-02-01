@@ -62,7 +62,7 @@ def getReplacerTabUI(isDeicatedPage):
 
         with ResizeHandleRow():
 
-            with gr.Column():
+            with gr.Column(scale=3):
 
                 with gr.Row():
                     placeholder = getDetectionPromptExamples()[0]
@@ -150,137 +150,148 @@ def getReplacerTabUI(isDeicatedPage):
 
 
                 with gr.Accordion("Advanced options", open=False):
-                    with gr.Row():
-                        sampler = gr.Dropdown(
-                            label='Sampling method',
-                            elem_id="replacer_sampler",
-                            choices=sd_samplers.visible_sampler_names(),
-                            value="DPM++ 2M SDE Karras"
-                        )
+                    with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
+                        with gr.Tab('Generation'):
+                            with gr.Row():
+                                sampler = gr.Dropdown(
+                                    label='Sampling method',
+                                    elem_id="replacer_sampler",
+                                    choices=sd_samplers.visible_sampler_names(),
+                                    value="DPM++ 2M SDE Karras"
+                                )
 
-                        steps = gr.Slider(
-                            label='Steps',
-                            value=20,
-                            step=1,
-                            minimum=1,
-                            maximum=150,
-                            elem_id="replacer_steps"
-                        )
+                                steps = gr.Slider(
+                                    label='Steps',
+                                    value=20,
+                                    step=1,
+                                    minimum=1,
+                                    maximum=150,
+                                    elem_id="replacer_steps"
+                                )
+                            
+                            with gr.Row():
+                                cfg_scale = gr.Slider(label='CFG Scale',
+                                    value=5.5, elem_id="replacer_cfg_scale",
+                                    minimum=1.0, maximum=30.0, step=0.5)
 
-                    with gr.Row():
-                        box_threshold = gr.Slider(label='Box Threshold',
-                            value=0.3, elem_id="replacer_box_threshold",
-                            minimum=0.0, maximum=1.0, step=0.05)
-                        mask_expand = gr.Slider(label='Mask Expand',
-                            value=35, elem_id="replacer_mask_expand",
-                            minimum=-50, maximum=100, step=1)
-                        mask_blur = gr.Slider(label='Mask Blur',
-                            value=4, elem_id="replacer_mask_blur",
-                            minimum=0, maximum=10, step=1)
+                                fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
+                                    value=False, elem_id="replacer_fix_steps")
 
-                    with gr.Row():
+                            with gr.Row():
+                                with gr.Column():
+                                    width = gr.Slider(label='width',
+                                        value=512, elem_id="replacer_width",
+                                        minimum=64, maximum=2048, step=8)
+                                    height = gr.Slider(label='height',
+                                        value=512, elem_id="replacer_height",
+                                        minimum=64, maximum=2048, step=8)
+                                with gr.Column(elem_id="replacer_batch_count_size_column"):
+                                    batch_count = gr.Slider(label='batch count',
+                                        value=1, elem_id="replacer_batch_count",
+                                        minimum=1, maximum=10, step=1)
+                                    batch_size = gr.Slider(label='batch size',
+                                        value=1, elem_id="replacer_batch_size",
+                                        minimum=1, maximum=10, step=1)
 
-                        if not needAutoUnloadModels():
-                            unload = gr.Button(
-                                value="Unload detection models",
-                                elem_id="replacer_unload_detection_models")
+                            with gr.Row():
+                                upscaler_for_img2img = gr.Dropdown(
+                                    value=None,
+                                    choices=[x.name for x in shared.sd_upscalers],
+                                    label="Upscaler for img2Img",
+                                    elem_id="replacer_upscaler_for_img2img",
+                                )
 
-                        max_resolution_on_detection = gr.Slider(
-                            label='Max resolution on detection',
-                            value=1280,
-                            step=1,
-                            minimum=64,
-                            maximum=2560,
-                            elem_id="replacer_max_resolution_on_detection"
-                        )
+                                if cmd_opts.use_textbox_seed:
+                                    seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
+                                else:
+                                    seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
 
-                    with gr.Row():
-                        from scripts.sam import sam_model_list, refresh_sam_models
-                        from scripts.dino import dino_model_list
+                                random_seed = ToolButton(
+                                    ui.random_symbol,
+                                    elem_id="replacer_random_seed",
+                                    label='Random seed'
+                                )
+                                reuse_seed = ToolButton(
+                                    ui.reuse_symbol,
+                                    elem_id="replacer_reuse_seed",
+                                    label='Reuse seed'
+                                )
+                            
+                            if not isDeicatedPage:
+                                with gr.Row():
+                                    sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                                    override_sd_model = gr.Checkbox(label='Override stable diffusion model',
+                                        value=False, elem_id="replacer_override_sd_model")
 
-                        sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
-                            value=sam_model_list[0] if len(sam_model_list) > 0 else None)
-                        sam_refresh_models = ToolButton(value=refresh_symbol)
-                        sam_refresh_models.click(refresh_sam_models, sam_model_name,sam_model_name)
+                        with gr.Tab('Inpainting'):
+                            with gr.Row():
+                                box_threshold = gr.Slider(label='Box Threshold',
+                                    value=0.3, elem_id="replacer_box_threshold",
+                                    minimum=0.0, maximum=1.0, step=0.05)
+                                mask_expand = gr.Slider(label='Mask Expand',
+                                    value=35, elem_id="replacer_mask_expand",
+                                    minimum=-50, maximum=100, step=1)
+                                mask_blur = gr.Slider(label='Mask Blur',
+                                    value=4, elem_id="replacer_mask_blur",
+                                    minimum=0, maximum=10, step=1)
 
-                        dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
+                            with gr.Row():
+                                if not needAutoUnloadModels():
+                                    unload = gr.Button(
+                                        value="Unload detection models",
+                                        elem_id="replacer_unload_detection_models")
 
-                    with gr.Row():
-                        cfg_scale = gr.Slider(label='CFG Scale',
-                            value=5.5, elem_id="replacer_cfg_scale",
-                            minimum=1.0, maximum=30.0, step=0.5)
-                        denoise = gr.Slider(label='Denoising',
-                            value=1.0, elem_id="replacer_denoise",
-                            minimum=0.0, maximum=1.0, step=0.01)
-                        inpaint_padding = gr.Slider(label='Padding',
-                            value=40, elem_id="replacer_inpaint_padding",
-                            minimum=0, maximum=250, step=1)
+                                max_resolution_on_detection = gr.Slider(
+                                    label='Max resolution on detection',
+                                    value=1280,
+                                    step=1,
+                                    minimum=64,
+                                    maximum=2560,
+                                    elem_id="replacer_max_resolution_on_detection"
+                                )
 
-                    with gr.Row():
-                        inpainting_fill = gr.Radio(label='Masked content',
-                            choices=['fill', 'original', 'latent noise', 'latent nothing'],
-                            value='fill', type="index", elem_id="replacer_inpainting_fill")
+                            with gr.Row():
+                                from scripts.sam import sam_model_list, refresh_sam_models
+                                from scripts.dino import dino_model_list
 
-                    with gr.Row():
-                        with gr.Column():
-                            width = gr.Slider(label='width',
-                                value=512, elem_id="replacer_width",
-                                minimum=64, maximum=2048, step=8)
-                            height = gr.Slider(label='height',
-                                value=512, elem_id="replacer_height",
-                                minimum=64, maximum=2048, step=8)
-                        with gr.Column():
-                            batch_count = gr.Slider(label='batch count',
-                                value=1, elem_id="replacer_batch_count",
-                                minimum=1, maximum=10, step=1)
-                            batch_size = gr.Slider(label='batch size',
-                                value=1, elem_id="replacer_batch_size",
-                                minimum=1, maximum=10, step=1)
+                                sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
+                                    value=sam_model_list[0] if len(sam_model_list) > 0 else None)
+                                sam_refresh_models = ToolButton(value=refresh_symbol)
+                                sam_refresh_models.click(refresh_sam_models, sam_model_name,sam_model_name)
 
-                    with gr.Row():
-                        upscaler_for_img2img = gr.Dropdown(
-                            value=None,
-                            choices=[x.name for x in shared.sd_upscalers],
-                            label="Upscaler for img2Img",
-                            elem_id="replacer_upscaler_for_img2img",
-                        )
+                                dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
 
-                        if cmd_opts.use_textbox_seed:
-                            seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
-                        else:
-                            seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
+                            with gr.Row():
+                                denoise = gr.Slider(label='Denoising',
+                                    value=1.0, elem_id="replacer_denoise",
+                                    minimum=0.0, maximum=1.0, step=0.01)
+                                inpaint_padding = gr.Slider(label='Padding',
+                                    value=40, elem_id="replacer_inpaint_padding",
+                                    minimum=0, maximum=250, step=1)
 
-                        random_seed = ToolButton(
-                            ui.random_symbol,
-                            elem_id="replacer_random_seed",
-                            label='Random seed'
-                        )
-                        reuse_seed = ToolButton(
-                            ui.reuse_symbol,
-                            elem_id="replacer_reuse_seed",
-                            label='Reuse seed'
-                        )
+                            with gr.Row():
+                                inpainting_fill = gr.Radio(label='Masked content',
+                                    choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                                    value='fill', type="index", elem_id="replacer_inpainting_fill")
 
-                    with gr.Row():
-                        inpainting_mask_invert = gr.Radio(
-                            label='Mask mode',
-                            choices=['Inpaint masked', 'Inpaint not masked'],
-                            value='Inpaint masked',
-                            type="index",
-                            elem_id="replacer_mask_mode")
-                        fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
-                            value=False, elem_id="replacer_fix_steps")
+                                inpainting_mask_invert = gr.Radio(
+                                    label='Mask mode',
+                                    choices=['Inpaint masked', 'Inpaint not masked'],
+                                    value='Inpaint masked',
+                                    type="index",
+                                    elem_id="replacer_mask_mode")
 
-                    with gr.Row():
-                        extra_includes = gr.CheckboxGroup(
-                            choices=["mask", "box", "cutted", "preview", "script"],
-                            label="Extra include in gallery",
-                            type="value",
-                            elem_id="replacer_extra_includes",
-                            value=["script"],
-                        )
-                        save_grid = gr.Checkbox(label='Save grid for batch size/count',
-                            value=False, elem_id="replacer_save_grid")
+
+                            with gr.Row():
+                                extra_includes = gr.CheckboxGroup(
+                                    choices=["mask", "box", "cutted", "preview", "script"],
+                                    label="Extra include in gallery",
+                                    type="value",
+                                    elem_id="replacer_extra_includes",
+                                    value=["script"],
+                                )
+                                save_grid = gr.Checkbox(label='Save grid for batch size/count',
+                                    value=False, elem_id="replacer_save_grid")
 
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
@@ -336,7 +347,7 @@ def getReplacerTabUI(isDeicatedPage):
                 if replacer_scripts.script_controlnet:
                     cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
 
-            with gr.Column():
+            with gr.Column(scale=2):
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel(runButtonIdPart, getSaveDir())
@@ -472,9 +483,10 @@ def getReplacerTabUI(isDeicatedPage):
                 with gr.Row():
                     if not isDeicatedPage:
                         gr.Markdown(f'[Open dedicated page](/{EXT_NAME_LOWER}-dedicated)')
-                        sd_model_checkpoint = gr.Textbox("", visible=False)
                     else:
                         sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                        override_sd_model = gr.Checkbox(label='Override sd model dedicated',
+                            value=True, elem_id="replacer_override_sd_model", visible=False)
                     
 
 
@@ -538,6 +550,7 @@ def getReplacerTabUI(isDeicatedPage):
                 save_grid,
                 extra_includes,
                 fix_steps,
+                override_sd_model,
                 sd_model_checkpoint,
             ] + cn_inputs,
             outputs=[
