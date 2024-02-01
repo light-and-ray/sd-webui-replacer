@@ -143,13 +143,15 @@ def generateSingle(
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
         gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection)
-
-    maskNum = gArgs.seed % len(masksCreator.previews)
-
+    if gArgs.mask_num == 'Random':
+        maskNum = gArgs.seed % len(masksCreator.previews)
+    else:
+        maskNum = int(gArgs.mask_num) - 1
     maskPreview = masksCreator.previews[maskNum]
     gArgs.mask = masksCreator.masks[maskNum]
     maskCutted = masksCreator.cutted[maskNum]
     maskBox = masksCreator.boxes[maskNum]
+    gArgs.mask_num_for_metadata = maskNum + 1
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
 
@@ -211,6 +213,7 @@ def generate(
     fix_steps,
     override_sd_model,
     sd_model_checkpoint,
+    mask_num,
     *scripts_args,
 ):
     restoreList = []
@@ -342,6 +345,8 @@ def generate(
             images,
             generationsN,
             sd_model_checkpoint,
+            mask_num,
+            None,
 
             scripts_args,
             )

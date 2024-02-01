@@ -31,4 +31,6 @@ class GenerationArgs:
     images: Any
     generationsN: Any
     sd_model_checkpoint : Any
+    mask_num : Any
+    mask_num_for_metadata : Any
     cn_args : Any

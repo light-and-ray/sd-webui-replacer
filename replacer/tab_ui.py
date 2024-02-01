@@ -277,6 +277,11 @@ def getReplacerTabUI(isDedicatedPage):
                                 sam_refresh_models.click(refresh_sam_models, sam_model_name,sam_model_name)
 
                                 dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
+                            
+                            with gr.Row():
+                                mask_num = gr.Radio(label='Mask num',
+                                    choices=['Random', '1', '2', '3'],
+                                    value='Random', type="value", elem_id="replacer_mask_num")
 
                         with gr.Tab('Avoidance'):
                             with gr.Row():
@@ -553,6 +558,7 @@ def getReplacerTabUI(isDedicatedPage):
                 fix_steps,
                 override_sd_model,
                 sd_model_checkpoint,
+                mask_num,
             ] + cn_inputs,
             outputs=[
                 img2img_gallery,
