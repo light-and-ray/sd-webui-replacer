@@ -45,12 +45,13 @@ def inpaint(
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
     inpainting_fill = gArgs.inpainting_fill
+    mask = gArgs.mask.resize(image.size)
     if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
         inpainting_fill = 1 # original
         try:
             from lama_cleaner_masked_content.inpaint import lamaInpaint
             from lama_cleaner_masked_content.options import getUpscaler
-            image = lamaInpaint(image, gArgs.mask, gArgs.inpainting_mask_invert, getUpscaler())
+            image = lamaInpaint(image, mask, gArgs.inpainting_mask_invert, getUpscaler())
         except Exception as e:
             print(f'[{EXT_NAME}]: {e}')
 
@@ -69,7 +70,7 @@ def inpaint(
         width=gArgs.width,
         height=gArgs.height,
         init_images=[image],
-        mask=gArgs.mask.resize(image.size),
+        mask=mask,
         mask_blur=gArgs.mask_blur,
         inpainting_fill=inpainting_fill,
         resize_mode=0,
