@@ -9,7 +9,7 @@ from replacer.tab_ui import getReplacerTabUI
 
 
 def on_ui_tabs():
-    replacerTabUi = getReplacerTabUI(False)
+    replacerTabUi = getReplacerTabUI(isDedicatedPage=False)
     return [(replacerTabUi, EXT_NAME, EXT_NAME)]
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
@@ -26,7 +26,7 @@ def mountDedicatedPage(demo, app):
             gr.Textbox(elem_id="txt2img_prompt", visible=False) # triggers onUiLoaded
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME}_dedicated"):
-                    getReplacerTabUI(True)
+                    getReplacerTabUI(isDedicatedPage=True)
         
         loadsave = copy.copy(demo.ui_loadsave)  
         loadsave.finalized_ui = False

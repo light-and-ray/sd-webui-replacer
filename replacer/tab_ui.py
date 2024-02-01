@@ -53,7 +53,7 @@ def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, isDeicatedPage
 
 
 
-def getReplacerTabUI(isDeicatedPage):
+def getReplacerTabUI(isDedicatedPage):
     with gr.Blocks() as replacerTabUI:
 
         tab_index = gr.Number(value=0, visible=False)
@@ -122,10 +122,10 @@ def getReplacerTabUI(isDeicatedPage):
                         examples_per_page=getNegativePromptExamplesNumber(),
                     )
                 
-                if not isDeicatedPage:
+                if not isDedicatedPage:
                     runButtonIdPart='replacer'
                 else:
-                    runButtonIdPart='replacer-dedicated'
+                    runButtonIdPart='replacer_dedicated'
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit
@@ -201,7 +201,7 @@ def getReplacerTabUI(isDeicatedPage):
                                     label='Reuse seed'
                                 )
                             
-                            if not isDeicatedPage:
+                            if not isDedicatedPage:
                                 with gr.Row():
                                     sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                                     override_sd_model = gr.Checkbox(label='Override stable diffusion model',
@@ -488,7 +488,7 @@ def getReplacerTabUI(isDeicatedPage):
                             )
 
                 with gr.Row():
-                    if not isDeicatedPage:
+                    if not isDedicatedPage:
                         gr.Markdown(f'[Open dedicated page](/{EXT_NAME_LOWER}-dedicated)')
                     else:
                         sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
@@ -516,7 +516,7 @@ def getReplacerTabUI(isDeicatedPage):
 
 
         run_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf', isDeicatedPage),
+            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf', isDedicatedPage),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -571,7 +571,7 @@ def getReplacerTabUI(isDeicatedPage):
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart, isDeicatedPage),
+            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart, isDedicatedPage),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
