@@ -33,4 +33,5 @@ class GenerationArgs:
     sd_model_checkpoint : Any
     mask_num : Any
     mask_num_for_metadata : Any
+    avoidance_mask : Any
     cn_args : Any

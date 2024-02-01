@@ -41,3 +41,29 @@ onAfterUiUpdate(function() {
         replacer_gallery = attachGalleryListeners("replacer_dedicated");
     }
 });
+
+
+function replacerGetCurrentSourceImg(dummy_component, imgCom) {
+    const img = gradioApp().querySelector('#replacer_image div div img');
+    const removeButton = gradioApp().getElementById('replacer_input_avoidance_mask').querySelector('button[aria-label="Remove Image"]');
+    if (removeButton){
+        removeButton.click();
+    }
+    return img ? [img.src] : [null];
+}
+
+
+function replacerApplyZoomAndPanIntegration () {
+    console.log(typeof window.applyZoomAndPanIntegration)
+    if (typeof window.applyZoomAndPanIntegration === "function") {
+        window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_input_avoidance_mask"]);
+        var index = uiUpdateCallbacks.indexOf(replacerApplyZoomAndPanIntegration);
+        if (index !== -1) {
+            uiUpdateCallbacks.splice(index, 1);
+        }
+    }
+}
+
+onUiUpdate(replacerApplyZoomAndPanIntegration);
+
+

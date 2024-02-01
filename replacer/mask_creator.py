@@ -17,6 +17,8 @@ def initSamDependencies():
 
 
 def limitSizeByOneDemention(image: Image, size):
+    if image is None:
+        return None
     w, h = image.size
     if h > w:
         if h > size:
@@ -42,7 +44,7 @@ masksCreatorCached = None
 
 class MasksCreator:
     def __init__(self, detectionPrompt, avoidancePrompt, image, samModel, grdinoModel, boxThreshold,
-            maskExpand, maxResolutionOnDetection):
+            maskExpand, maxResolutionOnDetection, avoidance_mask):
         self.detectionPrompt = detectionPrompt
         self.avoidancePrompt = avoidancePrompt
         self.image = image
@@ -51,6 +53,7 @@ class MasksCreator:
         self.boxThreshold = boxThreshold
         self.maskExpand = maskExpand
         self.maxResolutionOnDetection = maxResolutionOnDetection
+        self.avoidance_mask = avoidance_mask
 
         global masksCreatorCached
 
@@ -62,7 +65,8 @@ class MasksCreator:
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
                 self.maskExpand == masksCreatorCached.maskExpand and\
                 self.maxResolutionOnDetection == masksCreatorCached.maxResolutionOnDetection and\
-                areImagesTheSame(self.image, masksCreatorCached.image):
+                areImagesTheSame(self.image, masksCreatorCached.image) and\
+                areImagesTheSame(self.avoidance_mask, masksCreatorCached.avoidance_mask):
             self.previews = masksCreatorCached.previews
             self.masks = masksCreatorCached.masks
             self.cutted = masksCreatorCached.cutted
@@ -77,6 +81,10 @@ class MasksCreator:
     def _createMasks(self):
         initSamDependencies()
         imageResized = limitSizeByOneDemention(self.image, self.maxResolutionOnDetection)
+        if self.avoidance_mask is None:
+            customAvoidanceMaskResized = None
+        else:
+            customAvoidanceMaskResized = self.avoidance_mask.resize(imageResized.size)
         masks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)
@@ -104,21 +112,36 @@ class MasksCreator:
             self.cutted.append(expanded[2])
 
         if self.avoidancePrompt != "":
-            avoidanceMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
+            detectedAvoidanceMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
                 self.grdinoModel, self.avoidancePrompt, self.boxThreshold, False, [])
             print(samLog)
-            if len(avoidanceMasks) == 0:
+            if len(detectedAvoidanceMasks) == 0:
                 print('nothing has been detected by avoidance prompt')
+                if customAvoidanceMaskResized:
+                    avoidanceMasks = [customAvoidanceMaskResized, customAvoidanceMaskResized, customAvoidanceMaskResized]
+                else:
+                    avoidanceMasks = None
             else:
-                avoidanceMasks = [avoidanceMasks[3], avoidanceMasks[4], avoidanceMasks[5]]
-                for i in range(len(self.masks)):
-                    maskTmp = ImageOps.invert(self.masks[i].convert('L'))
-                    avoidanceMasks[i] = avoidanceMasks[i].convert('L')
-                    maskTmp.paste(avoidanceMasks[i], avoidanceMasks[i])
-                    self.masks[i] = ImageOps.invert(maskTmp)
-                    self.previews[i].paste(imageResized, avoidanceMasks[i])
-                    transparent = Image.new('RGBA', imageResized.size, (255, 0, 0, 0))
-                    self.cutted[i].paste(transparent, avoidanceMasks[i])
+                avoidanceMasks = [detectedAvoidanceMasks[3], detectedAvoidanceMasks[4], detectedAvoidanceMasks[5]]
+                if customAvoidanceMaskResized is not None:
+                    for i in range(len(avoidanceMasks)):
+                        avoidanceMasks[i] = avoidanceMasks[i].convert('L')
+                        avoidanceMasks[i].paste(customAvoidanceMaskResized, customAvoidanceMaskResized)
+        else:
+            if customAvoidanceMaskResized:
+                avoidanceMasks = [customAvoidanceMaskResized, customAvoidanceMaskResized, customAvoidanceMaskResized]
+            else:
+                avoidanceMasks = None
+
+        if avoidanceMasks is not None:
+            for i in range(len(self.masks)):
+                maskTmp = ImageOps.invert(self.masks[i].convert('L'))
+                whiteFilling = Image.new('L', maskTmp.size, 255)
+                maskTmp.paste(whiteFilling, avoidanceMasks[i])
+                self.masks[i] = ImageOps.invert(maskTmp)
+                self.previews[i].paste(imageResized, avoidanceMasks[i])
+                transparent = Image.new('RGBA', imageResized.size, (255, 0, 0, 0))
+                self.cutted[i].paste(transparent, avoidanceMasks[i])
 
         if needAutoUnloadModels():
             clear_cache()

@@ -17,7 +17,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata, extraMaskExpand
+from replacer.tools import addReplacerMetadata, extraMaskExpand, prepareAvoidanceMask
 
 g_clear_cache = None
 
@@ -142,7 +142,8 @@ def generateSingle(
     batch_processed : list,
 ):
     masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
-        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection)
+        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
+        gArgs.avoidance_mask)
     if gArgs.mask_num == 'Random':
         maskNum = gArgs.seed % len(masksCreator.previews)
     else:
@@ -214,6 +215,8 @@ def generate(
     override_sd_model,
     sd_model_checkpoint,
     mask_num,
+    avoidance_mask_mode,
+    avoidance_mask,
     *scripts_args,
 ):
     restoreList = []
@@ -347,6 +350,7 @@ def generate(
             sd_model_checkpoint,
             mask_num,
             None,
+            prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask),
 
             scripts_args,
             )

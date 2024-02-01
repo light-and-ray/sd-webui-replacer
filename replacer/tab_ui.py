@@ -22,6 +22,12 @@ try:
 except Exception as e:
     OUTPUT_PANEL_AVALIABLE = False
 
+def update_mask_brush_color(color):
+    return gr.Image.update(brush_color=color)
+
+def get_current_image(image):
+    if image:
+        return gr.Image.update(image)
 
 def unloadModels():
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
@@ -133,7 +139,7 @@ def getReplacerTabUI(isDedicatedPage):
                 run_button.value = 'Run'
 
 
-                with gr.Accordion("Advanced options", open=False):
+                with gr.Accordion("Advanced options", open=False, elem_id='replacer_advanced_options'):
                     with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
                         with gr.Tab('Generation'):
                             with gr.Row():
@@ -300,10 +306,29 @@ def getReplacerTabUI(isDedicatedPage):
                                     examples_per_page=getAvoidancePromptExamplesNumber(),
                                 )
 
+                            with gr.Row():
+                                create_canvas_avoid = gr.Button('Create canvas', elem_id='replacer_create_canvas_avoid')
+                                avoidance_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
+                                mask_brush_color_avoid = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
+                            with gr.Row():
+                                avoidance_mask = gr.Image(
+                                    label="Censor mask",
+                                    show_label=False,
+                                    elem_id="replacer_input_avoidance_mask",
+                                    source="upload",
+                                    interactive=True,
+                                    type="pil",
+                                    tool="sketch",
+                                    image_mode="RGBA",
+                                    brush_color='#ffffff'
+                                )
+
+
+
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
                     with gr.TabItem('Single Image', id="single_image", elem_id="replacer_single_tab") as tab_single:
-                        image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="image", image_mode="RGBA")
+                        image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="replacer_image", image_mode="RGBA")
 
                     with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as tab_batch:
                         image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
@@ -559,6 +584,8 @@ def getReplacerTabUI(isDedicatedPage):
                 override_sd_model,
                 sd_model_checkpoint,
                 mask_num,
+                avoidance_mask_mode,
+                avoidance_mask,
             ] + cn_inputs,
             outputs=[
                 img2img_gallery,
@@ -620,5 +647,20 @@ def getReplacerTabUI(isDedicatedPage):
                 fn=wrap_queued_call(unloadModels),
                 inputs=[],
                 outputs=[])
+
+        mask_brush_color_avoid.change(
+            fn=update_mask_brush_color,
+            inputs=[mask_brush_color_avoid],
+            outputs=[avoidance_mask]
+        )
+
+        create_canvas_avoid.click(
+            fn=get_current_image,
+            _js='replacerGetCurrentSourceImg',
+            inputs=[dummy_component],
+            outputs=[avoidance_mask],
+            postprocess=False,
+        )
+
 
     return replacerTabUI

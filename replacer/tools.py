@@ -16,6 +16,8 @@ def addReplacerMetadata(p, gArgs: GenerationArgs):
         p.extra_generation_params["Max num"] = gArgs.mask_num_for_metadata
 
 def areImagesTheSame(image_one, image_two):
+    if image_one is None or image_two is None:
+        return image_one is None and image_two is None
     if image_one.size != image_two.size:
         return False
     diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
@@ -52,3 +54,16 @@ def extraMaskExpand(mask: Image, expand: int):
         cashedExtraMaskExpand = CashedExtraMaskExpand(mask, expand, expandedMask)
         print('extraMaskExpand cached')
         return expandedMask
+
+
+def prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask):
+    if avoidance_mask_mode is None or avoidance_mask is None:
+        return None
+    mask = None
+    if 'Upload mask' in avoidance_mask_mode:
+        mask = avoidance_mask['image'].convert('L')
+    if 'Draw mask' in avoidance_mask_mode:
+        mask = Image.new('L', avoidance_mask['mask'].size, 0) if mask is None else mask
+        draw_mask = avoidance_mask['mask'].convert('L')
+        mask.paste(draw_mask, draw_mask)
+    return mask
