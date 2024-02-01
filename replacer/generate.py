@@ -86,7 +86,7 @@ def inpaint(
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed
-    p.do_not_save_grid = not gArgs.save_grid
+    p.do_not_save_grid = True
     if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
         replacer_scripts.enableInpaintModeForCN(gArgs.cn_args)
         p.scripts = copy.copy(scripts.scripts_img2img)
@@ -207,7 +207,6 @@ def generate(
     height,
     batch_size,
     inpainting_mask_invert,
-    save_grid,
     extra_includes,
     fix_steps,
     override_sd_model,
@@ -298,7 +297,6 @@ def generate(
             batch_count = 1
             batch_size = 1
             extra_includes = []
-            save_grid = False
             old_samples_filename_pattern = opts.samples_filename_pattern
             old_save_images_add_number = opts.save_images_add_number
             def restoreOpts():
@@ -343,7 +341,6 @@ def generate(
 
             images,
             generationsN,
-            save_grid,
             sd_model_checkpoint,
 
             scripts_args,

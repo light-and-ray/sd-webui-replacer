@@ -232,18 +232,13 @@ def getReplacerTabUI(isDedicatedPage):
 
 
                             with gr.Row():
-                                with gr.Column(scale=2):
-                                    extra_includes = gr.CheckboxGroup(
-                                        choices=["mask", "box", "cutted", "preview", "script"],
-                                        label="Extra include in gallery",
-                                        type="value",
-                                        elem_id="replacer_extra_includes",
-                                        value=["script"],
-                                    )
-                                
-                                with gr.Column():
-                                    save_grid = gr.Checkbox(label='Save grid for batch size/count',
-                                        value=False, elem_id="replacer_save_grid")
+                                extra_includes = gr.CheckboxGroup(
+                                    choices=["mask", "box", "cutted", "preview", "script"],
+                                    label="Extra include in gallery",
+                                    type="value",
+                                    elem_id="replacer_extra_includes",
+                                    value=["script"],
+                                )
 
                         with gr.Tab('Detection'):
                             with gr.Row():
@@ -554,7 +549,6 @@ def getReplacerTabUI(isDedicatedPage):
                 height,
                 batch_size,
                 inpainting_mask_invert,
-                save_grid,
                 extra_includes,
                 fix_steps,
                 override_sd_model,
