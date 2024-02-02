@@ -9,7 +9,7 @@ from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSe
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
-    needAutoUnloadModels, getAvoidancePromptExamples,
+    needAutoUnloadModels, getAvoidancePromptExamples, getDedicatedPagePath,
     getDetectionPromptExamplesNumber, getAvoidancePromptExamplesNumber,
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
@@ -529,7 +529,7 @@ def getReplacerTabUI(isDedicatedPage):
 
                 with gr.Row():
                     if not isDedicatedPage:
-                        gr.Markdown(f'[Open dedicated page](/{EXT_NAME_LOWER}-dedicated)')
+                        gr.Markdown(f'[Open dedicated page]({getDedicatedPagePath()})')
                     else:
                         sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                         override_sd_model = gr.Checkbox(label='Override sd model dedicated',

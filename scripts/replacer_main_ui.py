@@ -2,6 +2,7 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
+    getDedicatedPagePath,
 )
 from replacer.tab_ui import getReplacerTabUI
 
@@ -16,7 +17,8 @@ script_callbacks.on_ui_tabs(on_ui_tabs)
 
 def mountDedicatedPage(demo, app):
     try:
-        path = f'/{EXT_NAME_LOWER}-dedicated'
+        
+        path = getDedicatedPagePath()
         app.add_api_route(f"{path}/internal/progress",
             progress.progressapi, methods=["POST"],
             response_model=progress.ProgressResponse)

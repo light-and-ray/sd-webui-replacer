@@ -79,7 +79,7 @@ def prepareCustomMask(custom_mask_mode, custom_mask):
         mask = Image.new('L', custom_mask['mask'].size, 0) if mask is None else mask
         draw_mask = custom_mask['mask'].convert('L')
         mask.paste(draw_mask, draw_mask)
-    blackFilling = Image.new('L', mask.size, 0)
-    if areImagesTheSame(blackFilling, mask):
-        return None
+        blackFilling = Image.new('L', mask.size, 0)
+        if areImagesTheSame(blackFilling, mask):
+            return None
     return mask

@@ -25,6 +25,10 @@ def getSaveDir():
     return shared.opts.data.get(EXT_NAME_LOWER + "_save_dir", defaultOutputDirectory)
 
 
+def getDedicatedPagePath():
+    return f'/{EXT_NAME_LOWER}-dedicated'
+
+
 def needAutoUnloadModels():
     opt = shared.opts.data.get(EXT_NAME_LOWER + "_always_unload_models", 'Automatic')
 
