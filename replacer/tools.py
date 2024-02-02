@@ -56,28 +56,15 @@ def extraMaskExpand(mask: Image, expand: int):
         return expandedMask
 
 
-def prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask):
-    if avoidance_mask_mode is None or avoidance_mask is None:
+def prepareMask(mask_mode, mask_raw):
+    if mask_mode is None or mask_raw is None:
         return None
     mask = None
-    if 'Upload mask' in avoidance_mask_mode:
-        mask = avoidance_mask['image'].convert('L')
-    if 'Draw mask' in avoidance_mask_mode:
-        mask = Image.new('L', avoidance_mask['mask'].size, 0) if mask is None else mask
-        draw_mask = avoidance_mask['mask'].convert('L')
-        mask.paste(draw_mask, draw_mask)
-    return mask
-
-
-def prepareCustomMask(custom_mask_mode, custom_mask):
-    if custom_mask_mode is None or custom_mask is None:
-        return None
-    mask = None
-    if 'Upload mask' in custom_mask_mode:
-        mask = custom_mask['image'].convert('L')
-    if 'Draw mask' in custom_mask_mode:
-        mask = Image.new('L', custom_mask['mask'].size, 0) if mask is None else mask
-        draw_mask = custom_mask['mask'].convert('L')
+    if 'Upload mask' in mask_mode:
+        mask = mask_raw['image'].convert('L')
+    if 'Draw mask' in mask_mode:
+        mask = Image.new('L', mask_raw['mask'].size, 0) if mask is None else mask
+        draw_mask = mask_raw['mask'].convert('L')
         mask.paste(draw_mask, draw_mask)
         blackFilling = Image.new('L', mask.size, 0)
         if areImagesTheSame(blackFilling, mask):

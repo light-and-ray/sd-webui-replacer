@@ -301,9 +301,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 )
 
                             with gr.Row():
-                                create_canvas_avoid = gr.Button('Create canvas', elem_id='replacer_create_canvas_avoid')
-                                avoidance_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
-                                mask_brush_color_avoid = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
+                                create_canvas_avoid_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_avoid')
+                                avoid_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
+                                avoid_mask_brush_color = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
                             with gr.Row():
                                 avoidance_mask = gr.Image(
                                     label="Avoidance mask",
@@ -599,7 +599,7 @@ def getReplacerTabUI(isDedicatedPage):
                 override_sd_model,
                 sd_model_checkpoint,
                 mask_num,
-                avoidance_mask_mode,
+                avoid_mask_mode,
                 avoidance_mask,
                 only_custom_mask,
                 custom_mask_mode,
@@ -666,13 +666,13 @@ def getReplacerTabUI(isDedicatedPage):
                 inputs=[],
                 outputs=[])
 
-        mask_brush_color_avoid.change(
+        avoid_mask_brush_color.change(
             fn=update_mask_brush_color,
-            inputs=[mask_brush_color_avoid],
+            inputs=[avoid_mask_brush_color],
             outputs=[avoidance_mask]
         )
 
-        create_canvas_avoid.click(
+        create_canvas_avoid_mask.click(
             fn=get_current_image,
             _js='replacerGetCurrentSourceImgForAvoidanceMask',
             inputs=[dummy_component],

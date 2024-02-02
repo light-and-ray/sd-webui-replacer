@@ -65,8 +65,7 @@ function replacerGetCurrentSourceImgForCustomMask(dummy_component, imgCom) {
 
 function replacerApplyZoomAndPanIntegration () {
     if (typeof window.applyZoomAndPanIntegration === "function") {
-        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask"]);
-        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_custom_mask"]);
+        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
         var index = uiUpdateCallbacks.indexOf(replacerApplyZoomAndPanIntegration);
         if (index !== -1) {
             uiUpdateCallbacks.splice(index, 1);

@@ -17,8 +17,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareAvoidanceMask,
-    prepareCustomMask,
+from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask,
 )
 
 g_clear_cache = None
@@ -366,9 +365,9 @@ def generate(
             sd_model_checkpoint,
             mask_num,
             None,
-            prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask),
+            prepareMask(avoidance_mask_mode, avoidance_mask),
             only_custom_mask,
-            prepareCustomMask(custom_mask_mode, custom_mask),
+            prepareMask(custom_mask_mode, custom_mask),
 
             scripts_args,
             )
