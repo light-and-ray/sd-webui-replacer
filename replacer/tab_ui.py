@@ -423,109 +423,139 @@ def getReplacerTabUI(isDedicatedPage):
 
                 with gr.Row():
                     with gr.Accordion("HiresFix options", open=False):
-                        with gr.Row():
-                            hf_upscaler = gr.Dropdown(
-                                value="ESRGAN_4x",
-                                choices=[x.name for x in shared.sd_upscalers],
-                                label="Upscaler",
-                            )
+                        with gr.Tabs():
+                            with gr.Tab('General'):
+                                with gr.Row():
+                                    hf_upscaler = gr.Dropdown(
+                                        value="ESRGAN_4x",
+                                        choices=[x.name for x in shared.sd_upscalers],
+                                        label="Upscaler",
+                                    )
 
-                            hf_steps = gr.Slider(
-                                label='Hires steps',
-                                value=4,
-                                step=1,
-                                minimum=0,
-                                maximum=150,
-                                elem_id="replacer_hf_steps"
-                            )
+                                    hf_steps = gr.Slider(
+                                        label='Hires steps',
+                                        value=4,
+                                        step=1,
+                                        minimum=0,
+                                        maximum=150,
+                                        elem_id="replacer_hf_steps"
+                                    )
 
-                            hf_cfg_scale = gr.Slider(
-                                label='Hires CFG Scale',
-                                value=1.0,
-                                step=0.5,
-                                minimum=1.0,
-                                maximum=30.0,
-                                elem_id="replacer_hf_cfg_scale"
-                            )
+                                with gr.Row():
+                                    hf_denoise = gr.Slider(
+                                        label='Hires Denoising',
+                                        value=0.35,
+                                        step=0.01,
+                                        minimum=0.0,
+                                        maximum=1.0,
+                                        elem_id="replacer_hf_denoise",
+                                    )
 
-                        with gr.Row():
-                            hf_sampler = gr.Dropdown(
-                                label='Hires sampling method',
-                                elem_id="replacer_hf_sampler",
-                                choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
-                                value="Use same sampler"
-                            )
+                                with gr.Row():
+                                    hf_size_limit = gr.Slider(
+                                        label='Limit render size',
+                                        value=2000,
+                                        step=1,
+                                        minimum=1000,
+                                        maximum=10000,
+                                        elem_id="replacer_hf_size_limit",
+                                    )
 
-                            hf_denoise = gr.Slider(
-                                label='Hires Denoising',
-                                value=0.35,
-                                step=0.01,
-                                minimum=0.0,
-                                maximum=1.0,
-                                elem_id="replacer_hf_denoise",
-                            )
+                                    hf_above_limit_upscaler = gr.Dropdown(
+                                        value="Lanczos",
+                                        choices=[x.name for x in shared.sd_upscalers],
+                                        label="Above limit upscaler",
+                                    )
+                            
+                            with gr.Tab('Advanced'):
+                                with gr.Row():
+                                    hf_sampler = gr.Dropdown(
+                                        label='Hires sampling method',
+                                        elem_id="replacer_hf_sampler",
+                                        choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
+                                        value="Use same sampler"
+                                    )
+                                    hf_cfg_scale = gr.Slider(
+                                        label='Hires CFG Scale',
+                                        value=1.0,
+                                        step=0.5,
+                                        minimum=1.0,
+                                        maximum=30.0,
+                                        elem_id="replacer_hf_cfg_scale"
+                                    )
+                                    hf_unload_detection_models = gr.Checkbox(
+                                        label='Unload detection models before hires fix',
+                                        value=True,
+                                        elem_id="replacer_hf_unload_detection_models",
+                                    )
+                                    if needAutoUnloadModels():
+                                        hf_unload_detection_models.visible = False
 
-                        with gr.Row():
-                            placeholder = None
-                            placeholder = getHiresFixPositivePromptSuffixExamples()[0]
+                                with gr.Row():
+                                    placeholder = None
+                                    placeholder = getHiresFixPositivePromptSuffixExamples()[0]
 
-                            hfPositivePromptSuffix = gr.Textbox(
-                                label="Suffix for positive prompt",
-                                show_label=True,
-                                lines=1,
-                                elem_classes=["hfPositivePromptSuffix"],
-                                placeholder=placeholder,
-                                elem_id="replacer_hfPositivePromptSuffix",
-                            )
+                                    hfPositivePromptSuffix = gr.Textbox(
+                                        label="Suffix for positive prompt",
+                                        show_label=True,
+                                        lines=1,
+                                        elem_classes=["hfPositivePromptSuffix"],
+                                        placeholder=placeholder,
+                                        elem_id="replacer_hfPositivePromptSuffix",
+                                    )
 
-                            gr.Examples(
-                                examples=getHiresFixPositivePromptSuffixExamples(),
-                                inputs=hfPositivePromptSuffix,
-                                label="",
-                                elem_id="replacer_hfPositivePromptSuffix_examples",
-                            )
+                                    gr.Examples(
+                                        examples=getHiresFixPositivePromptSuffixExamples(),
+                                        inputs=hfPositivePromptSuffix,
+                                        label="",
+                                        elem_id="replacer_hfPositivePromptSuffix_examples",
+                                    )
 
-                        with gr.Row():
-                            hf_size_limit = gr.Slider(
-                                label='Limit render size',
-                                value=2000,
-                                step=1,
-                                minimum=1000,
-                                maximum=10000,
-                                elem_id="replacer_hf_size_limit",
-                            )
+                                with gr.Row():
+                                    hf_positvePrompt = gr.Textbox(label="Override positive prompt",
+                                            show_label=True,
+                                            lines=1,
+                                            elem_classes=["positvePrompt"],
+                                            placeholder='leave empty to use the same prompt',
+                                            elem_id="replacer_hf_positvePrompt")
+                                    
+                                with gr.Row():
+                                    hf_negativePrompt = gr.Textbox(label="Override negative prompt",
+                                            show_label=True,
+                                            lines=1,
+                                            elem_classes=["negativePrompt"],
+                                            placeholder='leave empty to use the same prompt',
+                                            elem_id="replacer_hf_negativePrompt")
+                                
+                                with gr.Row():
+                                    hf_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                                    hf_sd_model_checkpoint.choices = ['Use same model'] + hf_sd_model_checkpoint.choices
+                                    hf_sd_model_checkpoint.value = 'Use same model'
+                                    hf_sd_model_checkpoint.label = 'Override sd model'
 
-                            hf_above_limit_upscaler = gr.Dropdown(
-                                value="Lanczos",
-                                choices=[x.name for x in shared.sd_upscalers],
-                                label="Above limit upscaler",
-                            )
+                                    hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
+                                        value=0, elem_id="replacer_hf_extra_inpaint_padding",
+                                        minimum=0, maximum=250, step=1)
 
-                            hf_unload_detection_models = gr.Checkbox(
-                                label='Unload detection models before hires fix',
-                                value=True,
-                                elem_id="replacer_hf_unload_detection_models",
-                            )
-                            if needAutoUnloadModels():
-                                hf_unload_detection_models.visible = False
+                                with gr.Row():
+                                    hf_disable_cn = gr.Checkbox(
+                                        label='Disable ControlNet while hires fix',
+                                        value=True,
+                                        elem_id="replacer_hf_disable_cn",
+                                    )
+                                    if not replacer_scripts.script_controlnet:
+                                        hf_disable_cn.visible = False
 
-                        with gr.Row():
-                            hf_disable_cn = gr.Checkbox(
-                                label='Disable ControlNet while hires fix',
-                                value=True,
-                                elem_id="replacer_hf_disable_cn",
-                            )
-                            if not replacer_scripts.script_controlnet:
-                                hf_disable_cn.visible = False
+                                    hf_extra_mask_expand = gr.Slider(
+                                        label='Extra mask expand',
+                                        value=0,
+                                        step=1,
+                                        minimum=0,
+                                        maximum=200,
+                                        elem_id="replacer_hf_extra_mask_expand",
+                                    )
 
-                            hf_extra_mask_expand = gr.Slider(
-                                label='Extra mask expand',
-                                value=0,
-                                step=1,
-                                minimum=0,
-                                maximum=200,
-                                elem_id="replacer_hf_extra_mask_expand",
-                            )
+
 
                 with gr.Row():
                     if not isDedicatedPage:
@@ -631,6 +661,10 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_unload_detection_models,
                 hf_disable_cn,
                 hf_extra_mask_expand,
+                hf_positvePrompt,
+                hf_negativePrompt,
+                hf_sd_model_checkpoint,
+                hf_extra_inpaint_padding,
             ],
             outputs=[
                 img2img_gallery,

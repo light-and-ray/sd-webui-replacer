@@ -476,6 +476,10 @@ def applyHiresFix(
     hf_unload_detection_models,
     hf_disable_cn,
     hf_extra_mask_expand,
+    hf_positvePrompt,
+    hf_negativePrompt,
+    hf_sd_model_checkpoint,
+    hf_extra_inpaint_padding,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -497,11 +501,19 @@ def applyHiresFix(
         hrArgs.steps = hf_steps
     if hf_extra_mask_expand != 0:
         hrArgs.mask = extraMaskExpand(hrArgs.mask, hf_extra_mask_expand)
-    hrArgs.positvePrompt = gArgs.positvePrompt + " " + hfPositivePromptSuffix
     hrArgs.inpainting_fill = 1 # Original
     hrArgs.img2img_fix_steps = True
     if hf_disable_cn:
         hrArgs.cn_args = None
+    if hf_positvePrompt != "":
+        hrArgs.positvePrompt = hf_positvePrompt
+    hrArgs.positvePrompt = hrArgs.positvePrompt + " " + hfPositivePromptSuffix
+    if hf_negativePrompt != "":
+        hrArgs.negativePrompt = hf_negativePrompt
+    if hf_sd_model_checkpoint is not None and hf_sd_model_checkpoint != 'Use same model'\
+            and hf_sd_model_checkpoint != "":
+        hrArgs.sd_model_checkpoint = hf_sd_model_checkpoint
+    hrArgs.inpaint_full_res_padding += hf_extra_inpaint_padding
 
     if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
