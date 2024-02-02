@@ -207,39 +207,6 @@ def getReplacerTabUI(isDedicatedPage):
                                     override_sd_model = gr.Checkbox(label='Override stable diffusion model',
                                         value=False, elem_id="replacer_override_sd_model")
 
-                        with gr.Tab('Inpainting'):
-                            with gr.Row():
-                                denoise = gr.Slider(label='Denoising',
-                                    value=1.0, elem_id="replacer_denoise",
-                                    minimum=0.0, maximum=1.0, step=0.01)
-                                inpaint_padding = gr.Slider(label='Padding',
-                                    value=40, elem_id="replacer_inpaint_padding",
-                                    minimum=0, maximum=250, step=1)
-
-                            with gr.Row():
-                                with gr.Column(scale=2):
-                                    inpainting_fill = gr.Radio(label='Masked content',
-                                        choices=['fill', 'original', 'latent noise', 'latent nothing'],
-                                        value='fill', type="index", elem_id="replacer_inpainting_fill")
-
-                                with gr.Column():
-                                    inpainting_mask_invert = gr.Radio(
-                                        label='Mask mode',
-                                        choices=['Inpaint masked', 'Inpaint not masked'],
-                                        value='Inpaint masked',
-                                        type="index",
-                                        elem_id="replacer_mask_mode")
-
-
-                            with gr.Row():
-                                extra_includes = gr.CheckboxGroup(
-                                    choices=["mask", "box", "cutted", "preview", "script"],
-                                    label="Extra include in gallery",
-                                    type="value",
-                                    elem_id="replacer_extra_includes",
-                                    value=["script"],
-                                )
-
                         with gr.Tab('Detection'):
                             with gr.Row():
                                 box_threshold = gr.Slider(label='Box Threshold',
@@ -282,6 +249,39 @@ def getReplacerTabUI(isDedicatedPage):
                                 mask_num = gr.Radio(label='Mask num',
                                     choices=['Random', '1', '2', '3'],
                                     value='Random', type="value", elem_id="replacer_mask_num")
+
+                            with gr.Row():
+                                extra_includes = gr.CheckboxGroup(
+                                    choices=["mask", "box", "cutted", "preview", "script"],
+                                    label="Extra include in gallery",
+                                    type="value",
+                                    elem_id="replacer_extra_includes",
+                                    value=["script"],
+                                )
+
+                        with gr.Tab('Inpainting'):
+                            with gr.Row():
+                                denoise = gr.Slider(label='Denoising',
+                                    value=1.0, elem_id="replacer_denoise",
+                                    minimum=0.0, maximum=1.0, step=0.01)
+                                inpaint_padding = gr.Slider(label='Padding',
+                                    value=40, elem_id="replacer_inpaint_padding",
+                                    minimum=0, maximum=250, step=1)
+
+                            with gr.Row():
+                                with gr.Column(scale=2):
+                                    inpainting_fill = gr.Radio(label='Masked content',
+                                        choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                                        value='fill', type="index", elem_id="replacer_inpainting_fill")
+
+                                with gr.Column():
+                                    inpainting_mask_invert = gr.Radio(
+                                        label='Mask mode',
+                                        choices=['Inpaint masked', 'Inpaint not masked'],
+                                        value='Inpaint masked',
+                                        type="index",
+                                        elem_id="replacer_mask_mode")
+
 
                         with gr.Tab('Avoidance'):
                             with gr.Row():
