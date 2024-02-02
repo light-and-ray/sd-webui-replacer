@@ -43,14 +43,8 @@ def unloadModels():
 
 
 
-def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, isDeicatedPage):
-    if isDeicatedPage:
-        applyOptions = f'opts = {shared.opts.dumpjson()};'
-    else:
-        applyOptions = ''
-
+def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
     return 'function(){'\
-        f'{applyOptions}'\
         'var arguments_ = Array.from(arguments);'\
         f'arguments_.push("{extraShowButtonsId}", "{buttonsId}", "{galleryId}");'\
         'return submit_replacer.apply(null, arguments_);'\
@@ -312,9 +306,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 mask_brush_color_avoid = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
                             with gr.Row():
                                 avoidance_mask = gr.Image(
-                                    label="Censor mask",
+                                    label="Avoidance mask",
                                     show_label=False,
-                                    elem_id="replacer_input_avoidance_mask",
+                                    elem_id="replacer_avoidance_mask",
                                     source="upload",
                                     interactive=True,
                                     type="pil",
@@ -322,7 +316,28 @@ def getReplacerTabUI(isDedicatedPage):
                                     image_mode="RGBA",
                                     brush_color='#ffffff'
                                 )
+                        
+                        with gr.Tab('Custom mask'):
+                            with gr.Row():
+                                only_custom_mask = gr.Checkbox(label='Do not use detection prompt if use custom mask',
+                                    value=True, elem_id="replacer_only_custom_mask")
 
+                            with gr.Row():
+                                create_canvas_custom_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_custom_mask')
+                                custom_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
+                                custom_mask_brush_color = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
+                            with gr.Row():
+                                custom_mask = gr.Image(
+                                    label="Custom mask",
+                                    show_label=False,
+                                    elem_id="replacer_custom_mask",
+                                    source="upload",
+                                    interactive=True,
+                                    type="pil",
+                                    tool="sketch",
+                                    image_mode="RGBA",
+                                    brush_color='#ffffff'
+                                )
 
 
 
@@ -541,7 +556,7 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         run_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf', isDedicatedPage),
+            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf'),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -586,6 +601,9 @@ def getReplacerTabUI(isDedicatedPage):
                 mask_num,
                 avoidance_mask_mode,
                 avoidance_mask,
+                only_custom_mask,
+                custom_mask_mode,
+                custom_mask,
             ] + cn_inputs,
             outputs=[
                 img2img_gallery,
@@ -598,7 +616,7 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart, isDedicatedPage),
+            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -656,9 +674,24 @@ def getReplacerTabUI(isDedicatedPage):
 
         create_canvas_avoid.click(
             fn=get_current_image,
-            _js='replacerGetCurrentSourceImg',
+            _js='replacerGetCurrentSourceImgForAvoidanceMask',
             inputs=[dummy_component],
             outputs=[avoidance_mask],
+            postprocess=False,
+        )
+
+
+        custom_mask_brush_color.change(
+            fn=update_mask_brush_color,
+            inputs=[custom_mask_brush_color],
+            outputs=[custom_mask]
+        )
+
+        create_canvas_custom_mask.click(
+            fn=get_current_image,
+            _js='replacerGetCurrentSourceImgForCustomMask',
+            inputs=[dummy_component],
+            outputs=[custom_mask],
             postprocess=False,
         )
 

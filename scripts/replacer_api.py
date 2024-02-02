@@ -82,6 +82,7 @@ def replacer_api(_, app: FastAPI):
             data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
             data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, 1, data.height, 1,
             data.inpainting_mask_invert, [], False, False, data.fix_steps, 'Random', [], None,
+            False, [], None
         )[0][0]
 
         return {"image": encode_to_base64(result)}

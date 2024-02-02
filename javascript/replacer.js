@@ -43,9 +43,19 @@ onAfterUiUpdate(function() {
 });
 
 
-function replacerGetCurrentSourceImg(dummy_component, imgCom) {
+function replacerGetCurrentSourceImgForAvoidanceMask(dummy_component, imgCom) {
     const img = gradioApp().querySelector('#replacer_image div div img');
-    const removeButton = gradioApp().getElementById('replacer_input_avoidance_mask').querySelector('button[aria-label="Remove Image"]');
+    const removeButton = gradioApp().getElementById('replacer_avoidance_mask').querySelector('button[aria-label="Remove Image"]');
+    if (removeButton){
+        removeButton.click();
+    }
+    return img ? [img.src] : [null];
+}
+
+
+function replacerGetCurrentSourceImgForCustomMask(dummy_component, imgCom) {
+    const img = gradioApp().querySelector('#replacer_image div div img');
+    const removeButton = gradioApp().getElementById('replacer_custom_mask').querySelector('button[aria-label="Remove Image"]');
     if (removeButton){
         removeButton.click();
     }
@@ -54,9 +64,9 @@ function replacerGetCurrentSourceImg(dummy_component, imgCom) {
 
 
 function replacerApplyZoomAndPanIntegration () {
-    console.log(typeof window.applyZoomAndPanIntegration)
     if (typeof window.applyZoomAndPanIntegration === "function") {
-        window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_input_avoidance_mask"]);
+        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask"]);
+        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_custom_mask"]);
         var index = uiUpdateCallbacks.indexOf(replacerApplyZoomAndPanIntegration);
         if (index !== -1) {
             uiUpdateCallbacks.splice(index, 1);

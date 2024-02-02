@@ -17,7 +17,9 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata, extraMaskExpand, prepareAvoidanceMask
+from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareAvoidanceMask,
+    prepareCustomMask,
+)
 
 g_clear_cache = None
 
@@ -141,18 +143,29 @@ def generateSingle(
     extra_includes : list,
     batch_processed : list,
 ):
-    masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
-        gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
-        gArgs.avoidance_mask)
-    if gArgs.mask_num == 'Random':
-        maskNum = gArgs.seed % len(masksCreator.previews)
+    maskPreview = None
+    maskCutted = None
+    maskBox = None
+    if not gArgs.only_custom_mask or gArgs.custom_mask is None:
+        masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
+            gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
+            gArgs.avoidance_mask, gArgs.custom_mask)
+        if masksCreator.previews != []:
+            if gArgs.mask_num == 'Random':
+                maskNum = gArgs.seed % len(masksCreator.previews)
+            else:
+                maskNum = int(gArgs.mask_num) - 1
+            gArgs.mask = masksCreator.masks[maskNum]
+            gArgs.mask_num_for_metadata = maskNum + 1
+
+            maskPreview = masksCreator.previews[maskNum]
+            maskCutted = masksCreator.cutted[maskNum]
+            maskBox = masksCreator.boxes[maskNum]
+        else:
+            gArgs.mask = gArgs.custom_mask
     else:
-        maskNum = int(gArgs.mask_num) - 1
-    maskPreview = masksCreator.previews[maskNum]
-    gArgs.mask = masksCreator.masks[maskNum]
-    maskCutted = masksCreator.cutted[maskNum]
-    maskBox = masksCreator.boxes[maskNum]
-    gArgs.mask_num_for_metadata = maskNum + 1
+        gArgs.mask = gArgs.custom_mask
+
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
 
@@ -162,11 +175,11 @@ def generateSingle(
     extraImages = []
     if "mask" in extra_includes:
         extraImages.append(gArgs.mask)
-    if "box" in extra_includes:
+    if "box" in extra_includes and maskBox is not None:
         extraImages.append(maskBox)
-    if "cutted" in extra_includes:
+    if "cutted" in extra_includes and maskCutted is not None:
         extraImages.append(maskCutted)
-    if "preview" in extra_includes:
+    if "preview" in extra_includes and maskPreview is not None:
         extraImages.append(maskPreview)
     if "script" in extra_includes:
         extraImages.extend(scriptImages)
@@ -217,6 +230,9 @@ def generate(
     mask_num,
     avoidance_mask_mode,
     avoidance_mask,
+    only_custom_mask,
+    custom_mask_mode,
+    custom_mask,
     *scripts_args,
 ):
     restoreList = []
@@ -351,6 +367,8 @@ def generate(
             mask_num,
             None,
             prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask),
+            only_custom_mask,
+            prepareCustomMask(custom_mask_mode, custom_mask),
 
             scripts_args,
             )

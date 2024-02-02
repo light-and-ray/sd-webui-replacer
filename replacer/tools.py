@@ -67,3 +67,19 @@ def prepareAvoidanceMask(avoidance_mask_mode, avoidance_mask):
         draw_mask = avoidance_mask['mask'].convert('L')
         mask.paste(draw_mask, draw_mask)
     return mask
+
+
+def prepareCustomMask(custom_mask_mode, custom_mask):
+    if custom_mask_mode is None or custom_mask is None:
+        return None
+    mask = None
+    if 'Upload mask' in custom_mask_mode:
+        mask = custom_mask['image'].convert('L')
+    if 'Draw mask' in custom_mask_mode:
+        mask = Image.new('L', custom_mask['mask'].size, 0) if mask is None else mask
+        draw_mask = custom_mask['mask'].convert('L')
+        mask.paste(draw_mask, draw_mask)
+    blackFilling = Image.new('L', mask.size, 0)
+    if areImagesTheSame(blackFilling, mask):
+        return None
+    return mask

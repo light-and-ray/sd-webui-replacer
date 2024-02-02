@@ -1,7 +1,6 @@
 import copy
 import gradio as gr
-from modules import script_callbacks
-from modules import progress
+from modules import script_callbacks, progress, shared
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
 )
 from replacer.tab_ui import getReplacerTabUI
@@ -24,6 +23,8 @@ def mountDedicatedPage(demo, app):
 
         with gr.Blocks(title=EXT_NAME) as replacerUi:
             gr.Textbox(elem_id="txt2img_prompt", visible=False) # triggers onUiLoaded
+            gr.Textbox(value=shared.opts.dumpjson(), elem_id="settings_json", visible=False)
+
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME}_dedicated"):
                     getReplacerTabUI(isDedicatedPage=True)

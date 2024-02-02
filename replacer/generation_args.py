@@ -34,4 +34,6 @@ class GenerationArgs:
     mask_num : Any
     mask_num_for_metadata : Any
     avoidance_mask : Any
+    only_custom_mask : Any
+    custom_mask : Any
     cn_args : Any
