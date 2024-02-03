@@ -1,5 +1,8 @@
+import os
 from PIL import ImageChops, Image
 from dataclasses import dataclass
+import numpy as np
+from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generation_args import GenerationArgs
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):
@@ -27,6 +30,47 @@ def areImagesTheSame(image_one, image_two):
     else:
         return True
 
+
+def limitSizeByOneDemention(image: Image, size: int):
+    if image is None:
+        return None
+    w, h = image.size
+    if h > w:
+        if h > size:
+            w = size / h * w
+            h = size
+    else:
+        if w > size:
+            h = size / w * h
+            w = size
+
+    return image.resize((int(w), int(h)))
+
+
+
+def decode_to_pil(image):
+    if os.path.exists(image):
+        return Image.open(image)
+    elif type(image) is str:
+        return decode_base64_to_image(image)
+    elif type(image) is Image.Image:
+        return image
+    elif type(image) is np.ndarray:
+        return Image.fromarray(image)
+    else:
+        raise Exception("Not an image")
+
+
+def encode_to_base64(image):
+    if type(image) is str:
+        return image
+    elif type(image) is Image.Image:
+        return encode_pil_to_base64(image).decode()
+    elif type(image) is np.ndarray:
+        pil = Image.fromarray(image)
+        return encode_pil_to_base64(pil).decode()
+    else:
+        raise Exception("Invalid type")
 
 
 @dataclass

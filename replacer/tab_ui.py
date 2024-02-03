@@ -14,6 +14,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
 from replacer import replacer_scripts
+from replacer.tools import limitSizeByOneDemention, encode_to_base64
 
 
 try:
@@ -25,9 +26,15 @@ except Exception as e:
 def update_mask_brush_color(color):
     return gr.Image.update(brush_color=color)
 
-def get_current_image(image):
-    if image:
-        return gr.Image.update(image)
+def get_current_image(image, needLimit, maxResolutionOnDetection):
+    if image is None:
+        return
+    if needLimit:
+        image = limitSizeByOneDemention(image, maxResolutionOnDetection)
+
+    image = 'data:image/png;base64,' + encode_to_base64(image)
+    return gr.Image.update(image)
+
 
 def unloadModels():
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
@@ -301,9 +308,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 )
 
                             with gr.Row():
-                                create_canvas_avoid_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_avoid')
+                                avoid_mask_create_canvas = gr.Button('Create canvas', elem_id='replacer_avoid_mask_create_canvas')
+                                avoid_mask_need_limit = gr.Checkbox(value=True, label='Limit avoidance mask canvas resolution on creating')
                                 avoid_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
-                                avoid_mask_brush_color = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
                             with gr.Row():
                                 avoidance_mask = gr.Image(
                                     label="Avoidance mask",
@@ -316,6 +323,11 @@ def getReplacerTabUI(isDedicatedPage):
                                     image_mode="RGBA",
                                     brush_color='#ffffff'
                                 )
+                            with gr.Row():
+                                avoid_mask_brush_color = gr.ColorPicker(
+                                    '#ffffff', label='Brush color',
+                                    info='visual only, use when brush color is hard to see'
+                                )
                         
                         with gr.Tab('Custom mask'):
                             with gr.Row():
@@ -324,8 +336,8 @@ def getReplacerTabUI(isDedicatedPage):
 
                             with gr.Row():
                                 create_canvas_custom_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_custom_mask')
+                                custom_mask_need_limit = gr.Checkbox(value=True, label='Limit custom mask canvas resolution on creating')
                                 custom_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
-                                custom_mask_brush_color = gr.ColorPicker('#ffffff', label='Brush color', info='visual only, use when brush color is hard to see')
                             with gr.Row():
                                 custom_mask = gr.Image(
                                     label="Custom mask",
@@ -338,6 +350,10 @@ def getReplacerTabUI(isDedicatedPage):
                                     image_mode="RGBA",
                                     brush_color='#ffffff'
                                 )
+                            with gr.Row():
+                                custom_mask_brush_color = gr.ColorPicker(
+                                    '#ffffff', label='Brush color',
+                                    info='visual only, use when brush color is hard to see')
 
 
 
@@ -706,10 +722,9 @@ def getReplacerTabUI(isDedicatedPage):
             outputs=[avoidance_mask]
         )
 
-        create_canvas_avoid_mask.click(
+        avoid_mask_create_canvas.click(
             fn=get_current_image,
-            _js='replacerGetCurrentSourceImgForAvoidanceMask',
-            inputs=[dummy_component],
+            inputs=[image, avoid_mask_need_limit, max_resolution_on_detection],
             outputs=[avoidance_mask],
             postprocess=False,
         )
@@ -723,8 +738,7 @@ def getReplacerTabUI(isDedicatedPage):
 
         create_canvas_custom_mask.click(
             fn=get_current_image,
-            _js='replacerGetCurrentSourceImgForCustomMask',
-            inputs=[dummy_component],
+            inputs=[image, custom_mask_need_limit, max_resolution_on_detection],
             outputs=[custom_mask],
             postprocess=False,
         )

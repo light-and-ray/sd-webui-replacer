@@ -1,38 +1,12 @@
-import os
 from typing import Any
-import numpy as np
-from PIL import Image
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
-from replacer.generate import generate
 import modules.script_callbacks as script_callbacks
-from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from modules import shared
+from replacer.generate import generate
+from replacer.tools import decode_to_pil, encode_to_base64
 
 
-def decode_to_pil(image):
-    if os.path.exists(image):
-        return Image.open(image)
-    elif type(image) is str:
-        return decode_base64_to_image(image)
-    elif type(image) is Image.Image:
-        return image
-    elif type(image) is np.ndarray:
-        return Image.fromarray(image)
-    else:
-        raise Exception("Not an image")
-
-
-def encode_to_base64(image):
-    if type(image) is str:
-        return image
-    elif type(image) is Image.Image:
-        return encode_pil_to_base64(image).decode()
-    elif type(image) is np.ndarray:
-        pil = Image.fromarray(image)
-        return encode_pil_to_base64(pil).decode()
-    else:
-        raise Exception("Invalid type")
 
 
 def replacer_api(_, app: FastAPI):

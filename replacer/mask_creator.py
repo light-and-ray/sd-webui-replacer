@@ -1,6 +1,6 @@
 from PIL import Image, ImageOps
 from replacer.options import needAutoUnloadModels, EXT_NAME
-from replacer.tools import areImagesTheSame
+from replacer.tools import areImagesTheSame, limitSizeByOneDemention
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -14,22 +14,6 @@ def initSamDependencies():
         sam_predict = sam_predict_
         update_mask = update_mask_
         clear_cache = clear_cache_
-
-
-def limitSizeByOneDemention(image: Image, size):
-    if image is None:
-        return None
-    w, h = image.size
-    if h > w:
-        if h > size:
-            w = size / h * w
-            h = size
-    else:
-        if w > size:
-            h = size / w * h
-            w = size
-
-    return image.resize((int(w), int(h)))
 
 
 
