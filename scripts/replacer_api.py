@@ -55,7 +55,7 @@ def replacer_api(_, app: FastAPI):
             data.seed, data.sampler, data.steps, data.box_threshold, data.mask_expand, data.mask_blur, 
             data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
             data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, 1, data.height, 1,
-            data.inpainting_mask_invert, [], False, False, data.fix_steps, 'Random', [], None,
+            data.inpainting_mask_invert, [], data.fix_steps, True, data.sd_model_checkpoint, 'Random', [], None,
             False, [], None
         )[0][0]
 
@@ -68,7 +68,7 @@ def replacer_api(_, app: FastAPI):
             "sam_model_name": sam_model_list,
             "dino_model_name": dino_model_list,
             "upscalers": [""] + [x.name for x in shared.sd_upscalers],
-            "lama_cleaner_avaliable": lama_cleaner_avaliable,
+            "lama_cleaner_avaliable": lama_cleaner_avaliable, # inpainting_fill=4, https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
             }
 
 
