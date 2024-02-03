@@ -3,8 +3,8 @@ from fastapi import FastAPI, Body
 from pydantic import BaseModel
 import modules.script_callbacks as script_callbacks
 from modules import shared
+from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generate
-from replacer.tools import decode_to_pil, encode_to_base64
 
 
 
@@ -19,7 +19,7 @@ def replacer_api(_, app: FastAPI):
         lama_cleaner_avaliable = False
 
     class ReplaceRequest(BaseModel):
-        input_image: str = "base64 or path on server here"
+        input_image: str = "base64 image"
         detection_prompt: str = ""
         avoidance_prompt: str = ""
         positive_prompt: str = ""
@@ -47,7 +47,7 @@ def replacer_api(_, app: FastAPI):
 
     @app.post("/replacer/replace")
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
-        image = decode_to_pil(data.input_image).convert("RGBA")
+        image = decode_base64_to_image(data.input_image).convert("RGBA")
         
         result = generate(
             data.detection_prompt, data.avoidance_prompt, data.positive_prompt, data.negative_prompt,
@@ -59,7 +59,7 @@ def replacer_api(_, app: FastAPI):
             False, [], None
         )[0][0]
 
-        return {"image": encode_to_base64(result)}
+        return {"image": encode_pil_to_base64(result).decode()}
 
 
     @app.post("/replacer/avaliable_options")

@@ -5,6 +5,7 @@ from modules.shared import cmd_opts
 from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
+from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
@@ -14,7 +15,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
 from replacer import replacer_scripts
-from replacer.tools import limitSizeByOneDemention, encode_to_base64
+from replacer.tools import limitSizeByOneDemention
 
 
 try:
@@ -26,13 +27,13 @@ except Exception as e:
 def update_mask_brush_color(color):
     return gr.Image.update(brush_color=color)
 
-def get_current_image(image, needLimit, maxResolutionOnDetection):
+def get_current_image(image, isAvoid, needLimit, maxResolutionOnDetection):
     if image is None:
         return
     if needLimit:
+        image = decode_base64_to_image(image)
         image = limitSizeByOneDemention(image, maxResolutionOnDetection)
-
-    image = 'data:image/png;base64,' + encode_to_base64(image)
+        image = 'data:image/png;base64,' + encode_pil_to_base64(image).decode()
     return gr.Image.update(image)
 
 
@@ -65,6 +66,8 @@ def getReplacerTabUI(isDedicatedPage):
 
         tab_index = gr.Number(value=0, visible=False)
         dummy_component = gr.Label(visible=False)
+        trueComponent = gr.Checkbox(value=True, visible=False)
+        falseComponent = gr.Checkbox(value=False, visible=False)
         replacer_scripts.initCNScript()
 
         with ResizeHandleRow():
@@ -724,7 +727,8 @@ def getReplacerTabUI(isDedicatedPage):
 
         avoid_mask_create_canvas.click(
             fn=get_current_image,
-            inputs=[image, avoid_mask_need_limit, max_resolution_on_detection],
+            _js='replacerGetCurrentSourceImg',
+            inputs=[dummy_component, trueComponent, avoid_mask_need_limit, max_resolution_on_detection],
             outputs=[avoidance_mask],
             postprocess=False,
         )
@@ -738,7 +742,8 @@ def getReplacerTabUI(isDedicatedPage):
 
         create_canvas_custom_mask.click(
             fn=get_current_image,
-            inputs=[image, custom_mask_need_limit, max_resolution_on_detection],
+            _js='replacerGetCurrentSourceImg',
+            inputs=[dummy_component, falseComponent, custom_mask_need_limit, max_resolution_on_detection],
             outputs=[custom_mask],
             postprocess=False,
         )

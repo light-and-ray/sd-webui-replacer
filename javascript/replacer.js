@@ -45,6 +45,23 @@ onAfterUiUpdate(function() {
 });
 
 
+function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxResolutionOnDetection) {
+        const img = gradioApp().querySelector('#replacer_image div div img');
+        var maskId = ''
+        if (isAvoid){
+            maskId = 'replacer_avoidance_mask'
+        } else {
+            maskId = 'replacer_custom_mask'
+        }
+        const removeButton = gradioApp().getElementById(maskId).querySelector('button[aria-label="Remove Image"]');
+        if (removeButton){
+            removeButton.click();
+        }
+        let resImg = img ? img.src : null;
+        return [resImg, isAvoid, needLimit, maxResolutionOnDetection]
+    }
+
+
 function replacerApplyZoomAndPanIntegration () {
     if (typeof window.applyZoomAndPanIntegration === "function") {
         window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);

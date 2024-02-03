@@ -107,7 +107,7 @@ Dedicated page (replacer tab only) is avaliable on url `/replacer-dedicated`
 API is avaliable on `/replacer/replace`
 
 ```python
-    input_image: str = "base64 or path on server here"
+    input_image: str = "base64 image"
     detection_prompt: str = ""
     avoidance_prompt: str = ""
     positive_prompt: str = ""
