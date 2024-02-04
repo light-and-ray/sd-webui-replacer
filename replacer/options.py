@@ -198,7 +198,7 @@ def on_ui_settings():
 
 
     shared.opts.add_option(
-        EXT_NAME_LOWER + "_use_cpu_for_detection",
+        EXT_NAME_LOWER + "_use_cpu_for_sam",
         shared.OptionInfo(
             False,
             f"Use CPU for SAM. If you get error on your GPU (AMD Redeon) use it",
@@ -209,10 +209,10 @@ def on_ui_settings():
 
 
     shared.opts.add_option(
-        EXT_NAME_LOWER + "_use_cpu_for_sam",
+        EXT_NAME_LOWER + "_use_cpu_for_detection",
         shared.OptionInfo(
             False,
-            f"Use CPU for detection (SAM + Dino). try it only if the option above didn't help you",
+            f"Use CPU for detection (SAM + Dino). For Intel ARC or if you don't have enought vram. Try it only if the option above didn't help you",
             gr.Checkbox,
             section=section,
         ).needs_restart()
