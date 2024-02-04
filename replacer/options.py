@@ -40,6 +40,11 @@ def needAutoUnloadModels():
     return shared.cmd_opts.lowvram or shared.cmd_opts.medvram
 
 
+def useCpuForSam():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_use_cpu_for_sam", False)
+    return opt
+
+
 def useCpuForDetection():
     opt = shared.opts.data.get(EXT_NAME_LOWER + "_use_cpu_for_detection", False)
     return opt
@@ -196,7 +201,18 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_cpu_for_detection",
         shared.OptionInfo(
             False,
-            f"Use CPU for detection. If you get error on your GPU (AMD Redeon or Intel ARC) use it",
+            f"Use CPU for SAM. If you get error on your GPU (AMD Redeon) use it",
+            gr.Checkbox,
+            section=section,
+        ).needs_restart()
+    )
+
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_use_cpu_for_sam",
+        shared.OptionInfo(
+            False,
+            f"Use CPU for detection (SAM + Dino). try it only if the option above didn't help you",
             gr.Checkbox,
             section=section,
         ).needs_restart()

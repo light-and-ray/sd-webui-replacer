@@ -1,5 +1,6 @@
 from PIL import Image, ImageOps
-from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection
+from modules import devices
+from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useCpuForSam
 from replacer.tools import areImagesTheSame, limitSizeByOneDemention
 sam_predict = None
 update_mask = None
@@ -12,9 +13,9 @@ def initSamDependencies():
         sam_predict = scripts.sam.sam_predict
         update_mask = scripts.sam.update_mask
         clear_cache = scripts.sam.clear_cache
-        if useCpuForDetection():
+        if useCpuForDetection() or useCpuForSam():
             scripts.sam.sam_device = 'cpu'
-            print(f'[{EXT_NAME}] Use CPU for detection')
+            print(f'[{EXT_NAME}] Use CPU for SAM')
 
 
 class NothingDetectedError(Exception):
@@ -59,9 +60,21 @@ class MasksCreator:
             self.boxes = masksCreatorCached.boxes
             print('MasksCreator restored from cache')
         else:
-            self._createMasks()
-            masksCreatorCached = self
-            print('MasksCreator cached')
+            restore = []
+            try:
+                if useCpuForDetection():
+                    oldDevice = devices.device
+                    def restore_():
+                        devices.device = oldDevice
+                    restore.append(restore_)
+                    devices.device = 'cpu'
+                    print(f'[{EXT_NAME}] Use CPU for detection')
+                self._createMasks()
+                masksCreatorCached = self
+                print('MasksCreator cached')
+            finally:
+                for f in restore:
+                    f()
 
 
     def _createMasks(self):
