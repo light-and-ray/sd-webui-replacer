@@ -1,5 +1,5 @@
 from PIL import Image, ImageOps
-from replacer.options import needAutoUnloadModels, EXT_NAME
+from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection
 from replacer.tools import areImagesTheSame, limitSizeByOneDemention
 sam_predict = None
 update_mask = None
@@ -8,13 +8,13 @@ clear_cache = None
 def initSamDependencies():
     global sam_predict, update_mask, clear_cache
     if not sam_predict or not update_mask or not clear_cache:
-        from scripts.sam import sam_predict as sam_predict_
-        from scripts.sam import update_mask as update_mask_
-        from scripts.sam import clear_cache as clear_cache_
-        sam_predict = sam_predict_
-        update_mask = update_mask_
-        clear_cache = clear_cache_
-
+        import scripts.sam
+        sam_predict = scripts.sam.sam_predict
+        update_mask = scripts.sam.update_mask
+        clear_cache = scripts.sam.clear_cache
+        if useCpuForDetection():
+            scripts.sam.sam_device = 'cpu'
+            print(f'[{EXT_NAME}] Use CPU for detection')
 
 
 class NothingDetectedError(Exception):

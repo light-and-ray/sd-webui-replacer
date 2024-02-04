@@ -9,7 +9,7 @@ Replacer is an extention for [AUTOMATIC1111/stable-diffusion-webui](https://gith
 1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
 2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
 3. For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`. Or if you have already lcm lora, then change hires suffix in the extension options
-4. Install this extention. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For 1.6.x last compatiable version is 9a20cb2 (run `git checkout 9a20cb2` inside extension's directory for downgrade)
+4. Install this extention. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For AMD and Intel GPUs you need to enable cpu in Replacer's settings
 5. Reload UI
 
 ### SAM models list:
@@ -34,6 +34,14 @@ SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model siz
 </blockquote>
 
 _FastSAM_ and _Matting-Anything_ aren't currently supported
+
+### AMD Radeon and Intel ARC
+
+For AMD and Intel GPUs, and maby some else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
+
+![](images/img7.jpg)
+
+Then restart webui (do not press _reload ui_, restart it completly)
 
 ## Usage
 ### General
