@@ -131,11 +131,8 @@ def getReplacerTabUI(isDedicatedPage):
                         elem_id="replacer_negativePrompt_examples",
                         examples_per_page=getNegativePromptExamplesNumber(),
                     )
-                
-                if not isDedicatedPage:
-                    runButtonIdPart='replacer'
-                else:
-                    runButtonIdPart='replacer_dedicated'
+
+                runButtonIdPart='replacer'
                 toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
                 toprow.create_inline_toprow_image()
                 run_button = toprow.submit

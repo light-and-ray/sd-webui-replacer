@@ -40,7 +40,6 @@ let replacer_gallery = undefined;
 onAfterUiUpdate(function() {
     if (!replacer_gallery) {
         replacer_gallery = attachGalleryListeners("replacer");
-        replacer_gallery = attachGalleryListeners("replacer_dedicated");
     }
 });
 
