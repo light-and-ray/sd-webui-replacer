@@ -31,8 +31,8 @@ titles = {
     "Max resolution on detection": "If one side of the image is smaller than that, it will be resized before detection. It doesn't have effect on inpainting. Reduces vram usage and mask generation time.",
     "Mask Expand": "Mask dilation, px, releative to \"Max resolution on detection\"",
     "Extra mask expand": "Extra mask dilation on hires fix step, px, releative to \"Max resolution on detection\"",
-    "Limit avoidance mask canvas resolution on creating": "Limit the canvas create by the buttom, using \"Max resolution on detection\" option",
-    "Limit custom mask canvas resolution on creating": "Limit the canvas create by the buttom, using \"Max resolution on detection\" option",
+    "Limit avoidance mask canvas resolution on creating": "Limit the canvas created by the buttom, using \"Max resolution on detection\" option",
+    "Limit custom mask canvas resolution on creating": "Limit the canvas created by the buttom, using \"Max resolution on detection\" option",
 };
 
 
