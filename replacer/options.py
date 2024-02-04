@@ -201,7 +201,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_cpu_for_sam",
         shared.OptionInfo(
             False,
-            f"Use CPU for SAM. If you get error on your GPU (AMD Redeon) use it",
+            f"Use CPU for SAM. If you get error on your GPU (AMD Radeon) use it",
             gr.Checkbox,
             section=section,
         ).needs_restart()
