@@ -41,7 +41,7 @@ For AMD and Intel GPUs, and maby some else, you need to enable CPU for detection
 
 ![](images/img7.jpg)
 
-Then restart webui (do not press _reload ui_, restart it completly)
+Then click _"Apply settings"_ and restart webui (do not press _reload ui_, restart it completly)
 
 ## Usage
 ### General
