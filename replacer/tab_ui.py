@@ -547,7 +547,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     hf_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                                     hf_sd_model_checkpoint.choices = ['Use same model'] + hf_sd_model_checkpoint.choices
                                     hf_sd_model_checkpoint.value = 'Use same model'
-                                    hf_sd_model_checkpoint.label = 'Override sd model'
+                                    hf_sd_model_checkpoint.label = 'Override sd model while hires fix'
 
                                     hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
                                         value=0, elem_id="replacer_hf_extra_inpaint_padding",
