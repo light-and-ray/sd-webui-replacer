@@ -487,6 +487,7 @@ def applyHiresFix(
     hf_negativePrompt,
     hf_sd_model_checkpoint,
     hf_extra_inpaint_padding,
+    hf_extra_mask_blur,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -521,6 +522,7 @@ def applyHiresFix(
             and hf_sd_model_checkpoint != "":
         hrArgs.sd_model_checkpoint = hf_sd_model_checkpoint
     hrArgs.inpaint_full_res_padding += hf_extra_inpaint_padding
+    hrArgs.mask_blur += hf_extra_mask_blur
 
     if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"

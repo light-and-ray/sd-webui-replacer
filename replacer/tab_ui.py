@@ -485,6 +485,24 @@ def getReplacerTabUI(isDedicatedPage):
                                         choices=[x.name for x in shared.sd_upscalers],
                                         label="Above limit upscaler",
                                     )
+                                
+                                with gr.Row():
+                                    hf_extra_mask_expand = gr.Slider(
+                                        label='Extra mask expand',
+                                        value=0,
+                                        step=1,
+                                        minimum=0,
+                                        maximum=200,
+                                        elem_id="replacer_hf_extra_mask_expand",
+                                    )
+                                
+                                    hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
+                                        value=0, elem_id="replacer_hf_extra_inpaint_padding",
+                                        minimum=0, maximum=250, step=1)
+                                    
+                                    hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
+                                        value=0, elem_id="replacer_hf_extra_mask_blur",
+                                        minimum=0, maximum=50, step=1)
                             
                             with gr.Tab('Advanced'):
                                 with gr.Row():
@@ -551,12 +569,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     hf_sd_model_checkpoint.choices = ['Use same model'] + hf_sd_model_checkpoint.choices
                                     hf_sd_model_checkpoint.value = 'Use same model'
                                     hf_sd_model_checkpoint.label = 'Override sd model while hires fix'
-
-                                    hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
-                                        value=0, elem_id="replacer_hf_extra_inpaint_padding",
-                                        minimum=0, maximum=250, step=1)
-
-                                with gr.Row():
+                                    
                                     hf_disable_cn = gr.Checkbox(
                                         label='Disable ControlNet while hires fix',
                                         value=True,
@@ -565,14 +578,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     if not replacer_scripts.script_controlnet:
                                         hf_disable_cn.visible = False
 
-                                    hf_extra_mask_expand = gr.Slider(
-                                        label='Extra mask expand',
-                                        value=0,
-                                        step=1,
-                                        minimum=0,
-                                        maximum=200,
-                                        elem_id="replacer_hf_extra_mask_expand",
-                                    )
+
 
 
 
@@ -684,6 +690,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_negativePrompt,
                 hf_sd_model_checkpoint,
                 hf_extra_inpaint_padding,
+                hf_extra_mask_blur,
             ],
             outputs=[
                 img2img_gallery,
