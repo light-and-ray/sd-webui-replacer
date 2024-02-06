@@ -6,7 +6,7 @@ from modules.processing import StableDiffusionProcessingImg2Img, process_images,
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
-from modules import scripts
+from modules import scripts, sd_models
 from replacer.mask_creator import MasksCreator
 from replacer.generation_args import GenerationArgs
 from replacer.video_tools import getVideoFrames, save_video
@@ -262,6 +262,9 @@ def generate(
 
         if not override_sd_model or sd_model_checkpoint is None or sd_model_checkpoint == "":
             sd_model_checkpoint = opts.sd_model_checkpoint
+        else:
+            opts.sd_model_checkpoint = sd_model_checkpoint
+            sd_models.reload_model_weights()
 
         images = []
 
