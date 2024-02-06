@@ -1,10 +1,14 @@
 from PIL import ImageChops, Image
 import numpy as np
-import cv2, random
+import cv2, random, git, os
 from dataclasses import dataclass
 from replacer.generation_args import GenerationArgs
 
+REPLACER_VERSION = git.Repo(os.path.dirname(__file__), search_parent_directories=True).head.object.hexsha[:7]
+
+
 def addReplacerMetadata(p, gArgs: GenerationArgs):
+    p.extra_generation_params["Extension"] = f'sd-webui-replacer {REPLACER_VERSION}'
     if gArgs.detectionPrompt != '':
         p.extra_generation_params["Detection prompt"] = gArgs.detectionPrompt
     if gArgs.avoidancePrompt != '':
