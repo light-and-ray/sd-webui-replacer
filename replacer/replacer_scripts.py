@@ -4,7 +4,15 @@ from modules import scripts
 from modules.images import resize_image
 from replacer.tools import limitSizeByOneDemention
 
+try:
+    from lib_controlnet.external_code import ResizeMode
+    IS_SD_WEBUI_FORGE = True
+except:
+    ResizeMode = None
+    IS_SD_WEBUI_FORGE = False
+
 script_controlnet : scripts.Script = None
+
 
 def initCNScript():
     global script_controlnet
@@ -40,15 +48,9 @@ def restoreAfterCN(origImage, origMask, processed, upscaler):
         processed.images[i] = imageOrg
 
 
-ResizeMode = None
-
 def initResizeMode():
     global ResizeMode
-    try:
-        from internal_controlnet.external_code import ResizeMode
-    except ImportError:
-        from lib_controlnet.external_code import ResizeMode
-
+    from internal_controlnet.external_code import ResizeMode
 
 
 def enableInpaintModeForCN(controlNetUnits, p):
@@ -59,7 +61,7 @@ def enableInpaintModeForCN(controlNetUnits, p):
     for controlNetUnit in controlNetUnits:
         if not controlNetUnit.enabled:
             continue
-        if controlNetUnit.module == 'inpaint_only':
+        if not IS_SD_WEBUI_FORGE and controlNetUnit.module == 'inpaint_only':
             print('Use cn inpaint instead of sd inpaint')
             image = limitSizeByOneDemention(p.init_images[0], max(p.width, p.height))
             controlNetUnit.image = {
