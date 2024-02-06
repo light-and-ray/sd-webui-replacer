@@ -17,7 +17,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask,
+from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask
 )
 
 g_clear_cache = None
@@ -105,7 +105,7 @@ def inpaint(
 
     needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
     if needRestoreAfterCN:
-        replacer_scripts.restoreAfterCN(image, gArgs.mask, processed, gArgs.upscalerForImg2Img)
+        replacer_scripts.restoreAfterCN(image, gArgs, processed)
 
 
     if savePath != "":

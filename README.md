@@ -1,20 +1,21 @@
 # Replacer
 
-Replacer is an extention for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extention is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion and controlnet
+Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion and controlnet
 
 ![](images/img1.jpg)
 
+You also can draw your mask instead of or in addition to detection, and take advantage of convenient HiresFix option, and ControlNet inpainting with preserving original image resolution and aspect ratio
 
 ## Installation
-1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extention. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
+1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extension. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
 2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
 3. For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`. Or if you have already lcm lora, then change hires suffix in the extension options
-4. Install this extention. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For AMD and Intel GPUs you need to enable cpu in Replacer's settings
+4. Install this extension. Go to tab `Extension` -> `Available` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.7.0. For AMD and Intel GPUs you need to enable cpu in Replacer's settings
 5. Reload UI
 
 ### SAM models list:
 
-SAM-HQ are the best for me. Choose it depenping on your vram. Sum this model size with dino model size (694MB-938MB)
+SAM-HQ are the best for me. Choose it depending on your vram. Sum this model size with dino model size (694MB-938MB)
 
 <blockquote>
 
@@ -37,7 +38,7 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 ### AMD Radeon and Intel ARC
 
-For AMD and Intel GPUs, and maby some else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
+For AMD and Intel GPUs, and maby something else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
 
 ![](images/img7.jpg)
 
@@ -57,9 +58,9 @@ You can detect few objects, just using comma `,`
 
 ### HiresFix
 
-Default settings designed for using lcm lora for fast upscale. It requires lcm lora I mentioned, cfg scale 1.0 and sampling steps 4. There is no difference in quality for my opinion
+Default settings are designed for using lcm lora for fast upscale. It requires lcm lora I mentioned, cfg scale 1.0 and sampling steps 4. There is no difference in quality for my opinion
 
-Despite in txt2img for lcm lora DPM++ samplers produses awful results, while hires fix it produces a way better result. So I recommend to "Use the same sampler" option
+Despite in txt2img for lcm lora DPM++ samplers produces awful results, while hires fix it produces a way better result. So I recommend "Use the same sampler" option
 
 Note: hires fix is designed for single-user server
 
@@ -78,7 +79,7 @@ It also supports [ControlNet extension](https://github.com/Mikubill/sd-webui-con
 
 ### Video inpainting
 
-You can use Replacer to inpaint video with regular stable diffusion inpaint method. It is very inconsistant, but in few cases it can produces good enought results
+You can use Replacer to inpaint video with a regular stable diffusion inpaint method. It is very inconsistent, but in a few cases it can produce good enough results
 
 Example:
 ```
@@ -100,7 +101,7 @@ https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/a9816404-fea3
 
 https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/20a01878-6361-4dc3-a30f-be92ff85dc85
 
-To increase consistency it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
+To increase consistency, it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
 
 To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
 
@@ -108,7 +109,7 @@ You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-cont
 
 
 ### Dedicated page
-Dedicated page (replacer tab only) is avaliable on url `/replacer-dedicated`
+Dedicated page (replacer tab only) is available on url `/replacer-dedicated`
 
 
 ### API
@@ -149,9 +150,9 @@ See an example of usage in [apiExample.py](apiExample.py) script
 
 
 ### Extention name
-If you don't like "Replacer" name of this extention, you can provide it inside `ExtensionName.txt` in root of extension directory.
+Replacer" name of this extension, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
-Or you can override it using envirovment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
+Or you can override it using the environment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
 
 For exaple: Linux
 ```sh
@@ -163,6 +164,11 @@ Or Windows in your `.bat` file:
 set SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
 ```
 
+## How it works?
+
+First, grounding dino models detect objects you provided in the detection prompt. Then segment anything model generates contours of them. And then extension chooses randomly 1 of 3 generated masks, and inpaints it with regular inpainting method in a1111 webui
+
+When you press the "Apply hires fix" button, the extension regenerates the image with exactly the same settings, excluding upscaler_for_img2img. Then it applies inpainting with "Original" masked content mode and lower denoising but higher resolution.
 
 ## Useful Tips!
 
@@ -170,11 +176,11 @@ set SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
 
 ![](images/img4.jpg)
 
-You need to reload the web page, then set your desirable settings. Then go to the "Defaults" section in "Settings" tab. Click "View changes", check is it ok, then click "Apply" and "Reload UI"
+You need to reload the web page, then set your desirable settings. Then go to the "Defaults" section in the "Settings" tab. Click "View changes", check is it ok, then click "Apply" and "Reload UI"
 
-### How to get inpainting model?
+### How to get an inpainting model?
 
-I recommend to use [EpicPhotoGasm - Z - Inpainting](https://civitai.com/models/132632?modelVersionId=201346) model for realism. If you've already have your favourite model, but it doesn't have inpainting model, you can make it in "Checkpoint Merger" tab:
+I recommend you to using [EpicPhotoGasm - Z - Inpainting](https://civitai.com/models/132632?modelVersionId=201346) model for realism. If you've already have your favorite model, but it doesn't have inpainting model, you can make it in "Checkpoint Merger" tab:
 1. Select your target model as "model B"
 2. Select [sd-v1-5-inpainting](https://huggingface.co/webui/stable-diffusion-inpainting/blob/main/sd-v1-5-inpainting.safetensors) as "model A"
 3. Select `sd_v1-5-pruned-emaonly` as "model C"

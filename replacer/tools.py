@@ -1,4 +1,6 @@
 from PIL import ImageChops, Image
+import numpy as np
+import cv2
 from dataclasses import dataclass
 from replacer.generation_args import GenerationArgs
 
@@ -85,3 +87,23 @@ def prepareMask(mask_mode, mask_raw):
         if areImagesTheSame(blackFilling, mask):
             return None
     return mask
+
+
+def applyMaskBlur(mask, mask_blur):
+    mask_blur_x = mask_blur
+    mask_blur_y = mask_blur
+    image_mask = mask
+    if mask_blur_x > 0:
+        np_mask = np.array(image_mask)
+        kernel_size = 2 * int(2.5 * mask_blur_x + 0.5) + 1
+        np_mask = cv2.GaussianBlur(np_mask, (kernel_size, 1), mask_blur_x)
+        image_mask = Image.fromarray(np_mask)
+
+    if mask_blur_y > 0:
+        np_mask = np.array(image_mask)
+        kernel_size = 2 * int(2.5 * mask_blur_y + 0.5) + 1
+        np_mask = cv2.GaussianBlur(np_mask, (1, kernel_size), mask_blur_y)
+        image_mask = Image.fromarray(np_mask)
+    
+    return image_mask
+

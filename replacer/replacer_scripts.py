@@ -1,8 +1,10 @@
 import copy
 import numpy as np
+from PIL import Image, ImageChops
 from modules import scripts
 from modules.images import resize_image
-from replacer.tools import limitSizeByOneDemention
+from replacer.tools import limitSizeByOneDemention, applyMaskBlur
+from replacer.generation_args import GenerationArgs
 
 try:
     from lib_controlnet.external_code import ResizeMode
@@ -36,10 +38,16 @@ def convertIntoCNImageFromat(image):
     return color
 
 
-def restoreAfterCN(origImage, origMask, processed, upscaler):
+def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
     print('Restoring images resolution after ControlNet Inpainting')
+    origMask = gArgs.mask
+    if gArgs.inpainting_mask_invert:
+        origMask = ImageChops.invert(gArgs.mask)
+    origMask = applyMaskBlur(origMask, gArgs.mask_blur)
+    upscaler = gArgs.upscalerForImg2Img
     if upscaler == "":
         upscaler = None
+
     for i in range(len(processed.images)):
         imageOrg = copy.copy(origImage)
         w, h = imageOrg.size
@@ -54,14 +62,21 @@ def initResizeMode():
 
 
 def enableInpaintModeForCN(controlNetUnits, p):
-    if ResizeMode is None:
-        initResizeMode()
-    mask = p.image_mask
+    mask = None
 
     for controlNetUnit in controlNetUnits:
         if not controlNetUnit.enabled:
             continue
+
         if not IS_SD_WEBUI_FORGE and controlNetUnit.module == 'inpaint_only':
+            if p.image_mask is not None:
+                mask = p.image_mask
+                if p.inpainting_mask_invert:
+                    mask = ImageChops.invert(mask)
+                mask = applyMaskBlur(mask, p.mask_blur)
+                if ResizeMode is None:
+                    initResizeMode()
+
             print('Use cn inpaint instead of sd inpaint')
             image = limitSizeByOneDemention(p.init_images[0], max(p.width, p.height))
             controlNetUnit.image = {
