@@ -36,8 +36,24 @@ def needAutoUnloadModels():
         return True
     if opt == 'Disabled':
         return False
+    if opt == 'Only SDXL':
+        return shared.sd_model.is_sdxl
+
+    return shared.cmd_opts.lowvram or shared.cmd_opts.medvram or (shared.sd_model.is_sdxl and shared.cmd_opts.medvram_sdxl)
+
+
+def doNotShowUnloadButton():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_always_unload_models", 'Automatic')
+
+    if opt == 'Enabled':
+        return True
+    if opt == 'Disabled':
+        return False
+    if opt == 'Only SDXL':
+        return False
 
     return shared.cmd_opts.lowvram or shared.cmd_opts.medvram
+
 
 
 def useCpuForSam():
@@ -188,7 +204,7 @@ def on_ui_settings():
             f"Always unload detection models after generation",
             gr.Radio,
             {
-                'choices' : ['Automatic', 'Enabled', 'Disabled'],
+                'choices' : ['Automatic', 'Enabled', 'Only SDXL', 'Disabled'],
             },
             section=section,
         ).info("Significally increases detection time but reduces vram usage. "\

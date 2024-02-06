@@ -10,7 +10,7 @@ from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSe
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
-    needAutoUnloadModels, getAvoidancePromptExamples, getDedicatedPagePath,
+    doNotShowUnloadButton, getAvoidancePromptExamples, getDedicatedPagePath,
     getDetectionPromptExamplesNumber, getAvoidancePromptExamplesNumber,
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
@@ -227,7 +227,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     minimum=0, maximum=10, step=1)
 
                             with gr.Row():
-                                if not needAutoUnloadModels():
+                                if not doNotShowUnloadButton():
                                     unload = gr.Button(
                                         value="Unload detection models",
                                         elem_id="replacer_unload_detection_models")
@@ -532,7 +532,7 @@ def getReplacerTabUI(isDedicatedPage):
                                         value=True,
                                         elem_id="replacer_hf_unload_detection_models",
                                     )
-                                    if needAutoUnloadModels():
+                                    if doNotShowUnloadButton():
                                         hf_unload_detection_models.visible = False
 
                                 with gr.Row():
@@ -727,7 +727,7 @@ def getReplacerTabUI(isDedicatedPage):
             ]
         )
 
-        if not needAutoUnloadModels():
+        if not doNotShowUnloadButton():
             unload.click(
                 fn=wrap_queued_call(unloadModels),
                 inputs=[],
