@@ -89,7 +89,7 @@ def inpaint(
     p.seed = gArgs.seed
     p.do_not_save_grid = True
     if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
-        replacer_scripts.enableInpaintModeForCN(gArgs.cn_args)
+        replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
         p.scripts = copy.copy(scripts.scripts_img2img)
         p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
         p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
@@ -101,6 +101,12 @@ def inpaint(
 
     scriptImages = processed.images[len(processed.all_seeds):]
     processed.images = processed.images[:len(processed.all_seeds)]
+
+
+    needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
+    if needRestoreAfterCN:
+        replacer_scripts.restoreAfterCN(image, gArgs.mask, processed, gArgs.upscalerForImg2Img)
+
 
     if savePath != "":
         for i in range(len(processed.images)):

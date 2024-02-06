@@ -408,7 +408,10 @@ def getReplacerTabUI(isDedicatedPage):
                 
                 cn_inputs = []
                 if replacer_scripts.script_controlnet:
-                    cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
+                    with gr.Row():
+                        cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
+                    with gr.Row():
+                        gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
 
             with gr.Column(scale=2):
                 with gr.Row():
