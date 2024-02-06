@@ -1,6 +1,4 @@
-import os
-import copy
-import random
+import os, copy
 from contextlib import closing
 from PIL import Image
 import modules.shared as shared
@@ -17,7 +15,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask
+from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask, generateSeed
 )
 
 g_clear_cache = None
@@ -255,7 +253,7 @@ def generate(
             negativePrompt = getNegativePromptExamples()[0]
 
         if (seed == -1):
-            seed = int(random.randrange(4294967294))
+            seed = generateSeed()
 
         detectionPrompt = detectionPrompt.strip()
         avoidancePrompt = avoidancePrompt.strip()
@@ -488,6 +486,7 @@ def applyHiresFix(
     hf_sd_model_checkpoint,
     hf_extra_inpaint_padding,
     hf_extra_mask_blur,
+    hf_randomize_seed,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -523,6 +522,8 @@ def applyHiresFix(
         hrArgs.sd_model_checkpoint = hf_sd_model_checkpoint
     hrArgs.inpaint_full_res_padding += hf_extra_inpaint_padding
     hrArgs.mask_blur += hf_extra_mask_blur
+    if hf_randomize_seed:
+        hrArgs.seed = generateSeed()
 
     if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.n_iter > 1:
         errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"

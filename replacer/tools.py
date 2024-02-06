@@ -1,6 +1,6 @@
 from PIL import ImageChops, Image
 import numpy as np
-import cv2
+import cv2, random
 from dataclasses import dataclass
 from replacer.generation_args import GenerationArgs
 
@@ -106,4 +106,9 @@ def applyMaskBlur(mask, mask_blur):
         image_mask = Image.fromarray(np_mask)
     
     return image_mask
+
+
+
+def generateSeed():
+    return int(random.randrange(4294967294))
 

@@ -495,7 +495,7 @@ def getReplacerTabUI(isDedicatedPage):
                                         maximum=200,
                                         elem_id="replacer_hf_extra_mask_expand",
                                     )
-                                
+
                                     hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
                                         value=0, elem_id="replacer_hf_extra_inpaint_padding",
                                         minimum=0, maximum=250, step=1)
@@ -503,7 +503,14 @@ def getReplacerTabUI(isDedicatedPage):
                                     hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
                                         value=0, elem_id="replacer_hf_extra_mask_blur",
                                         minimum=0, maximum=50, step=1)
-                            
+
+                                with gr.Row():
+                                    hf_randomize_seed = gr.Checkbox(
+                                        label='Randomize seed for hires fix',
+                                        value=True,
+                                        elem_id="replacer_hf_randomize_seed",
+                                    )
+
                             with gr.Tab('Advanced'):
                                 with gr.Row():
                                     hf_sampler = gr.Dropdown(
@@ -577,7 +584,6 @@ def getReplacerTabUI(isDedicatedPage):
                                     )
                                     if not replacer_scripts.script_controlnet:
                                         hf_disable_cn.visible = False
-
 
 
 
@@ -691,6 +697,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_sd_model_checkpoint,
                 hf_extra_inpaint_padding,
                 hf_extra_mask_blur,
+                hf_randomize_seed,
             ],
             outputs=[
                 img2img_gallery,
