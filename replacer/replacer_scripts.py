@@ -40,11 +40,22 @@ def restoreAfterCN(origImage, origMask, processed, upscaler):
         processed.images[i] = imageOrg
 
 
+ResizeMode = None
 
-def enableInpaintModeForCN(args, p):
-    from internal_controlnet.external_code import get_all_units_from, ResizeMode
+def initResizeMode():
+    global ResizeMode
+    try:
+        from internal_controlnet.external_code import ResizeMode
+    except ImportError:
+        from lib_controlnet.external_code import ResizeMode
+
+
+
+def enableInpaintModeForCN(controlNetUnits, p):
+    if ResizeMode is None:
+        initResizeMode()
     mask = p.image_mask
-    controlNetUnits = get_all_units_from(args)
+
     for controlNetUnit in controlNetUnits:
         if not controlNetUnit.enabled:
             continue
