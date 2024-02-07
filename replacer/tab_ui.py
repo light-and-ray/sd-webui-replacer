@@ -617,9 +617,10 @@ def getReplacerTabUI(isDedicatedPage):
 
                 for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
                     ui_group.register_run_annotator()
-                    ui_group.inpaint_crop_input_image.value = True
-                    ui_group.inpaint_crop_input_image.visible = True
-                    ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
+                    if not replacer_scripts.IS_SD_WEBUI_FORGE:
+                        ui_group.inpaint_crop_input_image.value = True
+                        ui_group.inpaint_crop_input_image.visible = True
+                        ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
                     # if isDedicatedPage: 
                     #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
                     # ui_group.register_sd_version_changed()
