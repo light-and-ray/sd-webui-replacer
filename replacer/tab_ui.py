@@ -611,14 +611,20 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         if replacer_scripts.script_controlnet:
-            replacer_scripts.ControlNetUiGroup.a1111_context.img2img_w_slider = width
-            replacer_scripts.ControlNetUiGroup.a1111_context.img2img_h_slider = height
+            try:
+                replacer_scripts.ControlNetUiGroup.a1111_context.img2img_w_slider = width
+                replacer_scripts.ControlNetUiGroup.a1111_context.img2img_h_slider = height
 
-            for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
-                ui_group.register_run_annotator()
-                # if isDedicatedPage: 
-                #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
-                # ui_group.register_sd_version_changed()
+                for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
+                    ui_group.register_run_annotator()
+                    ui_group.inpaint_crop_input_image.value = True
+                    ui_group.inpaint_crop_input_image.visible = True
+                    ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
+                    # if isDedicatedPage: 
+                    #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
+                    # ui_group.register_sd_version_changed()
+            except Exception as e:
+                errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
 
 
         def tab_single_on_select():

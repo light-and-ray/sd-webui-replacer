@@ -100,8 +100,7 @@ def enableInpaintModeForCN(controlNetUnits, p):
             controlNetUnit.inpaint_crop_input_image = False
             controlNetUnit.resize_mode = ResizeMode.RESIZE
             p.needRestoreAfterCN = True
-        else:
-            controlNetUnit.inpaint_crop_input_image = True
+
 
 
 needWatchControlNetUI = False
