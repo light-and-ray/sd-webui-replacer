@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import shared, sd_samplers, ui_toprow, ui, ui_settings
+from modules import shared, sd_samplers, ui_toprow, ui, ui_settings, errors
 from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.shared import cmd_opts
 from modules.ui_components import ToolButton, ResizeHandleRow
@@ -413,7 +413,7 @@ def getReplacerTabUI(isDedicatedPage):
                         cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
                         replacer_scripts.needWatchControlNetUI = False
                         if not replacer_scripts.controlNetAccordion:
-                            print(f"[{EXT_NAME}] controlnet accordion wasn't found")
+                            errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
                         else:
                             with replacer_scripts.controlNetAccordion:
                                 with gr.Row():

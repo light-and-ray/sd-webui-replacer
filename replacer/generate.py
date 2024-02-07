@@ -6,7 +6,7 @@ from modules.processing import StableDiffusionProcessingImg2Img, process_images,
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
-from modules import scripts, sd_models
+from modules import scripts, sd_models, errors
 from replacer.mask_creator import MasksCreator
 from replacer.generation_args import GenerationArgs
 from replacer.video_tools import getVideoFrames, save_video
@@ -52,7 +52,7 @@ def inpaint(
             from lama_cleaner_masked_content.options import getUpscaler
             image = lamaInpaint(image, mask, gArgs.inpainting_mask_invert, getUpscaler())
         except Exception as e:
-            print(f'[{EXT_NAME}]: {e}')
+            errors.report(f'[{EXT_NAME}]: {e}', exc_info=True)
 
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
@@ -86,11 +86,14 @@ def inpaint(
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed
     p.do_not_save_grid = True
-    if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
-        replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
-        p.scripts = copy.copy(scripts.scripts_img2img)
-        p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
-        p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
+    try:
+        if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
+            replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
+            p.scripts = copy.copy(scripts.scripts_img2img)
+            p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
+            p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
+    except Exception as e:
+        errors.report(f"Error {e}", exc_info=True)
 
 
 

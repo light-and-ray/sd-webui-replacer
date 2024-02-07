@@ -1,6 +1,6 @@
 import copy
 import gradio as gr
-from modules import script_callbacks, progress, shared
+from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
     getDedicatedPagePath,
 )
@@ -39,7 +39,7 @@ def mountDedicatedPage(demo, app):
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)
     except Exception as e:
-        print(f'[{EXT_NAME}] error while creating dedicated page: {e}')
+        errors.report(f'[{EXT_NAME}] error while creating dedicated page: {e}', exc_info=True)
 
 script_callbacks.on_app_started(mountDedicatedPage)
 
@@ -54,7 +54,7 @@ def hideSegmentAnythingAccordions(demo, app):
             accordion.render = False
         print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
     except Exception as e:
-        print(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}")
+        errors.report(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}", exc_info=True)
 
 
 if needHideSegmentAnythingAccordions():

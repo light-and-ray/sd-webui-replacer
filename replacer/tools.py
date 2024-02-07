@@ -2,9 +2,15 @@ from PIL import ImageChops, Image
 import numpy as np
 import cv2, random, git
 from dataclasses import dataclass
+from modules import errors
 from replacer.generation_args import GenerationArgs
 
-REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
+try:
+    REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
+except Exception:
+    errors.report(f"Error reading replacer git info from {__file__}", exc_info=True)
+    REPLACER_VERSION = "None"
+
 
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):

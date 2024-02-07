@@ -15,7 +15,7 @@ def initSamDependencies():
         clear_cache = scripts.sam.clear_cache
         if useCpuForDetection():
             scripts.sam.sam_device = 'cpu'
-            print(f'[{EXT_NAME}] Use CPU for SAM')
+            print('Use CPU for SAM')
 
 
 class NothingDetectedError(Exception):
@@ -68,7 +68,7 @@ class MasksCreator:
                         devices.device = oldDevice
                     restore.append(restore_)
                     devices.device = 'cpu'
-                    print(f'[{EXT_NAME}] Use CPU for detection')
+                    print('Use CPU for detection')
                 self._createMasks()
                 masksCreatorCached = self
                 print('MasksCreator cached')
