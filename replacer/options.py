@@ -56,11 +56,6 @@ def doNotShowUnloadButton():
 
 
 
-def useCpuForSam():
-    opt = shared.opts.data.get(EXT_NAME_LOWER + "_use_cpu_for_sam", False)
-    return opt
-
-
 def useCpuForDetection():
     opt = shared.opts.data.get(EXT_NAME_LOWER + "_use_cpu_for_detection", False)
     return opt
@@ -214,21 +209,10 @@ def on_ui_settings():
 
 
     shared.opts.add_option(
-        EXT_NAME_LOWER + "_use_cpu_for_sam",
-        shared.OptionInfo(
-            False,
-            f"Use CPU for SAM. If you get error on your GPU (AMD Radeon) use it",
-            gr.Checkbox,
-            section=section,
-        ).needs_restart()
-    )
-
-
-    shared.opts.add_option(
         EXT_NAME_LOWER + "_use_cpu_for_detection",
         shared.OptionInfo(
             False,
-            f"Use CPU for detection (SAM + Dino). For Intel ARC or if you don't have enought vram. Try it only if the option above didn't help you",
+            f"Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enought vram",
             gr.Checkbox,
             section=section,
         ).needs_restart()
