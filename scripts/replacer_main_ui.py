@@ -29,7 +29,7 @@ def mountDedicatedPage(demo, app):
             gr.Textbox(value=shared.opts.dumpjson(), elem_id="settings_json", visible=False)
 
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
-                with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME}_dedicated"):
+                with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     getReplacerTabUI(isDedicatedPage=True)
         
         loadsave = copy.copy(demo.ui_loadsave)  
