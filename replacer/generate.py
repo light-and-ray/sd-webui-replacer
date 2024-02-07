@@ -102,7 +102,7 @@ def inpaint(
 
     scriptImages = processed.images[len(processed.all_seeds):]
     processed.images = processed.images[:len(processed.all_seeds)]
-
+    scriptImages.extend(getattr(processed, 'extra_images', []))
 
     needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
     if needRestoreAfterCN:
