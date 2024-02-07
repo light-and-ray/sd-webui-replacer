@@ -92,4 +92,23 @@ def enableInpaintModeForCN(controlNetUnits, p):
         else:
             controlNetUnit.inpaint_crop_input_image = True
 
-    
+
+needWatchControlNetUI = False
+controlNetAccordion = None
+
+def watchControlNetUI(component, **kwargs):
+    global needWatchControlNetUI, controlNetAccordion
+    if not needWatchControlNetUI:
+        return
+
+    elem_id = kwargs.get('elem_id', None)
+    if elem_id is None:
+        return
+
+    if elem_id == 'controlnet':
+        controlNetAccordion = component
+        return
+
+    if 'img2img' in elem_id:
+        component.elem_id = elem_id.replace('img2img', 'replacer')
+

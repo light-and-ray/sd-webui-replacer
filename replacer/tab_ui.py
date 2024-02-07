@@ -409,9 +409,15 @@ def getReplacerTabUI(isDedicatedPage):
                 cn_inputs = []
                 if replacer_scripts.script_controlnet:
                     with gr.Row():
+                        replacer_scripts.needWatchControlNetUI = True
                         cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
-                    with gr.Row():
-                        gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
+                        replacer_scripts.needWatchControlNetUI = False
+                        if not replacer_scripts.controlNetAccordion:
+                            print(f"[{EXT_NAME}] controlnet accordion wasn't found")
+                        else:
+                            with replacer_scripts.controlNetAccordion:
+                                with gr.Row():
+                                    gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
 
             with gr.Column(scale=2):
                 with gr.Row():

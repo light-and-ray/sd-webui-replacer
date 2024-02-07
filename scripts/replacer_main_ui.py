@@ -5,6 +5,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingA
     getDedicatedPagePath,
 )
 from replacer.tab_ui import getReplacerTabUI
+from replacer import replacer_scripts
 
 
 
@@ -59,4 +60,6 @@ def hideSegmentAnythingAccordions(demo, app):
 if needHideSegmentAnythingAccordions():
     script_callbacks.on_app_started(hideSegmentAnythingAccordions)
 
+
+script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 
