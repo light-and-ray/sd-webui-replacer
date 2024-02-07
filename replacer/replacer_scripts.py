@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 from PIL import Image, ImageChops
-from modules import scripts
+from modules import scripts, errors
 from modules.images import resize_image
 from replacer.tools import limitSizeByOneDemention, applyMaskBlur
 from replacer.generation_args import GenerationArgs
@@ -14,10 +14,10 @@ except:
     IS_SD_WEBUI_FORGE = False
 
 script_controlnet : scripts.Script = None
-
+ControlNetUiGroup = None
 
 def initCNScript():
-    global script_controlnet
+    global script_controlnet, ControlNetUiGroup
     cnet_idx = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
         if script.title().lower() == "controlnet":
@@ -25,6 +25,17 @@ def initCNScript():
             break
     if cnet_idx is not None:
         script_controlnet = copy.copy(scripts.scripts_img2img.alwayson_scripts[cnet_idx])
+    else:
+        return
+    
+    try:
+        if not IS_SD_WEBUI_FORGE:
+            from scripts.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
+        else:
+            from lib_controlnet.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
+    except:
+        errors.report('Cannot register ControlNetUiGroup', exc_info=True)
+        script_controlnet = None
 
 
 g_cn_HWC3 = None
@@ -111,4 +122,5 @@ def watchControlNetUI(component, **kwargs):
 
     if 'img2img' in elem_id:
         component.elem_id = elem_id.replace('img2img', 'replacer')
+    
 

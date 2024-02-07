@@ -68,7 +68,8 @@ def getReplacerTabUI(isDedicatedPage):
         dummy_component = gr.Label(visible=False)
         trueComponent = gr.Checkbox(value=True, visible=False)
         falseComponent = gr.Checkbox(value=False, visible=False)
-        replacer_scripts.initCNScript()
+        if replacer_scripts.script_controlnet:
+            cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
 
         with ResizeHandleRow():
 
@@ -408,16 +409,21 @@ def getReplacerTabUI(isDedicatedPage):
                 
                 cn_inputs = []
                 if replacer_scripts.script_controlnet:
-                    with gr.Row():
-                        replacer_scripts.needWatchControlNetUI = True
-                        cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
-                        replacer_scripts.needWatchControlNetUI = False
-                        if not replacer_scripts.controlNetAccordion:
-                            errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
-                        else:
-                            with replacer_scripts.controlNetAccordion:
-                                with gr.Row():
-                                    gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
+                    try:
+                        with gr.Row():
+                            replacer_scripts.needWatchControlNetUI = True
+                            cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
+                            replacer_scripts.needWatchControlNetUI = False
+
+                            if not replacer_scripts.controlNetAccordion:
+                                errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
+                            else:
+                                with replacer_scripts.controlNetAccordion:
+                                    with gr.Row():
+                                        gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
+                    except Exception as e:
+                        errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
+
 
             with gr.Column(scale=2):
                 with gr.Row():
@@ -601,7 +607,18 @@ def getReplacerTabUI(isDedicatedPage):
                         sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                         override_sd_model = gr.Checkbox(label='Override sd model dedicated',
                             value=True, elem_id="replacer_override_sd_model", visible=False)
-                    
+
+
+
+        if replacer_scripts.script_controlnet:
+            replacer_scripts.ControlNetUiGroup.a1111_context.img2img_w_slider = width
+            replacer_scripts.ControlNetUiGroup.a1111_context.img2img_h_slider = height
+
+            for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
+                ui_group.register_run_annotator()
+                # if isDedicatedPage: 
+                #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
+                # ui_group.register_sd_version_changed()
 
 
         def tab_single_on_select():
