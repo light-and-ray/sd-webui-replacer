@@ -266,6 +266,10 @@ def generate(
         if not override_sd_model or sd_model_checkpoint is None or sd_model_checkpoint == "":
             sd_model_checkpoint = opts.sd_model_checkpoint
         else:
+            oldModel = opts.sd_model_checkpoint
+            def restore():
+                opts.sd_model_checkpoint = oldModel
+            restoreList.append(restore)
             opts.sd_model_checkpoint = sd_model_checkpoint
             sd_models.reload_model_weights()
 
