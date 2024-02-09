@@ -187,7 +187,7 @@ def getReplacerTabUI(isDedicatedPage):
 
                             with gr.Row():
                                 upscaler_for_img2img = gr.Dropdown(
-                                    value=None,
+                                    value="None",
                                     choices=[x.name for x in shared.sd_upscalers],
                                     label="Upscaler for img2Img",
                                     elem_id="replacer_upscaler_for_img2img",

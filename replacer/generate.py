@@ -8,7 +8,7 @@ from modules.ui import plaintext_to_html
 from modules.images import save_image
 from modules import scripts, sd_models, errors
 from replacer.mask_creator import MasksCreator
-from replacer.generation_args import GenerationArgs, HiresFixCachedData
+from replacer.generation_args import GenerationArgs, HiresFixCacheData
 from replacer.video_tools import getVideoFrames, save_video
 from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
     getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
@@ -37,7 +37,7 @@ def inpaint(
     batch_processed : Processed = None
 ):
     override_settings = {}
-    if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != ""):
+    if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != "" and gArgs.upscalerForImg2Img != "None"):
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
     if (gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != ""):
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
@@ -459,6 +459,7 @@ def generate(
 
         global lastGenerationArgs
         lastGenerationArgs = gArgs
+        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0])
         shared.state.end()
 
         if tab_index == 3:
@@ -564,15 +565,15 @@ def applyHiresFix(
         hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
 
     shared.state.textinfo = "inpaint with upscaler"
-    if lastGenerationArgs.hiresFixCachedData is not None and\
-            lastGenerationArgs.hiresFixCachedData.upscaler == hf_upscaler:
-        generatedImage = lastGenerationArgs.hiresFixCachedData.result
-        print('hiresFixCachedData restored from cache')
+    if lastGenerationArgs.hiresFixCacheData is not None and\
+            lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler:
+        generatedImage = lastGenerationArgs.hiresFixCacheData.generatedImage
+        print('hiresFixCacheData restored from cache')
     else:
         processed, scriptImages = inpaint(image, gArgs)
         generatedImage = processed.images[0]
-        lastGenerationArgs.hiresFixCachedData = HiresFixCachedData(hf_upscaler, generatedImage)
-        print('hiresFixCachedData cached')
+        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage)
+        print('hiresFixCacheData cached')
         
 
     shared.state.textinfo = "hiresfix"

@@ -4,9 +4,9 @@ from PIL import Image
 
 
 @dataclass
-class HiresFixCachedData:
+class HiresFixCacheData:
     upscaler: str
-    result: Image
+    generatedImage: Image
 
 
 @dataclass
@@ -46,4 +46,4 @@ class GenerationArgs:
     custom_mask: Image
     cn_args: list
 
-    hiresFixCachedData : HiresFixCachedData = None
+    hiresFixCacheData : HiresFixCacheData = None
