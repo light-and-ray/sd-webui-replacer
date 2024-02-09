@@ -25,7 +25,7 @@ def addReplacerMetadata(p, gArgs: GenerationArgs):
     p.extra_generation_params["Mask expand"] = gArgs.maskExpand
     p.extra_generation_params["Max resolution on detection"] = gArgs.maxResolutionOnDetection
     if gArgs.mask_num_for_metadata is not None:
-        p.extra_generation_params["Max num"] = gArgs.mask_num_for_metadata
+        p.extra_generation_params["Mask num"] = gArgs.mask_num_for_metadata
 
 def areImagesTheSame(image_one, image_two):
     if image_one is None or image_two is None:
