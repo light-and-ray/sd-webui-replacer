@@ -57,28 +57,28 @@ def limitSizeByOneDemention(image: Image, size: int):
 
 
 @dataclass
-class CashedExtraMaskExpand:
+class CachedExtraMaskExpand:
     mask: Image
     expand: int
     result: Image
-cashedExtraMaskExpand: CashedExtraMaskExpand = None
+cachedExtraMaskExpand: CachedExtraMaskExpand = None
 
 update_mask = None
 
 def extraMaskExpand(mask: Image, expand: int):
-    global cashedExtraMaskExpand, update_mask
+    global cachedExtraMaskExpand, update_mask
 
-    if cashedExtraMaskExpand is not None and\
-            cashedExtraMaskExpand.expand == expand and\
-            areImagesTheSame(cashedExtraMaskExpand.mask, mask):
+    if cachedExtraMaskExpand is not None and\
+            cachedExtraMaskExpand.expand == expand and\
+            areImagesTheSame(cachedExtraMaskExpand.mask, mask):
         print('extraMaskExpand restored from cache')
-        return cashedExtraMaskExpand.result
+        return cachedExtraMaskExpand.result
     else:
         if update_mask is None:
             from scripts.sam import update_mask as update_mask_
             update_mask = update_mask_
         expandedMask = update_mask(mask, 0, expand, mask.convert('RGBA'))[1]
-        cashedExtraMaskExpand = CashedExtraMaskExpand(mask, expand, expandedMask)
+        cachedExtraMaskExpand = CachedExtraMaskExpand(mask, expand, expandedMask)
         print('extraMaskExpand cached')
         return expandedMask
 
