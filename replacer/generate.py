@@ -8,7 +8,7 @@ from modules.ui import plaintext_to_html
 from modules.images import save_image
 from modules import scripts, sd_models, errors
 from replacer.mask_creator import MasksCreator
-from replacer.generation_args import GenerationArgs
+from replacer.generation_args import GenerationArgs, HiresFixCachedData
 from replacer.video_tools import getVideoFrames, save_video
 from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
     getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
@@ -564,8 +564,16 @@ def applyHiresFix(
         hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
 
     shared.state.textinfo = "inpaint with upscaler"
-    processed, scriptImages = inpaint(image, gArgs)
-    generatedImage = processed.images[0]
+    if lastGenerationArgs.hiresFixCachedData is not None and\
+            lastGenerationArgs.hiresFixCachedData.upscaler == hf_upscaler:
+        generatedImage = lastGenerationArgs.hiresFixCachedData.result
+        print('hiresFixCachedData restored from cache')
+    else:
+        processed, scriptImages = inpaint(image, gArgs)
+        generatedImage = processed.images[0]
+        lastGenerationArgs.hiresFixCachedData = HiresFixCachedData(hf_upscaler, generatedImage)
+        print('hiresFixCachedData cached')
+        
 
     shared.state.textinfo = "hiresfix"
     processed, scriptImages = inpaint(generatedImage, hrArgs, saveDir, "-hires-fix")
