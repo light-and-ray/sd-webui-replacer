@@ -569,6 +569,8 @@ def applyHiresFix(
             lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler:
         generatedImage = lastGenerationArgs.hiresFixCacheData.generatedImage
         print('hiresFixCacheData restored from cache')
+        shared.state.job_count = 1
+        shared.total_tqdm.updateTotal(hrArgs.steps)
     else:
         processed, scriptImages = inpaint(image, gArgs)
         generatedImage = processed.images[0]
