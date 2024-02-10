@@ -375,6 +375,9 @@ def getReplacerTabUI(isDedicatedPage):
                             with gr.Row():
                                 inpaint_diff_threshold = gr.Slider(label='Difference threshold',
                                     maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
+                                inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
+                                    value=5, elem_id="replacer_inpaint_diff_mask_expand",
+                                    minimum=0, maximum=100, step=1)
                                 inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
                                     value=False, elem_id='inpaint_difference_contours_only')
                         if not replacer_scripts.InpaintDifferenceGlobals:
@@ -826,7 +829,7 @@ def getReplacerTabUI(isDedicatedPage):
                     non_altered_image_for_inpaint_diff,
                     image,
                     mask_blur,
-                    mask_expand,
+                    inpaint_diff_mask_expand,
                     inpaint_diff_threshold,
                     inpaint_diff_contours_only,
                 ],
