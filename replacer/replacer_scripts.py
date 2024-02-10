@@ -123,3 +123,38 @@ def watchControlNetUI(component, **kwargs):
         component.elem_id = elem_id.replace('img2img', 'replacer')
     
 
+
+InpaintDifferenceGlobals = None
+computeInpaintDifference = None
+
+def initInpaintDiffirence():
+    global InpaintDifferenceGlobals, computeInpaintDifference
+    try:
+        from lib_inpaint_difference.globals import DifferenceGlobals as InpaintDifferenceGlobals
+    except:
+        InpaintDifferenceGlobals = None
+        return
+
+    try:
+        from lib_inpaint_difference.mask_processing import compute_mask
+        def computeInpaintDifference(
+            non_altered_image_for_inpaint_diff,
+            image,
+            mask_blur,
+            mask_expand,
+            inpaint_diff_threshold,
+            inpaint_diff_contours_only,
+        ):
+            return compute_mask(
+                non_altered_image_for_inpaint_diff.convert('RGB'),
+                image.convert('RGB'),
+                mask_blur,
+                mask_expand,
+                inpaint_diff_threshold,
+                inpaint_diff_contours_only,
+            )
+            
+    except Exception as e:
+        errors.report(f"Cannot init InpaintDiffirence {e}", exc_info=True)
+        InpaintDifferenceGlobals = None
+

@@ -152,10 +152,18 @@ def generateSingle(
     maskPreview = None
     maskCutted = None
     maskBox = None
-    if not gArgs.only_custom_mask or gArgs.custom_mask is None:
+
+    if gArgs.use_inpaint_diff:
+        gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask
+
+    elif gArgs.only_custom_mask and gArgs.custom_mask is not None:
+        gArgs.mask = gArgs.custom_mask
+
+    else:
         masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
             gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
             gArgs.avoidance_mask, gArgs.custom_mask)
+
         if masksCreator.previews != []:
             if gArgs.mask_num == 'Random':
                 maskNum = gArgs.seed % len(masksCreator.previews)
@@ -169,8 +177,7 @@ def generateSingle(
             maskBox = masksCreator.boxes[maskNum]
         else:
             gArgs.mask = gArgs.custom_mask
-    else:
-        gArgs.mask = gArgs.custom_mask
+
 
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpaint"
@@ -239,6 +246,8 @@ def generate(
     only_custom_mask,
     custom_mask_mode,
     custom_mask,
+    use_inpaint_diff,
+    inpaint_diff_mask_view,
     *scripts_args,
 ):
     restoreList = []
@@ -383,6 +392,9 @@ def generate(
             prepareMask(avoidance_mask_mode, avoidance_mask),
             only_custom_mask,
             prepareMask(custom_mask_mode, custom_mask),
+            use_inpaint_diff and inpaint_diff_mask_view is not None and \
+                replacer_scripts.InpaintDifferenceGlobals is not None and \
+                replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
 
             scripts_args,
             )

@@ -44,6 +44,7 @@ class GenerationArgs:
     avoidance_mask: Image
     only_custom_mask: bool
     custom_mask: Image
+    use_inpaint_diff: bool
     cn_args: list
 
     hiresFixCacheData : HiresFixCacheData = None

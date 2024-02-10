@@ -11,6 +11,7 @@ from replacer import replacer_scripts
 
 def on_ui_tabs():
     replacer_scripts.initCNScript()
+    replacer_scripts.initInpaintDiffirence()
     replacerTabUi = getReplacerTabUI(isDedicatedPage=False)
     return [(replacerTabUi, EXT_NAME, EXT_NAME)]
 

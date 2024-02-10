@@ -356,6 +356,32 @@ def getReplacerTabUI(isDedicatedPage):
                                     '#ffffff', label='Brush color',
                                     info='visual only, use when brush color is hard to see')
 
+                        with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
+                                else gr.Group()) as inpaint_diff_tab:
+                            with gr.Row():
+                                inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
+                                use_inpaint_diff = gr.Checkbox(label='Use inpaint difference',
+                                    value=True, elem_id="replacer_use_inpaint_diff")
+                            with gr.Row():
+                                non_altered_image_for_inpaint_diff = gr.Image(
+                                    label="Non altered image",
+                                    show_label=True,
+                                    elem_id="replacer_non_altered_image_for_inpaint_diff",
+                                    source="upload",
+                                    type="pil",
+                                    image_mode="RGBA",
+                                )
+                                inpaint_diff_mask_view = gr.Image(label="Difference mask",
+                                    interactive=True, type="pil",
+                                    elem_id="replacer_inpaint_diff_mask_view")
+                            with gr.Row():
+                                inpaint_diff_threshold = gr.Slider(label='Difference threshold',
+                                    maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
+                                inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
+                                    value=False, elem_id='inpaint_difference_contours_only')
+                        if not replacer_scripts.InpaintDifferenceGlobals:
+                            inpaint_diff_tab.visible = False
+                            inpaint_diff_tab.render = False
 
 
                 with gr.Tabs(elem_id="replacer_input_modes"):
@@ -695,6 +721,8 @@ def getReplacerTabUI(isDedicatedPage):
                 only_custom_mask,
                 custom_mask_mode,
                 custom_mask,
+                use_inpaint_diff,
+                inpaint_diff_mask_view,
             ] + cn_inputs,
             outputs=[
                 img2img_gallery,
@@ -791,6 +819,21 @@ def getReplacerTabUI(isDedicatedPage):
             outputs=[custom_mask],
             postprocess=False,
         )
+
+        
+        if replacer_scripts.InpaintDifferenceGlobals:
+            inpaint_diff_create.click(
+                fn=replacer_scripts.computeInpaintDifference,
+                inputs=[
+                    non_altered_image_for_inpaint_diff,
+                    image,
+                    mask_blur,
+                    mask_expand,
+                    inpaint_diff_threshold,
+                    inpaint_diff_contours_only,
+                ],
+                outputs=[inpaint_diff_mask_view],
+            )
 
 
     return replacerTabUI

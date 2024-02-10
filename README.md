@@ -47,6 +47,18 @@ For AMD and Intel GPUs, and maby something else, you need to enable CPU for dete
 
 Then click _"Apply settings"_ and restart webui (do not press _reload ui_, restart it completly)
 
+### Supported extensons:
+
+1. [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
+![](images/img6.jpg)
+
+1. My other extension ["Lama cleaner as masked content"](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
+
+
+2. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
+
+3. Fork [sd-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge)
+
 ## Usage
 ### General
 You just need to upload your image, enter 3 prompts, and click "Run". You can override prompts examples in Settings with your commonly using prompts. Don't forget to select inpaint checkpoint
@@ -72,12 +84,6 @@ Note: hires fix is designed for single-user server
 I do not recommend change these options, if you don't know what you do
 
 ![](images/img2.jpg)
-
-It supports my other extension ["Lama cleaner as masked content"](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
-
-It also supports [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
-
-![](images/img6.jpg)
 
 
 ### Video inpainting
