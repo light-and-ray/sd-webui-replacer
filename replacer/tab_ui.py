@@ -1,8 +1,6 @@
 import gradio as gr
 from modules import shared, sd_samplers, ui_toprow, ui, ui_settings, errors
 from modules.ui_components import ToolButton, ResizeHandleRow
-from modules.shared import cmd_opts
-from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
@@ -193,7 +191,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     elem_id="replacer_upscaler_for_img2img",
                                 )
 
-                                if cmd_opts.use_textbox_seed:
+                                if shared.cmd_opts.use_textbox_seed:
                                     seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
                                 else:
                                     seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)

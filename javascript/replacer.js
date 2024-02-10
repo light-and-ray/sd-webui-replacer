@@ -46,18 +46,18 @@ onAfterUiUpdate(function() {
 
 function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxResolutionOnDetection) {
         const img = gradioApp().querySelector('#replacer_image div div img');
-        var maskId = ''
+        var maskId = '';
         if (isAvoid){
-            maskId = 'replacer_avoidance_mask'
+            maskId = 'replacer_avoidance_mask';
         } else {
-            maskId = 'replacer_custom_mask'
+            maskId = 'replacer_custom_mask';
         }
         const removeButton = gradioApp().getElementById(maskId).querySelector('button[aria-label="Remove Image"]');
         if (removeButton){
             removeButton.click();
         }
         let resImg = img ? img.src : null;
-        return [resImg, isAvoid, needLimit, maxResolutionOnDetection]
+        return [resImg, isAvoid, needLimit, maxResolutionOnDetection];
     }
 
 
@@ -73,4 +73,18 @@ function replacerApplyZoomAndPanIntegration () {
 
 onUiUpdate(replacerApplyZoomAndPanIntegration);
 
+
+function replacerRemoveInpaintDiffMaskUpload() {
+    const mask = gradioApp().getElementById('replacer_inpaint_diff_mask_view');
+    var imageContainer = mask.getElementsByClassName('image-container')[0];
+    const images = imageContainer.getElementsByTagName('img');
+
+    if (images.length == 0){
+        imageContainer.style.visibility='hidden';
+    } else {
+        imageContainer.style.visibility='visible';
+    }
+}
+
+onUiUpdate(replacerRemoveInpaintDiffMaskUpload);
 
