@@ -145,6 +145,8 @@ def initInpaintDiffirence():
             inpaint_diff_threshold,
             inpaint_diff_contours_only,
         ):
+            if image is None or non_altered_image_for_inpaint_diff is None:
+                return None
             return compute_mask(
                 non_altered_image_for_inpaint_diff.convert('RGB'),
                 image.convert('RGB'),
