@@ -1,9 +1,10 @@
 from PIL import ImageChops, Image
 import numpy as np
-import cv2, random, git
+import cv2, random, git, torch, copy
 from dataclasses import dataclass
 from modules import errors
 from replacer.generation_args import GenerationArgs
+from replacer.options import useFastDilation
 
 try:
     REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
@@ -65,6 +66,45 @@ cachedExtraMaskExpand: CachedExtraMaskExpand = None
 
 update_mask = None
 
+def fastMaskDilate_(mask, dilation_amount):
+    if dilation_amount == 0:
+        return mask
+
+    oldMode = mask.mode
+    mask = np.array(mask.convert('RGB')).astype(np.int32)
+    tensor_mask = torch.from_numpy((mask / 255).astype(np.float32)).permute(2, 0, 1).unsqueeze(0)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    tensor_mask = tensor_mask.to(device)
+    kernel = torch.ones(1, 1, 3, 3).to(device)
+
+    tensor_mask_r = tensor_mask[:, 0:1, :, :]
+    tensor_mask_g = tensor_mask[:, 1:2, :, :]
+    tensor_mask_b = tensor_mask[:, 2:3, :, :]
+    for _ in range(dilation_amount):
+        tensor_mask_r = (torch.nn.functional.conv2d(tensor_mask_r, kernel, padding=1) > 0).float()
+        tensor_mask_g = (torch.nn.functional.conv2d(tensor_mask_g, kernel, padding=1) > 0).float()
+        tensor_mask_b = (torch.nn.functional.conv2d(tensor_mask_b, kernel, padding=1) > 0).float()
+
+    tensor_mask = torch.cat((tensor_mask_r, tensor_mask_g, tensor_mask_b), dim=1)
+    dilated_mask = tensor_mask.squeeze(0).permute(1, 2, 0).cpu().numpy()
+    dilated_mask = (dilated_mask * 255).astype(np.uint8)
+    return Image.fromarray(dilated_mask).convert(oldMode)
+
+
+def fastMaskDilate(mask, _, dilation_amount, imageResized):
+    print("Dilation Amount: ", dilation_amount)
+    dilated_mask = fastMaskDilate_(mask, dilation_amount // 2)
+    maskFilling = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
+    maskFilling.paste(Image.new('RGBA', dilated_mask.size, (132, 184, 154, 127)), dilated_mask)
+    preview = imageResized.resize(dilated_mask.size)
+    preview.paste(maskFilling, (0, 0), maskFilling)
+    cutted = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
+    cutted.paste(imageResized, dilated_mask)
+
+    return [preview, dilated_mask, cutted]
+
+
 def extraMaskExpand(mask: Image, expand: int):
     global cachedExtraMaskExpand, update_mask
 
@@ -75,8 +115,11 @@ def extraMaskExpand(mask: Image, expand: int):
         return cachedExtraMaskExpand.result
     else:
         if update_mask is None:
-            from scripts.sam import update_mask as update_mask_
-            update_mask = update_mask_
+            if useFastDilation():
+                update_mask = fastMaskDilate
+            else:
+                from scripts.sam import update_mask as update_mask_
+                update_mask = update_mask_
         expandedMask = update_mask(mask, 0, expand, mask.convert('RGBA'))[1]
         cachedExtraMaskExpand = CachedExtraMaskExpand(mask, expand, expandedMask)
         print('extraMaskExpand cached')

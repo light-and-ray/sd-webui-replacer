@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 from modules import devices
-from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection
-from replacer.tools import areImagesTheSame, limitSizeByOneDemention
+from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
+from replacer.tools import areImagesTheSame, limitSizeByOneDemention, fastMaskDilate
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -11,7 +11,10 @@ def initSamDependencies():
     if not sam_predict or not update_mask or not clear_cache:
         import scripts.sam
         sam_predict = scripts.sam.sam_predict
-        update_mask = scripts.sam.update_mask
+        if useFastDilation():
+            update_mask = fastMaskDilate
+        else:
+            update_mask = scripts.sam.update_mask
         clear_cache = scripts.sam.clear_cache
         if useCpuForDetection():
             scripts.sam.sam_device = 'cpu'

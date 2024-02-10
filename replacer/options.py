@@ -60,6 +60,10 @@ def useCpuForDetection():
     opt = shared.opts.data.get(EXT_NAME_LOWER + "_use_cpu_for_detection", False)
     return opt
 
+def useFastDilation():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_fast_dilation", True)
+    return opt
+
 
 detectionPromptExamples_defaults = [
             "background",
@@ -213,6 +217,17 @@ def on_ui_settings():
         shared.OptionInfo(
             False,
             f"Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enought vram",
+            gr.Checkbox,
+            section=section,
+        ).needs_restart()
+    )
+
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_fast_dilation",
+        shared.OptionInfo(
+            True,
+            "Use fast mask dilation (Squarer)",
             gr.Checkbox,
             section=section,
         ).needs_restart()
