@@ -56,7 +56,7 @@ def replacer_api(_, app: FastAPI):
             data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
             data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, 1, data.height, 1,
             data.inpainting_mask_invert, [], data.fix_steps, True, data.sd_model_checkpoint, 'Random', [], None,
-            False, [], None
+            False, [], None, False, None,
         )[0][0]
 
         return {"image": encode_pil_to_base64(result).decode()}
@@ -69,7 +69,7 @@ def replacer_api(_, app: FastAPI):
             "dino_model_name": dino_model_list,
             "upscalers": [""] + [x.name for x in shared.sd_upscalers],
             "lama_cleaner_avaliable": lama_cleaner_avaliable, # inpainting_fill=4, https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
-            }
+        }
 
 
 script_callbacks.on_app_started(replacer_api)
