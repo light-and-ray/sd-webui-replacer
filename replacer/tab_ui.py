@@ -67,7 +67,10 @@ def getReplacerTabUI(isDedicatedPage):
         trueComponent = gr.Checkbox(value=True, visible=False)
         falseComponent = gr.Checkbox(value=False, visible=False)
         if replacer_scripts.script_controlnet:
-            cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
+            try:
+                cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
+            except Exception as e:
+                errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
 
         with ResizeHandleRow():
 
