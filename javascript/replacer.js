@@ -62,7 +62,7 @@ function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxRes
 
 
 function replacerApplyZoomAndPanIntegration () {
-    if (typeof window.applyZoomAndPanIntegration === "function") {
+    if (typeof window.applyZoomAndPanIntegration === "function" && window.applyZoomAndPanIntegration_replacer_mod === "function") {
         window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
         var index = uiUpdateCallbacks.indexOf(replacerApplyZoomAndPanIntegration);
         if (index !== -1) {
@@ -76,7 +76,9 @@ onUiUpdate(replacerApplyZoomAndPanIntegration);
 
 function replacerRemoveInpaintDiffMaskUpload() {
     const mask = gradioApp().getElementById('replacer_inpaint_diff_mask_view');
+    if (!mask){ return; }
     var imageContainer = mask.getElementsByClassName('image-container')[0];
+    if (!imageContainer){ return; }
     const images = imageContainer.getElementsByTagName('img');
 
     if (images.length == 0){
