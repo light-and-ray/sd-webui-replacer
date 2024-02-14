@@ -143,11 +143,12 @@ def prepareMask(mask_mode, mask_raw):
 
 
 def applyMaskBlur(image_mask, mask_blur):
+    originalMode = image_mask.mode
     if mask_blur > 0:
-        np_mask = np.array(image_mask)
+        np_mask = np.array(image_mask).astype(np.uint8)
         kernel_size = 2 * int(2.5 * mask_blur + 0.5) + 1
         np_mask = cv2.GaussianBlur(np_mask, (kernel_size, kernel_size), mask_blur)
-        image_mask = Image.fromarray(np_mask)
+        image_mask = Image.fromarray(np_mask).convert(originalMode)
     return image_mask
 
 

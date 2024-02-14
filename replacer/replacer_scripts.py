@@ -45,13 +45,13 @@ def convertIntoCNImageFromat(image):
         from annotator.util import HWC3
         g_cn_HWC3 = HWC3
 
-    color = g_cn_HWC3(np.asarray(image))
+    color = g_cn_HWC3(np.asarray(image).astype(np.uint8))
     return color
 
 
 def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
     print('Restoring images resolution after ControlNet Inpainting')
-    origMask = gArgs.mask
+    origMask = gArgs.mask.convert('RGBA')
     if gArgs.inpainting_mask_invert:
         origMask = ImageChops.invert(gArgs.mask)
     origMask = applyMaskBlur(origMask, gArgs.mask_blur)
@@ -81,7 +81,7 @@ def enableInpaintModeForCN(controlNetUnits, p):
 
         if not IS_SD_WEBUI_FORGE and controlNetUnit.module == 'inpaint_only':
             if p.image_mask is not None:
-                mask = p.image_mask
+                mask = p.image_mask.convert('L')
                 if p.inpainting_mask_invert:
                     mask = ImageChops.invert(mask)
                 mask = applyMaskBlur(mask, p.mask_blur)
