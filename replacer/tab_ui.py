@@ -530,7 +530,7 @@ def getReplacerTabUI(isDedicatedPage):
                                 with gr.Row():
                                     hf_extra_mask_expand = gr.Slider(
                                         label='Extra mask expand',
-                                        value=0,
+                                        value=5,
                                         step=1,
                                         minimum=0,
                                         maximum=200,
@@ -538,11 +538,11 @@ def getReplacerTabUI(isDedicatedPage):
                                     )
 
                                     hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
-                                        value=0, elem_id="replacer_hf_extra_inpaint_padding",
+                                        value=10, elem_id="replacer_hf_extra_inpaint_padding",
                                         minimum=0, maximum=250, step=1)
                                     
                                     hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
-                                        value=0, elem_id="replacer_hf_extra_mask_blur",
+                                        value=2, elem_id="replacer_hf_extra_mask_blur",
                                         minimum=0, maximum=50, step=1)
 
                                 with gr.Row():
