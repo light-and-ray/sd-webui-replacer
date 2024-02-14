@@ -60,8 +60,7 @@ def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
 
 
 def getReplacerTabUI(isDedicatedPage):
-    with gr.Blocks() as replacerTabUI:
-
+    with gr.Blocks(analytics_enabled=False) as replacerTabUI:
         tab_index = gr.Number(value=0, visible=False)
         dummy_component = gr.Label(visible=False)
         trueComponent = gr.Checkbox(value=True, visible=False)

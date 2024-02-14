@@ -20,20 +20,19 @@ script_callbacks.on_ui_tabs(on_ui_tabs)
 
 def mountDedicatedPage(demo, app):
     try:
-        
         path = getDedicatedPagePath()
         app.add_api_route(f"{path}/internal/progress",
             progress.progressapi, methods=["POST"],
             response_model=progress.ProgressResponse)
 
-        with gr.Blocks(title=EXT_NAME) as replacerUi:
+        with gr.Blocks(title=EXT_NAME, analytics_enabled=False) as replacerUi:
             gr.Textbox(elem_id="txt2img_prompt", visible=False) # triggers onUiLoaded
             gr.Textbox(value=shared.opts.dumpjson(), elem_id="settings_json", visible=False)
 
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     getReplacerTabUI(isDedicatedPage=True)
-        
+
         loadsave = copy.copy(demo.ui_loadsave)  
         loadsave.finalized_ui = False
         loadsave.add_block(replacerUi, EXT_NAME)
