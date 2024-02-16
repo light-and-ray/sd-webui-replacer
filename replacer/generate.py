@@ -44,7 +44,7 @@ def inpaint(
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
     inpainting_fill = gArgs.inpainting_fill
-    mask = gArgs.mask.resize(image.size)
+    mask = gArgs.mask.resize(image.size).convert('L')
     if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
         inpainting_fill = 1 # original
         try:

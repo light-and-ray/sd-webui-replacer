@@ -81,7 +81,7 @@ def enableInpaintModeForCN(controlNetUnits, p):
 
         if not IS_SD_WEBUI_FORGE and controlNetUnit.module == 'inpaint_only':
             if p.image_mask is not None:
-                mask = p.image_mask.convert('L')
+                mask = p.image_mask
                 if p.inpainting_mask_invert:
                     mask = ImageChops.invert(mask)
                 mask = applyMaskBlur(mask, p.mask_blur)
