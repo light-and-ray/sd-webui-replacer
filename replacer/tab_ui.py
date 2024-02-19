@@ -1,5 +1,9 @@
 import gradio as gr
-from modules import shared, sd_samplers, ui_toprow, ui, ui_settings, errors
+from modules import shared, sd_samplers, ui, ui_settings, errors
+try:
+    from modules import ui_toprow
+except:
+    ui_toprow = None
 from modules.ui_components import ToolButton, ResizeHandleRow
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
@@ -50,6 +54,8 @@ def unloadModels():
 
 
 def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
+    if not ui_toprow:
+        return ''
     return 'function(){'\
         'var arguments_ = Array.from(arguments);'\
         f'arguments_.push("{extraShowButtonsId}", "{buttonsId}", "{galleryId}");'\
@@ -134,11 +140,14 @@ def getReplacerTabUI(isDedicatedPage):
                     )
 
                 runButtonIdPart='replacer'
-                toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
-                toprow.create_inline_toprow_image()
-                run_button = toprow.submit
-                run_button.variant = 'secondary'
-                run_button.value = 'Run'
+                if ui_toprow:
+                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
+                    toprow.create_inline_toprow_image()
+                    run_button = toprow.submit
+                    run_button.variant = 'secondary'
+                    run_button.value = 'Run'
+                else:
+                    run_button = gr.Button("Run")
 
 
                 with gr.Accordion("Advanced options", open=False, elem_id='replacer_advanced_options'):
@@ -475,11 +484,14 @@ def getReplacerTabUI(isDedicatedPage):
                     )
 
                 with gr.Row():
-                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{runButtonIdPart}_hf')
-                    toprow.create_inline_toprow_image()
-                    apply_hires_fix_button = toprow.submit
-                    apply_hires_fix_button.variant = 'secondary'
-                    apply_hires_fix_button.value = 'Apply HiresFix'
+                    if ui_toprow:
+                        toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{runButtonIdPart}_hf')
+                        toprow.create_inline_toprow_image()
+                        apply_hires_fix_button = toprow.submit
+                        apply_hires_fix_button.variant = 'secondary'
+                        apply_hires_fix_button.value = 'Apply HiresFix'
+                    else:
+                        apply_hires_fix_button = gr.Button('Apply HiresFix')
 
                 with gr.Row():
                     with gr.Accordion("HiresFix options", open=False):
@@ -733,7 +745,7 @@ def getReplacerTabUI(isDedicatedPage):
                 html_info,
                 html_log,
             ],
-            show_progress=False,
+            show_progress=ui_toprow is None,
         )
 
 
@@ -766,7 +778,7 @@ def getReplacerTabUI(isDedicatedPage):
                 html_info,
                 html_log,
             ],
-            show_progress=False,
+            show_progress=ui_toprow is None,
         )
 
 
