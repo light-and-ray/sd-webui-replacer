@@ -187,6 +187,24 @@ def initSoftInpaintScript():
 
 
 
+needWatchSoftInpaintUI = False
+
+
+def watchSoftInpaintUI(component, **kwargs):
+    global needWatchSoftInpaintUI
+    if not needWatchSoftInpaintUI:
+        return
+
+    elem_id = kwargs.get('elem_id', None)
+    if elem_id is None:
+        return
+
+    if 'soft' in elem_id:
+        component.elem_id = elem_id.replace('soft', 'replacer_soft')
+
+    
+
+
 # --------
 
 

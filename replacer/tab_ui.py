@@ -84,6 +84,7 @@ def getReplacerTabUI(isDedicatedPage):
                 cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
             except Exception as e:
                 errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
+                replacer_scripts.script_controlnet = None
 
         with ResizeHandleRow():
 
@@ -310,9 +311,19 @@ def getReplacerTabUI(isDedicatedPage):
                             if replacer_scripts.script_soft_inpaint:
                                 try:
                                     with gr.Row():
+                                        replacer_scripts.needWatchSoftInpaintUI = True
                                         soft_inpaint_inputs = list(replacer_scripts.script_soft_inpaint.ui(True))
+                                        replacer_scripts.needWatchSoftInpaintUI = False
+                                        from modules.ui_components import InputAccordion
+                                        new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
+                                        new_soft_inpaint_accordion.accordion.children = soft_inpaint_inputs[0].accordion.children
+                                        for child in new_soft_inpaint_accordion.accordion.children:
+                                            child.parent = new_soft_inpaint_accordion.accordion
+                                        soft_inpaint_inputs[0].accordion.visible = False
+                                        soft_inpaint_inputs[0] = new_soft_inpaint_accordion
                                 except Exception as e:
                                     errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
+                                    replacer_scripts.script_soft_inpaint = None
 
 
                         with gr.Tab('Avoidance'):
@@ -470,12 +481,14 @@ def getReplacerTabUI(isDedicatedPage):
 
                             if not replacer_scripts.controlNetAccordion:
                                 errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
+                                replacer_scripts.script_controlnet = None
                             else:
                                 with replacer_scripts.controlNetAccordion:
                                     with gr.Row():
                                         gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
                     except Exception as e:
                         errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
+                        replacer_scripts.script_controlnet = None
 
 
             with gr.Column(scale=2):
@@ -682,6 +695,7 @@ def getReplacerTabUI(isDedicatedPage):
                     # ui_group.register_sd_version_changed()
             except Exception as e:
                 errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
+                replacer_scripts.script_controlnet = None
 
 
         def tab_single_on_select():

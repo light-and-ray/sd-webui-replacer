@@ -62,4 +62,5 @@ if needHideSegmentAnythingAccordions():
 
 
 script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
+script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
 
