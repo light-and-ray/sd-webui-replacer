@@ -144,6 +144,8 @@ onUiLoaded(async() => {
         canvas_hotkey_fullscreen: "KeyS",
         canvas_hotkey_move: "KeyF",
         canvas_hotkey_overlap: "KeyO",
+        canvas_hotkey_shrink_brush: "KeyQ",
+        canvas_hotkey_grow_brush: "KeyW",
         canvas_disabled_functions: [],
         canvas_show_tooltip: true,
         canvas_auto_expand: true,
@@ -153,6 +155,8 @@ onUiLoaded(async() => {
     const functionMap = {
         "Zoom": "canvas_hotkey_zoom",
         "Adjust brush size": "canvas_hotkey_adjust",
+        "Hotkey shrink brush": "canvas_hotkey_shrink_brush",
+        "Hotkey enlarge brush": "canvas_hotkey_grow_brush",
         "Moving canvas": "canvas_hotkey_move",
         "Fullscreen": "canvas_hotkey_fullscreen",
         "Reset Zoom": "canvas_hotkey_reset",
@@ -592,7 +596,9 @@ onUiLoaded(async() => {
             const hotkeyActions = {
                 [hotkeysConfig.canvas_hotkey_reset]: resetZoom,
                 [hotkeysConfig.canvas_hotkey_overlap]: toggleOverlap,
-                [hotkeysConfig.canvas_hotkey_fullscreen]: fitToScreen
+                [hotkeysConfig.canvas_hotkey_fullscreen]: fitToScreen,
+                [hotkeysConfig.canvas_hotkey_shrink_brush]: () => adjustBrushSize(elemId, 10),
+                [hotkeysConfig.canvas_hotkey_grow_brush]: () => adjustBrushSize(elemId, -10)
             };
 
             const action = hotkeyActions[event.code];
