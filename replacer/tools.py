@@ -28,11 +28,13 @@ def addReplacerMetadata(p, gArgs: GenerationArgs):
     if gArgs.mask_num_for_metadata is not None:
         p.extra_generation_params["Mask num"] = gArgs.mask_num_for_metadata
 
+
 def areImagesTheSame(image_one, image_two):
     if image_one is None or image_two is None:
         return image_one is None and image_two is None
     if image_one.size != image_two.size:
         return False
+
     diff = ImageChops.difference(image_one.convert('RGB'), image_two.convert('RGB'))
 
     if diff.getbbox():
@@ -56,15 +58,6 @@ def limitSizeByOneDemention(image: Image, size: int):
 
     return image.resize((int(w), int(h)))
 
-
-@dataclass
-class CachedExtraMaskExpand:
-    mask: Image
-    expand: int
-    result: Image
-cachedExtraMaskExpand: CachedExtraMaskExpand = None
-
-update_mask = None
 
 def fastMaskDilate_(mask, dilation_amount):
     if dilation_amount == 0:
@@ -103,6 +96,16 @@ def fastMaskDilate(mask, _, dilation_amount, imageResized):
     cutted.paste(imageResized, dilated_mask)
 
     return [preview, dilated_mask, cutted]
+
+
+@dataclass
+class CachedExtraMaskExpand:
+    mask: Image
+    expand: int
+    result: Image
+
+cachedExtraMaskExpand: CachedExtraMaskExpand = None
+update_mask = None
 
 
 def extraMaskExpand(mask: Image, expand: int):
@@ -150,7 +153,6 @@ def applyMaskBlur(image_mask, mask_blur):
         np_mask = cv2.GaussianBlur(np_mask, (kernel_size, kernel_size), mask_blur)
         image_mask = Image.fromarray(np_mask).convert(originalMode)
     return image_mask
-
 
 
 def generateSeed():

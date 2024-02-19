@@ -63,21 +63,21 @@ class MasksCreator:
             self.boxes = masksCreatorCached.boxes
             print('MasksCreator restored from cache')
         else:
-            restore = []
+            restoreList = []
             try:
                 if useCpuForDetection():
                     oldDevice = devices.device
-                    def restore_():
+                    def restore():
                         devices.device = oldDevice
-                    restore.append(restore_)
+                    restoreList.append(restore)
                     devices.device = 'cpu'
                     print('Use CPU for detection')
                 self._createMasks()
                 masksCreatorCached = self
                 print('MasksCreator cached')
             finally:
-                for f in restore:
-                    f()
+                for restore in restoreList:
+                    restore()
 
 
     def _createMasks(self):
