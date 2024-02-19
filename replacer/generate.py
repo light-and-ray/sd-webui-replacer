@@ -89,11 +89,9 @@ def inpaint(
     try:
         if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
             replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
-            p.scripts = copy.copy(scripts.scripts_img2img)
-            p.scripts.alwayson_scripts = [replacer_scripts.script_controlnet]
-            p.script_args = [None] * replacer_scripts.script_controlnet.args_from + list(gArgs.cn_args)
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
+    replacer_scripts.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
 
 
 
@@ -396,7 +394,7 @@ def generate(
                 replacer_scripts.InpaintDifferenceGlobals is not None and \
                 replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
 
-            scripts_args,
+            *replacer_scripts.prepareScriptsArgs(scripts_args),
             )
 
         i = 1

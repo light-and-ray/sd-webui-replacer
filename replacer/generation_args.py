@@ -46,5 +46,6 @@ class GenerationArgs:
     custom_mask: Image
     use_inpaint_diff: bool
     cn_args: list
+    soft_inpaint_args: list
 
     hiresFixCacheData : HiresFixCacheData = None

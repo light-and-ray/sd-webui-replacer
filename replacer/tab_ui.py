@@ -306,6 +306,13 @@ def getReplacerTabUI(isDedicatedPage):
                                         value='Inpaint masked',
                                         type="index",
                                         elem_id="replacer_mask_mode")
+                            soft_inpaint_inputs = []
+                            if replacer_scripts.script_soft_inpaint:
+                                try:
+                                    with gr.Row():
+                                        soft_inpaint_inputs = list(replacer_scripts.script_soft_inpaint.ui(True))
+                                except Exception as e:
+                                    errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
 
 
                         with gr.Tab('Avoidance'):
@@ -746,7 +753,8 @@ def getReplacerTabUI(isDedicatedPage):
                 custom_mask,
                 use_inpaint_diff,
                 inpaint_diff_mask_view,
-            ] + cn_inputs,
+            ] + cn_inputs
+              + soft_inpaint_inputs,
             outputs=[
                 img2img_gallery,
                 generation_info,

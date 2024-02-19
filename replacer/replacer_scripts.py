@@ -6,6 +6,8 @@ from modules.images import resize_image
 from replacer.tools import limitSizeByOneDemention, applyMaskBlur
 from replacer.generation_args import GenerationArgs
 
+# --- ControlNet ----
+
 try:
     from lib_controlnet.external_code import ResizeMode
     IS_SD_WEBUI_FORGE = True
@@ -123,6 +125,8 @@ def watchControlNetUI(component, **kwargs):
         component.elem_id = elem_id.replace('img2img', 'replacer')
     
 
+# --- InpaintDifference ----
+
 
 InpaintDifferenceGlobals = None
 computeInpaintDifference = None
@@ -159,4 +163,87 @@ def initInpaintDiffirence():
     except Exception as e:
         errors.report(f"Cannot init InpaintDiffirence {e}", exc_info=True)
         InpaintDifferenceGlobals = None
+
+
+
+# --- SoftInpainting ----
+
+
+
+script_soft_inpaint : scripts.Script = None
+
+
+def initSoftInpaintScript():
+    global script_soft_inpaint
+    index = None
+    for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
+        if script.title() == "Soft Inpainting":
+            index = idx
+            break
+    if index is not None:
+        script_soft_inpaint = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
+    else:
+        return
+
+
+
+# --------
+
+
+def initAllScripts():
+    initCNScript()
+    initInpaintDiffirence()
+    initSoftInpaintScript()
+
+
+def prepareScriptsArgs(scripts_args):
+    global script_controlnet, script_soft_inpaint
+    result = []
+
+    lastIndex = 0
+
+    if script_controlnet:
+        argsLen = script_controlnet.args_to - script_controlnet.args_from
+        result.append(scripts_args[lastIndex:lastIndex+argsLen])
+        lastIndex += argsLen
+    else:
+        result.append([])
+
+    if script_soft_inpaint:
+        argsLen = script_soft_inpaint.args_to - script_soft_inpaint.args_from
+        result.append(scripts_args[lastIndex:lastIndex+argsLen])
+        lastIndex += argsLen
+    else:
+        result.append([])
+    
+    return result
+
+
+def applyScripts(p, cn_args, soft_inpaint_args):
+    global script_controlnet, script_soft_inpaint
+    needControlNet = script_controlnet is not None and cn_args is not None and len(cn_args) != 0
+    needSoftInpaint = script_soft_inpaint is not None and soft_inpaint_args is not None and len(soft_inpaint_args) != 0
+
+    avaliableScripts = []
+    if needControlNet:
+        avaliableScripts.append(script_controlnet)
+    if needSoftInpaint :
+        avaliableScripts.append(script_soft_inpaint)
+
+    if len(avaliableScripts) == 0:
+        return
+
+    allArgsLen = max(x.args_to for x in avaliableScripts)
+
+    p.scripts = copy.copy(scripts.scripts_img2img)
+    p.scripts.alwayson_scripts = avaliableScripts
+    p.script_args = [None] * allArgsLen
+
+    if needControlNet:
+        for i in range(len(cn_args)):
+            p.script_args[script_controlnet.args_from + i] = cn_args[i]
+    
+    if needSoftInpaint:
+        for i in range(len(soft_inpaint_args)):
+            p.script_args[script_soft_inpaint.args_from + i] = soft_inpaint_args[i]
 
