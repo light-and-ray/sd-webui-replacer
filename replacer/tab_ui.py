@@ -4,7 +4,11 @@ try:
     from modules import ui_toprow
 except:
     ui_toprow = None
-from modules.ui_components import ToolButton, ResizeHandleRow
+from modules.ui_components import ToolButton
+try:
+    from modules.ui_components import ResizeHandleRow
+except:
+    ResizeHandleRow = gr.Row
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
@@ -25,6 +29,10 @@ try:
     OUTPUT_PANEL_AVALIABLE = True
 except Exception as e:
     OUTPUT_PANEL_AVALIABLE = False
+
+if not hasattr(sd_samplers, 'visible_sampler_names'):
+    sd_samplers.visible_sampler_names = lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in shared.opts.hide_samplers]
+
 
 def update_mask_brush_color(color):
     return gr.Image.update(brush_color=color)

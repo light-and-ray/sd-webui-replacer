@@ -166,7 +166,9 @@ def getNegativePromptExamplesNumber():
 
 def on_ui_settings():
     section = (EXT_NAME_LOWER, EXT_NAME)
-
+    if not hasattr(shared.OptionInfo, 'needs_reload_ui'): # webui 1.5.0
+        shared.OptionInfo.needs_reload_ui = lambda self: self.info('requires Reload UI')
+        shared.OptionInfo.needs_restart = lambda self: self.info('requires restart')
     shared.opts.add_option(
         EXT_NAME_LOWER + "_use_first_positive_prompt_from_examples",
         shared.OptionInfo(
