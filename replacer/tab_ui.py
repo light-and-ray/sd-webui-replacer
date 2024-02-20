@@ -665,6 +665,13 @@ def getReplacerTabUI(isDedicatedPage):
                                     )
                                     if not replacer_scripts.script_controlnet:
                                         hf_disable_cn.visible = False
+                                
+                                with gr.Row():
+                                    hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
+                                        choices=['Same', 'Enable', 'Disable'],
+                                        value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
+                                    if not replacer_scripts.script_soft_inpaint:
+                                        hf_soft_inpaint.visible = False
 
 
 
@@ -801,6 +808,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_extra_inpaint_padding,
                 hf_extra_mask_blur,
                 hf_randomize_seed,
+                hf_soft_inpaint,
             ],
             outputs=[
                 img2img_gallery,

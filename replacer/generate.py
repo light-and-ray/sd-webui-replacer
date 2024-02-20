@@ -508,6 +508,7 @@ def applyHiresFix(
     hf_extra_inpaint_padding,
     hf_extra_mask_blur,
     hf_randomize_seed,
+    hf_soft_inpaint,
 ):
     if hfPositivePromptSuffix == "":
         hfPositivePromptSuffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -533,6 +534,9 @@ def applyHiresFix(
     hrArgs.img2img_fix_steps = True
     if hf_disable_cn:
         hrArgs.cn_args = None
+    if hf_soft_inpaint != 'Same' and hrArgs.soft_inpaint_args is not None and len(hrArgs.soft_inpaint_args) != 0:
+        hrArgs.soft_inpaint_args = list(hrArgs.soft_inpaint_args)
+        hrArgs.soft_inpaint_args[0] = hf_soft_inpaint == 'Enable'
     if hf_positvePrompt != "":
         hrArgs.positvePrompt = hf_positvePrompt
     hrArgs.positvePrompt = hrArgs.positvePrompt + " " + hfPositivePromptSuffix
