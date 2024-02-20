@@ -92,7 +92,6 @@ negativePromptExamples_defaults = [
 hiresFixPositivePromptSuffixExamples_defaults = [
     "<lora:lcm-lora-sdv1-5:1>",
     "<lora:lcm-lora-sdxl:1>",
-    "<lora:sd_xl_turbo_lora_v1-64dim:1>",
     " ",
 ]
 
@@ -204,7 +203,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_always_unload_models",
         shared.OptionInfo(
             'Automatic',
-            f"Always unload detection models after generation",
+            "Always unload detection models after generation",
             gr.Radio,
             {
                 'choices' : ['Automatic', 'Enabled', 'Only SDXL', 'Disabled'],
@@ -220,7 +219,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_cpu_for_detection",
         shared.OptionInfo(
             False,
-            f"Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enought vram",
+            "Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enought vram",
             gr.Checkbox,
             section=section,
         ).needs_restart()
@@ -235,6 +234,20 @@ def on_ui_settings():
             gr.Checkbox,
             section=section,
         ).needs_restart()
+    )
+
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_default_extra_includes",
+        shared.OptionInfo(
+            ["script"],
+            "Defaults for Extra include in gallery",
+            gr.CheckboxGroup,
+            {
+                'choices' : ["mask", "box", "cutted", "preview", "script"],
+            },
+            section=section,
+        ).needs_reload_ui()
     )
 
 

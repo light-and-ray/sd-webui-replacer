@@ -1,16 +1,9 @@
 import gradio as gr
+import modules
 from modules import shared, sd_samplers, ui, ui_settings, errors
-try:
-    from modules import ui_toprow
-except:
-    ui_toprow = None
-from modules.ui_components import ToolButton
-try:
-    from modules.ui_components import ResizeHandleRow
-except:
-    ResizeHandleRow = gr.Row
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
-from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info
+from modules.ui_components import ToolButton
+from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info, create_refresh_button
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
@@ -23,6 +16,16 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
 from replacer import replacer_scripts
 from replacer.tools import limitSizeByOneDemention
 
+
+try:
+    from modules import ui_toprow
+except:
+    ui_toprow = None
+
+try:
+    from modules.ui_components import ResizeHandleRow
+except:
+    ResizeHandleRow = gr.Row
 
 try:
     from modules.ui_common import OutputPanel # webui 1.8+
@@ -267,7 +270,7 @@ def getReplacerTabUI(isDedicatedPage):
                                 sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
                                     value=sam_model_list[0] if len(sam_model_list) > 0 else None)
                                 sam_refresh_models = ToolButton(value=refresh_symbol)
-                                sam_refresh_models.click(refresh_sam_models, sam_model_name,sam_model_name)
+                                sam_refresh_models.click(refresh_sam_models, sam_model_name, sam_model_name)
 
                                 dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
                             
@@ -277,13 +280,8 @@ def getReplacerTabUI(isDedicatedPage):
                                     value='Random', type="value", elem_id="replacer_mask_num")
 
                             with gr.Row():
-                                extra_includes = gr.CheckboxGroup(
-                                    choices=["mask", "box", "cutted", "preview", "script"],
-                                    label="Extra include in gallery",
-                                    type="value",
-                                    elem_id="replacer_extra_includes",
-                                    value=["script"],
-                                )
+                                extra_includes = ui_settings.create_setting_component(EXT_NAME_LOWER + "_default_extra_includes")
+                                extra_includes.label = 'Extra include in gallery'
 
                         with gr.Tab('Inpainting'):
                             with gr.Row():
@@ -643,20 +641,22 @@ def getReplacerTabUI(isDedicatedPage):
                                             elem_classes=["positvePrompt"],
                                             placeholder='leave empty to use the same prompt',
                                             elem_id="replacer_hf_positvePrompt")
-                                    
-                                with gr.Row():
+
                                     hf_negativePrompt = gr.Textbox(label="Override negative prompt",
                                             show_label=True,
                                             lines=1,
                                             elem_classes=["negativePrompt"],
                                             placeholder='leave empty to use the same prompt',
                                             elem_id="replacer_hf_negativePrompt")
-                                
+
                                 with gr.Row():
-                                    hf_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
-                                    hf_sd_model_checkpoint.choices = ['Use same model'] + hf_sd_model_checkpoint.choices
-                                    hf_sd_model_checkpoint.value = 'Use same model'
-                                    hf_sd_model_checkpoint.label = 'Override sd model while hires fix'
+                                    hf_sd_model_checkpoint = gr.Dropdown(label='Hires checkpoint',
+                                        elem_id="replacer_hf_sd_model_checkpoint",
+                                        choices=["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True),
+                                        value="Use same checkpoint")
+                                    create_refresh_button(hf_sd_model_checkpoint, modules.sd_models.list_models,
+                                        lambda: {"choices": ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True)},
+                                        "replacer_hf_sd_model_checkpoint")
                                     
                                     hf_disable_cn = gr.Checkbox(
                                         label='Disable ControlNet while hires fix',
