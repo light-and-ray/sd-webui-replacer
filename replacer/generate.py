@@ -6,7 +6,7 @@ from modules.processing import StableDiffusionProcessingImg2Img, process_images,
 from modules.shared import opts
 from modules.ui import plaintext_to_html
 from modules.images import save_image
-from modules import scripts, sd_models, errors
+from modules import sd_models, errors
 from replacer.mask_creator import MasksCreator
 from replacer.generation_args import GenerationArgs, HiresFixCacheData
 from replacer.video_tools import getVideoFrames, save_video
@@ -522,6 +522,7 @@ def applyHiresFix(
     gArgs.upscalerForImg2Img = hf_upscaler
 
     hrArgs = copy.copy(lastGenerationArgs)
+    hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
     hrArgs.cfg_scale = hf_cfg_scale
     hrArgs.denoising_strength = hf_denoise
     if not hf_sampler == 'Use same sampler':
@@ -573,10 +574,8 @@ def applyHiresFix(
     hrArgs.width, hrArgs.height = image.size
     if hrArgs.height > hf_size_limit:
         hrArgs.height = hf_size_limit
-        hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
     if hrArgs.width > hf_size_limit:
         hrArgs.width = hf_size_limit
-        hrArgs.upscalerForImg2Img = hf_above_limit_upscaler
 
     shared.state.textinfo = "inpaint with upscaler"
     if lastGenerationArgs.hiresFixCacheData is not None and\
