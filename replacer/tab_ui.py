@@ -667,7 +667,7 @@ def getReplacerTabUI(isDedicatedPage):
                                         elem_id="replacer_hf_sd_model_checkpoint",
                                         choices=getHiresFixCheckpoints(), value="Use same checkpoint")
                                     create_refresh_button(hf_sd_model_checkpoint, modules.sd_models.list_models,
-                                        getHiresFixCheckpoints, "replacer_hf_sd_model_checkpoint")
+                                        lambda: {"choices": getHiresFixCheckpoints()}, "replacer_hf_sd_model_checkpoint")
                                     
                                     hf_disable_cn = gr.Checkbox(
                                         label='Disable ControlNet while hires fix',
