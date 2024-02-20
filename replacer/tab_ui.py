@@ -33,8 +33,16 @@ try:
 except Exception as e:
     OUTPUT_PANEL_AVALIABLE = False
 
-if not hasattr(sd_samplers, 'visible_sampler_names'):
+IS_WEBUI_1_5 = False
+if not hasattr(sd_samplers, 'visible_sampler_names'): # webui 1.5
     sd_samplers.visible_sampler_names = lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in shared.opts.hide_samplers]
+    IS_WEBUI_1_5 = True
+
+def getHiresFixCheckpoints():
+    if IS_WEBUI_1_5:
+        return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles()
+    else:
+        return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True)
 
 
 def update_mask_brush_color(color):
@@ -60,7 +68,8 @@ def unloadModels():
     
     text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM were freed'
     print(text)
-    gr.Info(text)
+    if not IS_WEBUI_1_5:
+        gr.Info(text)
 
 
 
@@ -91,7 +100,7 @@ def getReplacerTabUI(isDedicatedPage):
 
         with ResizeHandleRow():
 
-            with gr.Column(scale=3):
+            with gr.Column(scale=4):
 
                 with gr.Row():
                     placeholder = getDetectionPromptExamples()[0]
@@ -293,7 +302,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     minimum=0, maximum=250, step=1)
 
                             with gr.Row():
-                                with gr.Column(scale=2):
+                                with gr.Column():
                                     inpainting_fill = gr.Radio(label='Masked content',
                                         choices=['fill', 'original', 'latent noise', 'latent nothing'],
                                         value='fill', type="index", elem_id="replacer_inpainting_fill")
@@ -362,6 +371,8 @@ def getReplacerTabUI(isDedicatedPage):
                                     '#ffffff', label='Brush color',
                                     info='visual only, use when brush color is hard to see'
                                 )
+                                if IS_WEBUI_1_5:
+                                    avoid_mask_brush_color.visible = False
                         
                         with gr.Tab('Custom mask'):
                             with gr.Row():
@@ -388,6 +399,8 @@ def getReplacerTabUI(isDedicatedPage):
                                 custom_mask_brush_color = gr.ColorPicker(
                                     '#ffffff', label='Brush color',
                                     info='visual only, use when brush color is hard to see')
+                                if IS_WEBUI_1_5:
+                                    custom_mask_brush_color.visible = False
 
                         with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
                                 else gr.Group()) as inpaint_diff_tab:
@@ -489,7 +502,7 @@ def getReplacerTabUI(isDedicatedPage):
                         replacer_scripts.script_controlnet = None
 
 
-            with gr.Column(scale=2):
+            with gr.Column(scale=3):
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel(runButtonIdPart, getSaveDir())
@@ -552,9 +565,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 with gr.Row():
                                     hf_size_limit = gr.Slider(
                                         label='Limit render size',
-                                        value=2000,
+                                        value=1800,
                                         step=1,
-                                        minimum=1000,
+                                        minimum=700,
                                         maximum=10000,
                                         elem_id="replacer_hf_size_limit",
                                     )
@@ -652,11 +665,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 with gr.Row():
                                     hf_sd_model_checkpoint = gr.Dropdown(label='Hires checkpoint',
                                         elem_id="replacer_hf_sd_model_checkpoint",
-                                        choices=["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True),
-                                        value="Use same checkpoint")
+                                        choices=getHiresFixCheckpoints(), value="Use same checkpoint")
                                     create_refresh_button(hf_sd_model_checkpoint, modules.sd_models.list_models,
-                                        lambda: {"choices": ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True)},
-                                        "replacer_hf_sd_model_checkpoint")
+                                        getHiresFixCheckpoints, "replacer_hf_sd_model_checkpoint")
                                     
                                     hf_disable_cn = gr.Checkbox(
                                         label='Disable ControlNet while hires fix',
