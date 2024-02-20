@@ -67,7 +67,7 @@ def unloadModels():
     memAfter = mem_stats['reserved']
     
     text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM were freed'
-    print(text)
+    print(text, flush=True)
     if not IS_WEBUI_1_5:
         gr.Info(text)
 
