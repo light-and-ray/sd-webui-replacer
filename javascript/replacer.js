@@ -90,3 +90,11 @@ function replacerRemoveInpaintDiffMaskUpload() {
 
 onUiUpdate(replacerRemoveInpaintDiffMaskUpload);
 
+
+onUiLoaded(function(){
+    let replacer_generate = gradioApp().getElementById('replacer_generate');
+    let replacer_hf_generate = gradioApp().getElementById('replacer_hf_generate');
+    replacer_generate.title = '';
+    replacer_hf_generate.title = '';
+});
+

@@ -4,7 +4,8 @@ from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
     getDedicatedPagePath,
 )
-from replacer.tab_ui import getReplacerTabUI
+from replacer.tab_ui import getReplacerTabUI, IS_WEBUI_1_5
+from replacer.tools import watchOuputPanel
 from replacer import replacer_scripts
 
 
@@ -46,12 +47,17 @@ script_callbacks.on_app_started(mountDedicatedPage)
 
 def hideSegmentAnythingAccordions(demo, app):
     try:
+        if IS_WEBUI_1_5:
+            print('hideSegmentAnythingAccordions is not avaliable for weui 1.5')
+            return
+
         for tab in ['txt2img', 'img2img']:
             samUseCpuPath = f"{tab}/Use CPU for SAM/value"
             samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
             accordion = samUseCpu.parent.parent.parent.parent
             accordion.visible = False
             accordion.render = False
+
         print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
     except Exception as e:
         errors.report(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}", exc_info=True)
@@ -63,4 +69,5 @@ if needHideSegmentAnythingAccordions():
 
 script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
+script_callbacks.on_after_component(watchOuputPanel)
 

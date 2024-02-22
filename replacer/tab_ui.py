@@ -14,7 +14,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
 )
 from replacer import replacer_scripts
-from replacer.tools import limitSizeByOneDemention
+from replacer.tools import limitSizeByOneDemention, OuputPanelWatcher
 
 
 try:
@@ -160,15 +160,14 @@ def getReplacerTabUI(isDedicatedPage):
                         examples_per_page=getNegativePromptExamplesNumber(),
                     )
 
-                runButtonIdPart='replacer'
                 if ui_toprow:
-                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=runButtonIdPart)
+                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
                     toprow.create_inline_toprow_image()
                     run_button = toprow.submit
                     run_button.variant = 'secondary'
                     run_button.value = 'Run'
                 else:
-                    run_button = gr.Button("Run")
+                    run_button = gr.Button('Run', elem_id='replacer_generate')
 
 
                 with gr.Accordion("Advanced options", open=False, elem_id='replacer_advanced_options'):
@@ -505,15 +504,15 @@ def getReplacerTabUI(isDedicatedPage):
             with gr.Column(scale=3):
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
-                        outputPanel = create_output_panel(runButtonIdPart, getSaveDir())
+                        outputPanel = create_output_panel('replacer', getSaveDir())
                         img2img_gallery = outputPanel.gallery
                         generation_info = outputPanel.generation_info
                         html_info = outputPanel.infotext
                         html_log = outputPanel.html_log
                     else:
                         img2img_gallery, generation_info, html_info, html_log = \
-                            create_output_panel(runButtonIdPart, getSaveDir())
-                    generation_info_button = gr.Button(visible=False, elem_id=f"{runButtonIdPart}_generation_info_button")
+                            create_output_panel('replacer', getSaveDir())
+                    generation_info_button = gr.Button(visible=False, elem_id="replacer_generation_info_button")
                     generation_info_button.click(
                         fn=update_generation_info,
                         _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
@@ -521,16 +520,20 @@ def getReplacerTabUI(isDedicatedPage):
                         outputs=[html_info, html_info],
                         show_progress=False,
                     )
+                    if isDedicatedPage and OuputPanelWatcher.send_to_img2img:
+                        OuputPanelWatcher.send_to_img2img.visible = False
+                        OuputPanelWatcher.send_to_inpaint.visible = False
+                        OuputPanelWatcher.send_to_extras.visible = False
 
                 with gr.Row():
                     if ui_toprow:
-                        toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part=f'{runButtonIdPart}_hf')
+                        toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
                         toprow.create_inline_toprow_image()
                         apply_hires_fix_button = toprow.submit
                         apply_hires_fix_button.variant = 'secondary'
-                        apply_hires_fix_button.value = 'Apply HiresFix'
+                        apply_hires_fix_button.value = 'Apply HiresFix ✨'
                     else:
-                        apply_hires_fix_button = gr.Button('Apply HiresFix')
+                        apply_hires_fix_button = gr.Button('Apply HiresFix ✨', elem_id='replacer_hf_generate')
 
                 with gr.Row():
                     with gr.Accordion("HiresFix options", open=False):
@@ -735,7 +738,7 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         run_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, runButtonIdPart, f'{runButtonIdPart}_hf'),
+            _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf'),
             fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
@@ -798,7 +801,7 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction(runButtonIdPart, f'{runButtonIdPart}_hf', runButtonIdPart),
+            _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer'),
             fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,

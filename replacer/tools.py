@@ -158,3 +158,26 @@ def applyMaskBlur(image_mask, mask_blur):
 def generateSeed():
     return int(random.randrange(4294967294))
 
+
+
+class OuputPanelWatcher():
+    send_to_img2img = None
+    send_to_inpaint = None
+    send_to_extras = None
+
+
+def watchOuputPanel(component, **kwargs):
+    elem_id = kwargs.get('elem_id', None)
+    if elem_id is None:
+        return
+
+    if elem_id == 'replacer_send_to_img2img':
+        OuputPanelWatcher.send_to_img2img = component
+
+    if elem_id == 'replacer_send_to_inpaint':
+        OuputPanelWatcher.send_to_inpaint = component
+
+    if elem_id == 'replacer_send_to_extras':
+        OuputPanelWatcher.send_to_extras = component
+
+
