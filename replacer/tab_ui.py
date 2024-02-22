@@ -207,7 +207,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     height = gr.Slider(label='height',
                                         value=512, elem_id="replacer_height",
                                         minimum=64, maximum=2048, step=8)
-                                with gr.Column(elem_id="replacer_batch_count_size_column"):
+                                with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="dimensions-tools-replacer"):
                                     batch_count = gr.Slider(label='batch count',
                                         value=1, elem_id="replacer_batch_count",
                                         minimum=1, maximum=10, step=1)
@@ -769,8 +769,8 @@ def getReplacerTabUI(isDedicatedPage):
                 inpaint_padding,
                 inpainting_fill,
                 width,
-                batch_count,
                 height,
+                batch_count,
                 batch_size,
                 inpainting_mask_invert,
                 extra_includes,
