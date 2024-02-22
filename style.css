@@ -1,6 +1,7 @@
-div.dimensions-tools-replacer{
-    min-width: 8em !important;
-    max-width: fit-content;
-    flex-direction: column;
-    place-content: center;
+div.replacer-batch-count-size{
+    min-width: 11em !important;
+}
+
+div.replacer-generation-size{
+    min-width: 11em !important;
 }

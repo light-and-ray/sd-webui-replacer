@@ -199,14 +199,14 @@ def getReplacerTabUI(isDedicatedPage):
                                     value=False, elem_id="replacer_fix_steps")
 
                             with gr.Row():
-                                with gr.Column():
+                                with gr.Column(elem_id="replacer_width_height_column", elem_classes="replacer-generation-size"):
                                     width = gr.Slider(label='width',
                                         value=512, elem_id="replacer_width",
                                         minimum=64, maximum=2048, step=8)
                                     height = gr.Slider(label='height',
                                         value=512, elem_id="replacer_height",
                                         minimum=64, maximum=2048, step=8)
-                                with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="dimensions-tools-replacer"):
+                                with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="replacer-batch-count-size"):
                                     batch_count = gr.Slider(label='batch count',
                                         value=1, elem_id="replacer_batch_count",
                                         minimum=1, maximum=10, step=1)
