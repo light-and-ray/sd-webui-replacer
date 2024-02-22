@@ -100,7 +100,7 @@ def getReplacerTabUI(isDedicatedPage):
 
         with ResizeHandleRow():
 
-            with gr.Column(scale=4):
+            with gr.Column(scale=16):
 
                 with gr.Row():
                     placeholder = getDetectionPromptExamples()[0]
@@ -501,7 +501,7 @@ def getReplacerTabUI(isDedicatedPage):
                         replacer_scripts.script_controlnet = None
 
 
-            with gr.Column(scale=3):
+            with gr.Column(scale=15):
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel('replacer', getSaveDir())
