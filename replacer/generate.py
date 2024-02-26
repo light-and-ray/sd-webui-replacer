@@ -15,8 +15,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import ( addReplacerMetadata, extraMaskExpand, prepareMask, generateSeed
-)
+from replacer.tools import addReplacerMetadata, extraMaskExpand, prepareMask, generateSeed
 
 g_clear_cache = None
 

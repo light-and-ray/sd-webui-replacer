@@ -2,7 +2,7 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath,
+    getDedicatedPagePath, on_ui_settings,
 )
 from replacer.tab_ui import getReplacerTabUI, IS_WEBUI_1_5
 from replacer.tools import watchOuputPanel
@@ -70,4 +70,5 @@ if needHideSegmentAnythingAccordions():
 script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOuputPanel)
+script_callbacks.on_ui_settings(on_ui_settings)
 
