@@ -171,13 +171,13 @@ def watchOuputPanel(component, **kwargs):
     if elem_id is None:
         return
 
-    if elem_id == 'replacer_send_to_img2img':
+    if elem_id == 'replacer_send_to_img2img' or elem_id == 'img2img_tab':
         OuputPanelWatcher.send_to_img2img = component
 
-    if elem_id == 'replacer_send_to_inpaint':
+    if elem_id == 'replacer_send_to_inpaint' or elem_id == 'inpaint_tab':
         OuputPanelWatcher.send_to_inpaint = component
 
-    if elem_id == 'replacer_send_to_extras':
+    if elem_id == 'replacer_send_to_extras' or elem_id == 'extras_tab':
         OuputPanelWatcher.send_to_extras = component
 
 
