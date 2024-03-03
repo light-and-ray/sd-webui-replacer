@@ -252,9 +252,6 @@ def getReplacerTabUI(isDedicatedPage):
                                 mask_expand = gr.Slider(label='Mask Expand',
                                     value=35, elem_id="replacer_mask_expand",
                                     minimum=-50, maximum=100, step=1)
-                                mask_blur = gr.Slider(label='Mask Blur',
-                                    value=4, elem_id="replacer_mask_blur",
-                                    minimum=0, maximum=10, step=1)
 
                             with gr.Row():
                                 if not doNotShowUnloadButton():
@@ -293,12 +290,17 @@ def getReplacerTabUI(isDedicatedPage):
 
                         with gr.Tab('Inpainting'):
                             with gr.Row():
-                                denoise = gr.Slider(label='Denoising',
-                                    value=1.0, elem_id="replacer_denoise",
-                                    minimum=0.0, maximum=1.0, step=0.01)
+                                mask_blur = gr.Slider(label='Mask Blur',
+                                    value=4, elem_id="replacer_mask_blur",
+                                    minimum=0, maximum=100, step=1)
                                 inpaint_padding = gr.Slider(label='Padding',
                                     value=40, elem_id="replacer_inpaint_padding",
                                     minimum=0, maximum=250, step=1)
+
+                            with gr.Row():
+                                denoise = gr.Slider(label='Denoising',
+                                    value=1.0, elem_id="replacer_denoise",
+                                    minimum=0.0, maximum=1.0, step=0.01)
 
                             with gr.Row():
                                 with gr.Column():
@@ -313,6 +315,7 @@ def getReplacerTabUI(isDedicatedPage):
                                         value='Inpaint masked',
                                         type="index",
                                         elem_id="replacer_mask_mode")
+
                             soft_inpaint_inputs = []
                             if replacer_scripts.script_soft_inpaint:
                                 try:
