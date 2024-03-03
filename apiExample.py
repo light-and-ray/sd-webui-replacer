@@ -17,18 +17,17 @@ payload = {
     "positive_prompt": "waterfall",
     "sam_model_name": "sam_hq_vit_h.pth",
     "dino_model_name": "GroundingDINO_SwinB (938MB)",
-# "scripts" has the same format with "alwayson_scripts" in /sdapi/v1/txt2img 
-    "scripts": {
+
+    "scripts": { # "scripts" has the same format with "alwayson_scripts" in /sdapi/v1/txt2img
         "controlnet": {
             "args": [
-                {
+                { # See ControlNetUnit dataclass for all possible fields
                     "module": "openpose_full",
                     "model": "control_v11p_sd15_openpose [cab727d4]",
-                    "inpaint_crop_input_image": True,
                 },
             ]
         },
-        "soft inpainting": {
+        "soft inpainting": { # Default args from UI, recommended hight "mask_blur"
             "args": [True, 1, 0.5, 4, 0, 1, 2]
         },
     },
