@@ -149,6 +149,7 @@ API is avaliable on `/replacer/replace`
     fix_steps : bool = False
     inpainting_fill : int = 0
     sd_model_checkpoint : str = ""
+    scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```
 
 Avaliable options on `/replacer/avaliable_options`

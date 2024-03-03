@@ -44,7 +44,7 @@ def replacer_api(_, app: FastAPI):
         fix_steps : bool = False
         inpainting_fill : int = 0
         sd_model_checkpoint : str = ""
-        scripts : dict = {}
+        scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 
 
     @app.post("/replacer/replace")
