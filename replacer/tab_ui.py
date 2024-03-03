@@ -603,7 +603,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     
                                     hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
                                         value=2, elem_id="replacer_hf_extra_mask_blur",
-                                        minimum=0, maximum=50, step=1)
+                                        minimum=0, maximum=150, step=1)
 
                                 with gr.Row():
                                     hf_randomize_seed = gr.Checkbox(
