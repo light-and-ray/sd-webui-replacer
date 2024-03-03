@@ -48,7 +48,7 @@ script_callbacks.on_app_started(mountDedicatedPage)
 def hideSegmentAnythingAccordions(demo, app):
     try:
         if IS_WEBUI_1_5:
-            print('hideSegmentAnythingAccordions is not avaliable for weui 1.5')
+            print('hideSegmentAnythingAccordions is not avaliable for webui 1.5')
             return
 
         for tab in ['txt2img', 'img2img']:

@@ -425,6 +425,9 @@ def getReplacerTabUI(isDedicatedPage):
                                 inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
                                     value=5, elem_id="replacer_inpaint_diff_mask_expand",
                                     minimum=0, maximum=100, step=1)
+                                inpaint_diff_mask_erosion = gr.Slider(label='Mask erosion',
+                                    maximum=100, step=1, value=0, elem_id='inpaint_difference_mask_erosion')
+                            with gr.Row():
                                 inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
                                     value=False, elem_id='inpaint_difference_contours_only')
                         if not replacer_scripts.InpaintDifferenceGlobals:
@@ -688,8 +691,6 @@ def getReplacerTabUI(isDedicatedPage):
                                         hf_soft_inpaint.visible = False
 
 
-
-
                 with gr.Row():
                     if not isDedicatedPage:
                         gr.Markdown(f'[Open dedicated page]({getDedicatedPagePath()})')
@@ -896,6 +897,7 @@ def getReplacerTabUI(isDedicatedPage):
                     image,
                     mask_blur,
                     inpaint_diff_mask_expand,
+                    inpaint_diff_mask_erosion,
                     inpaint_diff_threshold,
                     inpaint_diff_contours_only,
                 ],

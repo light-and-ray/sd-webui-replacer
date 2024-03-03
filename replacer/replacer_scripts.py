@@ -144,6 +144,7 @@ def initInpaintDiffirence():
             image,
             mask_blur,
             mask_expand,
+            erosion_amount,
             inpaint_diff_threshold,
             inpaint_diff_contours_only,
         ):
@@ -154,6 +155,7 @@ def initInpaintDiffirence():
                 image.convert('RGB'),
                 mask_blur,
                 mask_expand,
+                erosion_amount,
                 inpaint_diff_threshold,
                 inpaint_diff_contours_only,
             )
