@@ -17,6 +17,21 @@ payload = {
     "positive_prompt": "waterfall",
     "sam_model_name": "sam_hq_vit_h.pth",
     "dino_model_name": "GroundingDINO_SwinB (938MB)",
+# "scripts" has the same format with "alwayson_scripts" in /sdapi/v1/txt2img 
+    "scripts": {
+        "controlnet": {
+            "args": [
+                {
+                    "module": "openpose_full",
+                    "model": "control_v11p_sd15_openpose [cab727d4]",
+                    "inpaint_crop_input_image": True,
+                },
+            ]
+        },
+        "soft inpainting": {
+            "args": [True, 1, 0.5, 4, 0, 1, 2]
+        },
+    },
 }
 
 response = requests.post(url=f'{SD_WEBUI}/replacer/replace', json=payload)

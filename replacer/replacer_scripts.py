@@ -9,17 +9,18 @@ from replacer.generation_args import GenerationArgs
 # --- ControlNet ----
 
 try:
-    from lib_controlnet.external_code import ResizeMode
+    from lib_controlnet import external_code
     IS_SD_WEBUI_FORGE = True
 except:
-    ResizeMode = None
+    external_code = None
     IS_SD_WEBUI_FORGE = False
 
 script_controlnet : scripts.Script = None
 ControlNetUiGroup = None
 
+
 def initCNScript():
-    global script_controlnet, ControlNetUiGroup
+    global script_controlnet, ControlNetUiGroup, external_code
     cnet_idx = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
         if script.title().lower() == "controlnet":
@@ -33,6 +34,7 @@ def initCNScript():
     try:
         if not IS_SD_WEBUI_FORGE:
             from scripts.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
+            from scripts import external_code
         else:
             from lib_controlnet.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
     except:
@@ -69,15 +71,13 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
         processed.images[i] = imageOrg
 
 
-def initResizeMode():
-    global ResizeMode
-    from internal_controlnet.external_code import ResizeMode
-
-
-def enableInpaintModeForCN(controlNetUnits, p):
+def enableInpaintModeForCN(gArgs, p):
+    global external_code
     mask = None
-
-    for controlNetUnit in controlNetUnits:
+    gArgs.cn_args = list(gArgs.cn_args)
+    for i in range(len(gArgs.cn_args)):
+        gArgs.cn_args[i] = external_code.to_processing_unit(gArgs.cn_args[i])
+        controlNetUnit = gArgs.cn_args[i]
         if not controlNetUnit.enabled:
             continue
 
@@ -87,8 +87,6 @@ def enableInpaintModeForCN(controlNetUnits, p):
                 if p.inpainting_mask_invert:
                     mask = ImageChops.invert(mask)
                 mask = applyMaskBlur(mask, p.mask_blur)
-                if ResizeMode is None:
-                    initResizeMode()
 
             print('Use cn inpaint instead of sd inpaint')
             image = limitSizeByOneDemention(p.init_images[0], max(p.width, p.height))
@@ -100,7 +98,7 @@ def enableInpaintModeForCN(controlNetUnits, p):
             p.inpaint_full_res = False
             p.width, p.height = image.size
             controlNetUnit.inpaint_crop_input_image = False
-            controlNetUnit.resize_mode = ResizeMode.RESIZE
+            controlNetUnit.resize_mode = external_code.ResizeMode.RESIZE
             p.needRestoreAfterCN = True
 
 
@@ -216,8 +214,11 @@ def initAllScripts():
 
 def prepareScriptsArgs(scripts_args):
     global script_controlnet, script_soft_inpaint
-    result = []
 
+    if len(scripts_args) > 0 and scripts_args[0] == 'args_from_api':
+        return scripts_args[1:]
+
+    result = []
     lastIndex = 0
 
     if script_controlnet:
@@ -264,4 +265,29 @@ def applyScripts(p, cn_args, soft_inpaint_args):
     if needSoftInpaint:
         for i in range(len(soft_inpaint_args)):
             p.script_args[script_soft_inpaint.args_from + i] = soft_inpaint_args[i]
+
+
+def prepareScriptsArgs_api(scriptsApi : dict):
+    global script_controlnet, script_soft_inpaint
+    cn_args = []
+    soft_inpaint_args = []
+
+    for scriptApi in scriptsApi.items():
+        if scriptApi[0] == script_controlnet.name:
+            cn_args = scriptApi[1]["args"]
+            continue
+        if scriptApi[0] == script_soft_inpaint.name:
+            soft_inpaint_args = scriptApi[1]["args"]
+            continue
+    return ['args_from_api', cn_args, soft_inpaint_args]
+
+
+def getAvaliableScripts_api():
+    global script_controlnet, script_soft_inpaint
+    result = []
+    if script_controlnet:
+        result.append(script_controlnet.name)
+    if script_soft_inpaint:
+        result.append(script_soft_inpaint.name)
+    return result
 

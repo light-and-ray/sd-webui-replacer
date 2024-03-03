@@ -42,7 +42,7 @@ def getHiresFixCheckpoints():
     if IS_WEBUI_1_5:
         return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles()
     else:
-        return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=True)
+        return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=False)
 
 
 def update_mask_brush_color(color):

@@ -36,9 +36,9 @@ def inpaint(
     batch_processed : Processed = None
 ):
     override_settings = {}
-    if (gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != "" and gArgs.upscalerForImg2Img != "None"):
+    if gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != "" and gArgs.upscalerForImg2Img != "None":
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
-    if (gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != ""):
+    if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
@@ -87,7 +87,7 @@ def inpaint(
     p.do_not_save_grid = True
     try:
         if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
-            replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
+            replacer_scripts.enableInpaintModeForCN(gArgs, p)
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
     replacer_scripts.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
@@ -543,7 +543,7 @@ def applyHiresFix(
     if hf_negativePrompt != "":
         hrArgs.negativePrompt = hf_negativePrompt
     if hf_sd_model_checkpoint is not None and hf_sd_model_checkpoint != 'Use same model'\
-            and hf_sd_model_checkpoint != "":
+            and hf_sd_model_checkpoint != 'Use same checkpoint' and hf_sd_model_checkpoint != "":
         hrArgs.sd_model_checkpoint = hf_sd_model_checkpoint
     hrArgs.inpaint_full_res_padding += hf_extra_inpaint_padding
     hrArgs.mask_blur += hf_extra_mask_blur
