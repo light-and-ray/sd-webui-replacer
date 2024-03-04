@@ -1,10 +1,11 @@
-from PIL import ImageChops, Image, ImageColor
+import cv2, random, git, torch, os
 import numpy as np
-import cv2, random, git, torch
+from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
 from modules import errors
+from modules.ui import versions_html
 from replacer.generation_args import GenerationArgs
-from replacer.options import useFastDilation, getMaskColorStr
+from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY
 
 try:
     REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
@@ -181,3 +182,15 @@ def watchOuputPanel(component, **kwargs):
         OuputPanelWatcher.send_to_extras = component
 
 
+def getReplacerFooter():
+    footer = ""
+    try:
+        with open(os.path.join(EXT_ROOT_DIRECTORY, 'html', 'replacer_footer.html'), encoding="utf8") as file:
+            footer = file.read()
+        footer = footer.format(versions=versions_html()
+            .replace('checkpoint: <a id="sd_checkpoint_hash">N/A</a>',
+                f'replacer: <a href="https://github.com/light-and-ray/sd-webui-replacer/commit/{REPLACER_VERSION}">{REPLACER_VERSION}</a>'))
+    except Exception as e:
+        errors.report(f"Error getReplacerFooter: {e}", exc_info=True)
+        return ""
+    return footer

@@ -5,7 +5,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingA
     getDedicatedPagePath, on_ui_settings,
 )
 from replacer.tab_ui import getReplacerTabUI, IS_WEBUI_1_5
-from replacer.tools import watchOuputPanel
+from replacer.tools import watchOuputPanel, getReplacerFooter
 from replacer import replacer_scripts
 
 
@@ -32,6 +32,9 @@ def mountDedicatedPage(demo, app):
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     getReplacerTabUI(isDedicatedPage=True)
+
+            footer = getReplacerFooter()
+            gr.HTML(footer, elem_id="footer")
 
         loadsave = copy.copy(demo.ui_loadsave)  
         loadsave.finalized_ui = False

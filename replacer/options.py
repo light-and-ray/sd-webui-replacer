@@ -2,11 +2,11 @@ import os
 from pathlib import Path
 import gradio as gr
 from modules import shared
-from modules import script_callbacks
 
 EXT_NAME = None
+EXT_ROOT_DIRECTORY = str(Path(__file__).parent.parent.absolute())
 try:
-    extNameFilePath = os.path.join(str(Path(__file__).parent.parent.absolute()), 'ExtensionName.txt')
+    extNameFilePath = os.path.join(EXT_ROOT_DIRECTORY, 'ExtensionName.txt')
     if os.path.isfile(extNameFilePath):
         with open(extNameFilePath, 'r') as f:
             EXT_NAME = f.readline().strip()
