@@ -65,6 +65,11 @@ def useFastDilation():
     return opt
 
 
+def getMaskColorStr():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_mask_color", True)
+    return opt
+
+
 detectionPromptExamples_defaults = [
             "background",
             "hairstyle",
@@ -234,6 +239,17 @@ def on_ui_settings():
             gr.Checkbox,
             section=section,
         ).needs_restart()
+    )
+
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_mask_color",
+        shared.OptionInfo(
+            '#84FF9A',
+            "Color for mask in preview (fast dilation) and default for Custom mask and Avoidance mask",
+            gr.ColorPicker,
+            section=section,
+        ).needs_reload_ui()
     )
 
 

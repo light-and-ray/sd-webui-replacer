@@ -11,7 +11,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
     doNotShowUnloadButton, getAvoidancePromptExamples, getDedicatedPagePath,
     getDetectionPromptExamplesNumber, getAvoidancePromptExamplesNumber,
-    getPositivePromptExamplesNumber, getNegativePromptExamplesNumber,
+    getPositivePromptExamplesNumber, getNegativePromptExamplesNumber, getMaskColorStr
 )
 from replacer import replacer_scripts
 from replacer.tools import limitSizeByOneDemention, OuputPanelWatcher
@@ -366,11 +366,11 @@ def getReplacerTabUI(isDedicatedPage):
                                     type="pil",
                                     tool="sketch",
                                     image_mode="RGBA",
-                                    brush_color='#ffffff'
+                                    brush_color=getMaskColorStr()
                                 )
                             with gr.Row():
                                 avoid_mask_brush_color = gr.ColorPicker(
-                                    '#ffffff', label='Brush color',
+                                    getMaskColorStr(), label='Brush color',
                                     info='visual only, use when brush color is hard to see'
                                 )
                                 if IS_WEBUI_1_5:
@@ -395,11 +395,11 @@ def getReplacerTabUI(isDedicatedPage):
                                     type="pil",
                                     tool="sketch",
                                     image_mode="RGBA",
-                                    brush_color='#ffffff'
+                                    brush_color=getMaskColorStr()
                                 )
                             with gr.Row():
                                 custom_mask_brush_color = gr.ColorPicker(
-                                    '#ffffff', label='Brush color',
+                                    getMaskColorStr(), label='Brush color',
                                     info='visual only, use when brush color is hard to see')
                                 if IS_WEBUI_1_5:
                                     custom_mask_brush_color.visible = False

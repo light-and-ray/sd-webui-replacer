@@ -1,10 +1,10 @@
-from PIL import ImageChops, Image
+from PIL import ImageChops, Image, ImageColor
 import numpy as np
-import cv2, random, git, torch, copy
+import cv2, random, git, torch
 from dataclasses import dataclass
 from modules import errors
 from replacer.generation_args import GenerationArgs
-from replacer.options import useFastDilation
+from replacer.options import useFastDilation, getMaskColorStr
 
 try:
     REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
@@ -89,7 +89,7 @@ def fastMaskDilate(mask, _, dilation_amount, imageResized):
     print("Dilation Amount: ", dilation_amount)
     dilated_mask = fastMaskDilate_(mask, dilation_amount // 2)
     maskFilling = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
-    maskFilling.paste(Image.new('RGBA', dilated_mask.size, (132, 184, 154, 127)), dilated_mask)
+    maskFilling.paste(Image.new('RGBA', dilated_mask.size, ImageColor.getcolor(f'{getMaskColorStr()}7F', 'RGBA')), dilated_mask)
     preview = imageResized.resize(dilated_mask.size)
     preview.paste(maskFilling, (0, 0), maskFilling)
     cutted = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
