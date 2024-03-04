@@ -87,7 +87,7 @@ def inpaint(
     p.do_not_save_grid = True
     try:
         if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
-            replacer_scripts.enableInpaintModeForCN(gArgs, p)
+            replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
     replacer_scripts.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)

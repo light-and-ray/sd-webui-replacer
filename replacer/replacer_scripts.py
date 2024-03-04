@@ -71,13 +71,14 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
         processed.images[i] = imageOrg
 
 
-def enableInpaintModeForCN(gArgs, p):
+def enableInpaintModeForCN(cn_args, p):
+    if IS_SD_WEBUI_FORGE: return
     global external_code
     mask = None
-    gArgs.cn_args = list(gArgs.cn_args)
-    for i in range(len(gArgs.cn_args)):
-        gArgs.cn_args[i] = external_code.to_processing_unit(gArgs.cn_args[i])
-        controlNetUnit = gArgs.cn_args[i]
+
+    for controlNetUnit in cn_args:
+        controlNetUnit = external_code.to_processing_unit(controlNetUnit)
+
         if not controlNetUnit.enabled:
             continue
 
