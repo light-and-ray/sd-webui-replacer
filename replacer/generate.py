@@ -42,16 +42,7 @@ def inpaint(
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
 
-    inpainting_fill = gArgs.inpainting_fill
     mask = gArgs.mask.resize(image.size).convert('L')
-    if (inpainting_fill == 4): # lama cleaner (https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
-        inpainting_fill = 1 # original
-        try:
-            from lama_cleaner_masked_content.inpaint import lamaInpaint
-            from lama_cleaner_masked_content.options import getUpscaler
-            image = lamaInpaint(image, mask, gArgs.inpainting_mask_invert, getUpscaler())
-        except Exception as e:
-            errors.report(f'[{EXT_NAME}]: {e}', exc_info=True)
 
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
@@ -70,7 +61,7 @@ def inpaint(
         init_images=[image],
         mask=mask,
         mask_blur=gArgs.mask_blur,
-        inpainting_fill=inpainting_fill,
+        inpainting_fill=gArgs.inpainting_fill,
         resize_mode=0,
         denoising_strength=gArgs.denoising_strength,
         image_cfg_scale=1.5,
@@ -90,6 +81,7 @@ def inpaint(
             replacer_scripts.enableInpaintModeForCN(gArgs.cn_args, p)
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
+
     replacer_scripts.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
 
 

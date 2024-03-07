@@ -6,6 +6,7 @@ from modules.images import resize_image
 from replacer.tools import limitSizeByOneDemention, applyMaskBlur
 from replacer.generation_args import GenerationArgs
 
+
 # --- ControlNet ----
 
 try:
@@ -126,7 +127,6 @@ def watchControlNetUI(component, **kwargs):
 
 # --- InpaintDifference ----
 
-
 InpaintDifferenceGlobals = None
 computeInpaintDifference = None
 
@@ -169,8 +169,6 @@ def initInpaintDiffirence():
 
 # --- SoftInpainting ----
 
-
-
 script_soft_inpaint : scripts.Script = None
 
 
@@ -183,8 +181,6 @@ def initSoftInpaintScript():
             break
     if index is not None:
         script_soft_inpaint = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
-    else:
-        return
 
 
 
@@ -205,6 +201,21 @@ def watchSoftInpaintUI(component, **kwargs):
 
     
 
+# --- LamaCleaner as masked content ----
+
+
+script_lama_cleaner_as_masked_content = None
+
+def initLamaCleanerAsMaskedContent():
+    global script_lama_cleaner_as_masked_content
+    index = None
+    for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
+        if script.title() == "Lama-cleaner-masked-content":
+            index = idx
+            break
+    if index is not None:
+        script_lama_cleaner_as_masked_content = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
+
 
 # --------
 
@@ -213,6 +224,7 @@ def initAllScripts():
     initCNScript()
     initInpaintDiffirence()
     initSoftInpaintScript()
+    initLamaCleanerAsMaskedContent()
 
 
 def prepareScriptsArgs(scripts_args):
@@ -242,7 +254,7 @@ def prepareScriptsArgs(scripts_args):
 
 
 def applyScripts(p, cn_args, soft_inpaint_args):
-    global script_controlnet, script_soft_inpaint
+    global script_controlnet, script_soft_inpaint, script_lama_cleaner_as_masked_content
     needControlNet = script_controlnet is not None and cn_args is not None and len(cn_args) != 0
     needSoftInpaint = script_soft_inpaint is not None and soft_inpaint_args is not None and len(soft_inpaint_args) != 0
 
@@ -251,6 +263,8 @@ def applyScripts(p, cn_args, soft_inpaint_args):
         avaliableScripts.append(script_controlnet)
     if needSoftInpaint :
         avaliableScripts.append(script_soft_inpaint)
+    if script_lama_cleaner_as_masked_content is not None:
+        avaliableScripts.append(script_lama_cleaner_as_masked_content)
 
     if len(avaliableScripts) == 0:
         return
