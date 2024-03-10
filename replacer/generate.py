@@ -15,7 +15,7 @@ from replacer.options import ( getDetectionPromptExamples, getPositivePromptExam
     getHiresFixPositivePromptSuffixExamples, EXT_NAME, EXT_NAME_LOWER, getSaveDir, needAutoUnloadModels,
 )
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata, extraMaskExpand, prepareMask, generateSeed
+from replacer.tools import addReplacerMetadata, extraMaskExpand, prepareMask, generateSeed, interrupted
 
 g_clear_cache = None
 
@@ -395,7 +395,7 @@ def generate(
         batch_processed = None
 
         for image in images:
-            if shared.state.interrupted:
+            if interrupted():
                 if needAutoUnloadModels():
                     clearCache()
                 break
@@ -467,7 +467,7 @@ def generate(
             return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""
         
         if tab_index == 2 and not show_batch_dir_results:
-            return [], "", plaintext_to_html(f"Saved into {output_batch_dir}"), ""
+            return [], "", plaintext_to_html(f"Saved into {output_batch_dir or getSaveDir()}"), ""
 
         processed.images += allExtraImages
         processed.infotexts += [processed.info] * len(allExtraImages)
@@ -578,7 +578,7 @@ def applyHiresFix(
     else:
         processed, scriptImages = inpaint(image, gArgs)
         generatedImage = processed.images[0]
-        if not shared.state.interrupted and not shared.state.skipped:
+        if not interrupted() and not shared.state.skipped:
             lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage)
             print('hiresFixCacheData cached')
         

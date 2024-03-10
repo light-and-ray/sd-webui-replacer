@@ -2,7 +2,7 @@ import cv2, random, git, torch, os
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
-from modules import errors
+from modules import errors, shared
 from modules.ui import versions_html
 from replacer.generation_args import GenerationArgs
 from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY
@@ -182,11 +182,17 @@ def watchOuputPanel(component, **kwargs):
         OuputPanelWatcher.send_to_extras = component
 
 
+IS_WEBUI_1_9 = hasattr(shared.cmd_opts, 'unix_filenames_sanitization')
+
+
 def getReplacerFooter():
     footer = ""
     try:
-        with open(os.path.join(EXT_ROOT_DIRECTORY, 'html', 'replacer_footer.html'), encoding="utf8") as file:
-            footer = file.read()
+        if IS_WEBUI_1_9:
+            footer = shared.html('replacer_footer.html')
+        else:
+            with open(os.path.join(EXT_ROOT_DIRECTORY, 'html', 'replacer_footer.html'), encoding="utf8") as file:
+                footer = file.read()
         footer = footer.format(versions=versions_html()
             .replace('checkpoint: <a id="sd_checkpoint_hash">N/A</a>',
                 f'replacer: <a href="https://github.com/light-and-ray/sd-webui-replacer/commit/{REPLACER_VERSION}">{REPLACER_VERSION}</a>'))
@@ -194,3 +200,8 @@ def getReplacerFooter():
         errors.report(f"Error getReplacerFooter: {e}", exc_info=True)
         return ""
     return footer
+
+
+def interrupted():
+    return shared.state.interrupted or getattr(shared.state, 'stopping_generation', False)
+
