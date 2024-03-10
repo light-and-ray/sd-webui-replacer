@@ -578,8 +578,9 @@ def applyHiresFix(
     else:
         processed, scriptImages = inpaint(image, gArgs)
         generatedImage = processed.images[0]
-        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage)
-        print('hiresFixCacheData cached')
+        if not shared.state.interrupted and not shared.state.skipped:
+            lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage)
+            print('hiresFixCacheData cached')
         
 
     shared.state.textinfo = "hiresfix"
