@@ -591,10 +591,3 @@ def applyHiresFix(
     return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
 
 
-
-
-def generate_webui(id_task, *args, **kwargs):
-    return generate(*args, **kwargs)
-
-def applyHiresFix_webui(id_task, *args, **kwargs):
-    return applyHiresFix(*args, **kwargs)

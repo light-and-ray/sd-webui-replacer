@@ -182,17 +182,11 @@ def watchOuputPanel(component, **kwargs):
         OuputPanelWatcher.send_to_extras = component
 
 
-IS_WEBUI_1_9 = hasattr(shared.cmd_opts, 'unix_filenames_sanitization')
-
-
 def getReplacerFooter():
     footer = ""
     try:
-        if IS_WEBUI_1_9:
-            footer = shared.html('replacer_footer.html')
-        else:
-            with open(os.path.join(EXT_ROOT_DIRECTORY, 'html', 'replacer_footer.html'), encoding="utf8") as file:
-                footer = file.read()
+        with open(os.path.join(EXT_ROOT_DIRECTORY, 'html', 'replacer_footer.html'), encoding="utf8") as file:
+            footer = file.read()
         footer = footer.format(versions=versions_html()
             .replace('checkpoint: <a id="sd_checkpoint_hash">N/A</a>',
                 f'replacer: <a href="https://github.com/light-and-ray/sd-webui-replacer/commit/{REPLACER_VERSION}">{REPLACER_VERSION}</a>'))

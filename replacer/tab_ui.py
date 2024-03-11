@@ -5,7 +5,7 @@ from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_components import ToolButton
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info, create_refresh_button
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
-from replacer.generate import generate_webui, applyHiresFix_webui, getLastUsedSeed
+from replacer.generate import generate, applyHiresFix, getLastUsedSeed
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
@@ -43,6 +43,13 @@ def getHiresFixCheckpoints():
         return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles()
     else:
         return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=False)
+
+
+def generate_webui(id_task, *args, **kwargs):
+    return generate(*args, **kwargs)
+
+def applyHiresFix_webui(id_task, *args, **kwargs):
+    return applyHiresFix(*args, **kwargs)
 
 
 def update_mask_brush_color(color):
