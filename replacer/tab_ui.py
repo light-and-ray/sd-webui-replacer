@@ -310,18 +310,22 @@ def getReplacerTabUI(isDedicatedPage):
                                     minimum=0.0, maximum=1.0, step=0.01)
 
                             with gr.Row():
-                                with gr.Column():
-                                    inpainting_fill = gr.Radio(label='Masked content',
-                                        choices=['fill', 'original', 'latent noise', 'latent nothing'],
-                                        value='fill', type="index", elem_id="replacer_inpainting_fill")
+                                inpainting_fill = gr.Radio(label='Masked content',
+                                    choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                                    value='fill', type="index", elem_id="replacer_inpainting_fill")
 
-                                with gr.Column():
-                                    inpainting_mask_invert = gr.Radio(
-                                        label='Mask mode',
-                                        choices=['Inpaint masked', 'Inpaint not masked'],
-                                        value='Inpaint masked',
-                                        type="index",
-                                        elem_id="replacer_mask_mode")
+                            with gr.Row():
+                                lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
+                                if not replacer_scripts.script_lama_cleaner_as_masked_content:
+                                    lama_cleaner_upscaler.visible = False
+
+                            with gr.Row():
+                                inpainting_mask_invert = gr.Radio(
+                                    label='Mask mode',
+                                    choices=['Inpaint masked', 'Inpaint not masked'],
+                                    value='Inpaint masked',
+                                    type="index",
+                                    elem_id="replacer_mask_mode")
 
                             soft_inpaint_inputs = []
                             if replacer_scripts.script_soft_inpaint:
@@ -799,6 +803,7 @@ def getReplacerTabUI(isDedicatedPage):
                 custom_mask,
                 use_inpaint_diff,
                 inpaint_diff_mask_view,
+                lama_cleaner_upscaler,
             ] + cn_inputs
               + soft_inpaint_inputs,
             outputs=[

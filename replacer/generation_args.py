@@ -45,6 +45,8 @@ class GenerationArgs:
     only_custom_mask: bool
     custom_mask: Image
     use_inpaint_diff: bool
+    lama_cleaner_upscaler: str
+
     cn_args: list
     soft_inpaint_args: list
 

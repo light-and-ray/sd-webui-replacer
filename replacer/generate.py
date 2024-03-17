@@ -41,6 +41,8 @@ def inpaint(
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
+    if replacer_scripts.script_lama_cleaner_as_masked_content:
+        override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
 
     mask = gArgs.mask.resize(image.size).convert('L')
 
@@ -237,6 +239,7 @@ def generate(
     custom_mask,
     use_inpaint_diff,
     inpaint_diff_mask_view,
+    lama_cleaner_upscaler,
     *scripts_args,
 ):
     restoreList = []
@@ -384,6 +387,7 @@ def generate(
             use_inpaint_diff and inpaint_diff_mask_view is not None and \
                 replacer_scripts.InpaintDifferenceGlobals is not None and \
                 replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
+            lama_cleaner_upscaler,
 
             *replacer_scripts.prepareScriptsArgs(scripts_args),
             )
