@@ -61,17 +61,42 @@ function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxRes
     }
 
 
-function replacerApplyZoomAndPanIntegration () {
-    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function") {
-        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
-        var index = uiUpdateCallbacks.indexOf(replacerApplyZoomAndPanIntegration);
-        if (index !== -1) {
-            uiUpdateCallbacks.splice(index, 1);
+
+async function replacer_waitForOpts() {
+    for (; ;) {
+        if (window.opts && Object.keys(window.opts).length) {
+            return window.opts;
         }
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
 }
 
-onUiUpdate(replacerApplyZoomAndPanIntegration);
+var isZoomAndPanIntegrationApplied = false;
+
+function replacerApplyZoomAndPanIntegration () {
+    if (typeof window.applyZoomAndPanIntegration === "function") {
+        window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
+        isZoomAndPanIntegrationApplied = true;
+    }
+}
+
+function replacerApplyZoomAndPanIntegration_withMod () {
+    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function") {
+        window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
+        isZoomAndPanIntegrationApplied = true;
+    }
+}
+
+onUiUpdate(async() => {
+    if (isZoomAndPanIntegrationApplied) return;
+    const opts = await replacer_waitForOpts();
+
+    if (opts.prioritized_callbacks_app_started) { // webui 1.9
+        replacerApplyZoomAndPanIntegration();
+    } else {
+        replacerApplyZoomAndPanIntegration_withMod();
+    }
+});
 
 
 function replacerRemoveInpaintDiffMaskUpload() {
