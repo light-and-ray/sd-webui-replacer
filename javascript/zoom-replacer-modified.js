@@ -1,6 +1,20 @@
 onUiLoaded(async() => {
-    // modified extensions-builtin/canvas-zoom-and-pan/javascript/zoom.js
-    // for work in dedicated page
+    const elementIDs = {
+        img2imgTabs: "#mode_img2img .tab-nav",
+        inpaint: "#img2maskimg",
+        inpaintSketch: "#inpaint_sketch",
+        rangeGroup: "#img2img_column_size",
+        sketch: "#img2img_sketch"
+    };
+    const tabNameToElementId = {
+        "Inpaint sketch": elementIDs.inpaintSketch,
+        "Inpaint": elementIDs.inpaint,
+        "Sketch": elementIDs.sketch
+    };
+
+
+    // Helper functions
+    // Get active tab
 
     /**
      * Waits for an element to be present in the DOM.
@@ -14,6 +28,25 @@ onUiLoaded(async() => {
         checkForElement();
     });
 
+    function getActiveTab(elements, all = false) {
+        if (!elements.img2imgTabs) return null;
+        const tabs = elements.img2imgTabs.querySelectorAll("button");
+
+        if (all) return tabs;
+
+        for (let tab of tabs) {
+            if (tab.classList.contains("selected")) {
+                return tab;
+            }
+        }
+    }
+
+    // Get tab ID
+    function getTabId(elements) {
+        const activeTab = getActiveTab(elements);
+        if (!activeTab) return null;
+        return tabNameToElementId[activeTab.innerText];
+    }
 
     // Wait until opts loaded
     async function waitForOpts() {
@@ -134,6 +167,49 @@ onUiLoaded(async() => {
         return config;
     }
 
+    /**
+     * The restoreImgRedMask function displays a red mask around an image to indicate the aspect ratio.
+     * If the image display property is set to 'none', the mask breaks. To fix this, the function
+     * temporarily sets the display property to 'block' and then hides the mask again after 300 milliseconds
+     * to avoid breaking the canvas. Additionally, the function adjusts the mask to work correctly on
+     * very long images.
+     */
+    function restoreImgRedMask(elements) {
+        const mainTabId = getTabId(elements);
+
+        if (!mainTabId) return;
+
+        const mainTab = gradioApp().querySelector(mainTabId);
+        const img = mainTab.querySelector("img");
+        const imageARPreview = gradioApp().querySelector("#imageARPreview");
+
+        if (!img || !imageARPreview) return;
+
+        imageARPreview.style.transform = "";
+        if (parseFloat(mainTab.style.width) > 865) {
+            const transformString = mainTab.style.transform;
+            const scaleMatch = transformString.match(
+                /scale\(([-+]?[0-9]*\.?[0-9]+)\)/
+            );
+            let zoom = 1; // default zoom
+
+            if (scaleMatch && scaleMatch[1]) {
+                zoom = Number(scaleMatch[1]);
+            }
+
+            imageARPreview.style.transformOrigin = "0 0";
+            imageARPreview.style.transform = `scale(${zoom})`;
+        }
+
+        if (img.style.display !== "none") return;
+
+        img.style.display = "block";
+
+        setTimeout(() => {
+            img.style.display = "none";
+        }, 400);
+    }
+
     const hotkeysConfigOpts = await waitForOpts();
 
     // Default config
@@ -178,9 +254,27 @@ onUiLoaded(async() => {
     let isMoving = false;
     let mouseX, mouseY;
     let activeElement;
+    let interactedWithAltKey = false;
 
+    const elements = Object.fromEntries(
+        Object.keys(elementIDs).map(id => [
+            id,
+            gradioApp().querySelector(elementIDs[id])
+        ])
+    );
     const elemData = {};
 
+    // Apply functionality to the range inputs. Restore redmask and correct for long images.
+    const rangeInputs = elements.rangeGroup ?
+        Array.from(elements.rangeGroup.querySelectorAll("input")) :
+        [
+            gradioApp().querySelector("#img2img_width input[type='range']"),
+            gradioApp().querySelector("#img2img_height input[type='range']")
+        ];
+
+    for (const input of rangeInputs) {
+        input?.addEventListener("input", () => restoreImgRedMask(elements));
+    }
 
     function applyZoomAndPan(elemId, isExtension = true) {
         const targetElement = gradioApp().querySelector(elemId);
@@ -201,7 +295,7 @@ onUiLoaded(async() => {
 
         // Create tooltip
         function createTooltip() {
-            const toolTipElemnt =
+            const toolTipElement =
                 targetElement.querySelector(".image-container");
             const tooltip = document.createElement("div");
             tooltip.className = "canvas-tooltip";
@@ -264,7 +358,7 @@ onUiLoaded(async() => {
             tooltip.appendChild(tooltipContent);
 
             // Add a hint element to the target element
-            toolTipElemnt.appendChild(tooltip);
+            toolTipElement.appendChild(tooltip);
         }
 
         //Show tool tip if setting enable
@@ -274,14 +368,17 @@ onUiLoaded(async() => {
 
         // In the course of research, it was found that the tag img is very harmful when zooming and creates white canvases. This hack allows you to almost never think about this problem, it has no effect on webui.
         function fixCanvas() {
-            const img = targetElement.querySelector(`${elemId} img`);
+            const activeTab = getActiveTab(elements)?.textContent.trim();
 
-            if (img && img.style.display !== "none") {
-                img.style.display = "none";
-                img.style.visibility = "hidden";
+            if (activeTab && activeTab !== "img2img") {
+                const img = targetElement.querySelector(`${elemId} img`);
+
+                if (img && img.style.display !== "none") {
+                    img.style.display = "none";
+                    img.style.visibility = "hidden";
+                }
             }
         }
-
 
         // Reset the zoom level and pan position of the target element to their initial values
         function resetZoom() {
@@ -413,6 +510,10 @@ onUiLoaded(async() => {
         function changeZoomLevel(operation, e) {
             if (isModifierKey(e, hotkeysConfig.canvas_hotkey_zoom)) {
                 e.preventDefault();
+
+                if (hotkeysConfig.canvas_hotkey_zoom === "Alt") {
+                    interactedWithAltKey = true;
+                }
 
                 let zoomPosX, zoomPosY;
                 let delta = 0.2;
@@ -688,6 +789,16 @@ onUiLoaded(async() => {
         targetElement.addEventListener("mousemove", handleMouseMove);
         targetElement.addEventListener("mouseleave", handleMouseLeave);
 
+        // Reset zoom when click on another tab
+        if (elements.img2imgTabs) {
+            elements.img2imgTabs.addEventListener("click", resetZoom);
+            elements.img2imgTabs.addEventListener("click", () => {
+                // targetElement.style.width = "";
+                if (parseInt(targetElement.style.width) > 865) {
+                    setTimeout(fitToElement, 0);
+                }
+            });
+        }
 
         targetElement.addEventListener("wheel", e => {
             // change zoom level
@@ -697,6 +808,10 @@ onUiLoaded(async() => {
             // Handle brush size adjustment with ctrl key pressed
             if (isModifierKey(e, hotkeysConfig.canvas_hotkey_adjust)) {
                 e.preventDefault();
+
+                if (hotkeysConfig.canvas_hotkey_adjust === "Alt") {
+                    interactedWithAltKey = true;
+                }
 
                 // Increase or decrease brush size based on scroll direction
                 adjustBrushSize(elemId, e.deltaY);
@@ -738,28 +853,16 @@ onUiLoaded(async() => {
         document.addEventListener("keyup", handleMoveKeyUp);
 
 
-        // Prevent firefox to open toolbar on pressing alt
-        let wasAltPressed = false;
-
-        function handleAltKeyDown(e) {
-            if (!activeElement) return;
-            if (hotkeysConfig.canvas_hotkey_zoom !== "Alt") return;
-            if (e.key === "Alt") {
-                wasAltPressed = true;
-            } else {
-                wasAltPressed = false;
-            }
-        }
-
+        // Prevent firefox from opening main menu when alt is used as a hotkey for zoom or brush size
         function handleAltKeyUp(e) {
-            if (hotkeysConfig.canvas_hotkey_zoom !== "Alt") return;
-            if (wasAltPressed || (activeElement && e.key === "Alt")) {
-                e.preventDefault();
+            if (e.key !== "Alt" || !interactedWithAltKey) {
+                return;
             }
-            wasAltPressed = false;
+
+            e.preventDefault();
+            interactedWithAltKey = false;
         }
 
-        document.addEventListener("keydown", handleAltKeyDown);
         document.addEventListener("keyup", handleAltKeyUp);
 
 
@@ -836,8 +939,12 @@ onUiLoaded(async() => {
 
     }
 
+    elementIDs.sketch && applyZoomAndPan(elementIDs.sketch, false);
+    elementIDs.inpaint && applyZoomAndPan(elementIDs.inpaint, false);
+    elementIDs.inpaintSketch && applyZoomAndPan(elementIDs.inpaintSketch, false);
+
     // Make the function global so that other extensions can take advantage of this solution
-    const applyZoomAndPanIntegration_replacer_mod = async(id, elementIDs) => {
+    const applyZoomAndPanIntegration = async(id, elementIDs) => {
         const mainEl = document.querySelector(id);
         if (id.toLocaleLowerCase() === "none") {
             for (const elementID of elementIDs) {
@@ -858,7 +965,9 @@ onUiLoaded(async() => {
         }, {once: true});
     };
 
-    window.applyZoomAndPanIntegration_replacer_mod = applyZoomAndPanIntegration_replacer_mod; // for any extension
+    window.applyZoomAndPan_replacer_mod = applyZoomAndPan; // Only 1 elements, argument elementID, for example applyZoomAndPan("#txt2img_controlnet_ControlNet_input_image")
+
+    window.applyZoomAndPanIntegration_replacer_mod = applyZoomAndPanIntegration; // for any extension
 
     /*
         The function `applyZoomAndPanIntegration` takes two arguments:
