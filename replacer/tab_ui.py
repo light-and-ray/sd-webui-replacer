@@ -315,9 +315,10 @@ def getReplacerTabUI(isDedicatedPage):
                                     value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                             with gr.Row():
-                                lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
-                                if not replacer_scripts.script_lama_cleaner_as_masked_content:
-                                    lama_cleaner_upscaler.visible = False
+                                if replacer_scripts.script_lama_cleaner_as_masked_content:
+                                    lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
+                                else:
+                                    lama_cleaner_upscaler = gr.Textbox(visible=False)
 
                             with gr.Row():
                                 inpainting_mask_invert = gr.Radio(
