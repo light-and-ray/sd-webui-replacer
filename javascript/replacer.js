@@ -116,10 +116,63 @@ function replacerRemoveInpaintDiffMaskUpload() {
 onUiUpdate(replacerRemoveInpaintDiffMaskUpload);
 
 
-onUiLoaded(function(){
+onUiLoaded(function() {
     let replacer_generate = gradioApp().getElementById('replacer_generate');
     let replacer_hf_generate = gradioApp().getElementById('replacer_hf_generate');
     replacer_generate.title = '';
     replacer_hf_generate.title = '';
 });
 
+
+
+function replacer_imageComparisonloadImage() {
+    let source_a = gradioApp().getElementById('replacer_image').querySelector('img');
+    let source_b = gradioApp().getElementById('replacer_gallery').querySelector('img');
+
+    if (source_a == null || source_b == null)
+    return;
+
+    ImageComparator.img_A.src = source_a.src;
+    ImageComparator.img_B.src = source_b.src;
+    ImageComparator.reset();
+}
+
+function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/sd-webui-image-comparison
+    // 0: Off ; 1: Text ; 2: Icon
+    const config = gradioApp().getElementById('setting_comp_send_btn')?.querySelectorAll('label');
+    if (!config) return;
+    var option = 0;
+
+    for (let i = 1; i < 3; i++) {
+        if (config[i].classList.contains('selected')) {
+            option = i;
+            break;
+        }
+    }
+
+    if (option === 0)
+        return;
+
+    ['replacer'].forEach((mode) => {
+        const row = gradioApp().getElementById(`image_buttons_${mode}`).querySelector('.form');
+        const btn = row.lastElementChild.cloneNode();
+
+        btn.id = `${mode}_send_to_comp`;
+        btn.title = "Send images to comparison tab.";
+        if (option === 1)
+            btn.textContent = "Send to Comparison";
+        else
+            btn.textContent = "🆚";
+
+        btn.addEventListener('click', () => {
+            replacer_imageComparisonloadImage();
+            ImageComparator.switch_to_comparison();
+        }); 
+
+        row.appendChild(btn);
+    });
+}
+
+onUiLoaded(async () => {
+    replacer_imageComparisonAddButton();
+});

@@ -1,13 +1,15 @@
 import copy
 import numpy as np
-from PIL import Image, ImageChops
+import gradio as gr
+from PIL import ImageChops
 from modules import scripts, errors
 from modules.images import resize_image
 from replacer.tools import limitSizeByOneDemention, applyMaskBlur
 from replacer.generation_args import GenerationArgs
+from replacer.options import EXT_NAME
 
 
-# --- ControlNet ----
+# --- ControlNet ---- https://github.com/Mikubill/sd-webui-controlnet
 
 try:
     from lib_controlnet import external_code
@@ -125,7 +127,7 @@ def watchControlNetUI(component, **kwargs):
         component.elem_id = elem_id.replace('img2img', 'replacer')
     
 
-# --- InpaintDifference ----
+# --- InpaintDifference ---- https://github.com/John-WL/sd-webui-inpaint-difference
 
 InpaintDifferenceGlobals = None
 computeInpaintDifference = None
@@ -199,9 +201,9 @@ def watchSoftInpaintUI(component, **kwargs):
     if 'soft' in elem_id:
         component.elem_id = elem_id.replace('soft', 'replacer_soft')
 
-    
 
-# --- LamaCleaner as masked content ----
+
+# --- LamaCleaner as masked content ---- https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
 
 
 script_lama_cleaner_as_masked_content = None
@@ -215,6 +217,20 @@ def initLamaCleanerAsMaskedContent():
             break
     if index is not None:
         script_lama_cleaner_as_masked_content = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
+
+
+
+# --- ImageComparison ---- https://github.com/Haoming02/sd-webui-image-comparison
+
+
+def addButtonInComparisonTab(component, **kwargs):
+    elem_id = kwargs.get('elem_id', None)
+    if elem_id == 'img_comp_extras':
+        column = component.parent
+        with column.parent:
+            with column:
+                replacer_btn = gr.Button(f'Compare {EXT_NAME}', elem_id='img_comp_replacer')
+        replacer_btn.click(None, None, None, _js='replacer_imageComparisonloadImage')
 
 
 # --------

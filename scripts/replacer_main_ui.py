@@ -74,4 +74,4 @@ script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOuputPanel)
 script_callbacks.on_ui_settings(on_ui_settings)
-
+script_callbacks.on_after_component(replacer_scripts.addButtonInComparisonTab)

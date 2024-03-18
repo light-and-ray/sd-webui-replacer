@@ -59,6 +59,8 @@ Then click _"Apply settings"_ and restart webui (do not press _reload ui_, resta
 
 3. Fork [sd-webui-forge](https://github.com/lllyasviel/stable-diffusion-webui-forge)
 
+4. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
+
 ## Usage
 ### General
 You just need to upload your image, enter 3 prompts, and click "Run". You can override prompts examples in Settings with your commonly using prompts. Don't forget to select inpaint checkpoint
