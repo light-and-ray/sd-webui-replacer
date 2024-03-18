@@ -139,14 +139,22 @@ function replacer_imageComparisonloadImage() {
 
 function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/sd-webui-image-comparison
     // 0: Off ; 1: Text ; 2: Icon
-    const config = gradioApp().getElementById('setting_comp_send_btn')?.querySelectorAll('label');
-    if (!config) return;
     var option = 0;
-
-    for (let i = 1; i < 3; i++) {
-        if (config[i].classList.contains('selected')) {
-            option = i;
-            break;
+    const replacer_image_comparison = gradioApp().getElementById('replacer_image_comparison');
+    if (replacer_image_comparison) {
+        option = 2;
+        const inputs = gradioApp().getElementById('tab_sd-webui-image-comparison')?.getElementsByTagName('input');
+        for(var i = 0; i < inputs.length; i++) {
+            inputs[i].disabled = false;
+        }
+    } else {
+        const config = gradioApp().getElementById('setting_comp_send_btn')?.querySelectorAll('label');
+        if (!config) return;
+        for (let i = 1; i < 3; i++) {
+            if (config[i].classList.contains('selected')) {
+                option = i;
+                break;
+            }
         }
     }
 
@@ -159,6 +167,9 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
 
         btn.id = `${mode}_send_to_comp`;
         btn.title = "Send images to comparison tab.";
+        if (btn.classList.contains("hidden")) {
+            btn.classList.remove("hidden");
+        }
         if (option === 1)
             btn.textContent = "Send to Comparison";
         else
