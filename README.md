@@ -151,6 +151,8 @@ API is avaliable on `/replacer/replace`
     fix_steps : bool = False
     inpainting_fill : int = 0
     sd_model_checkpoint : str = ""
+    lama_cleaner_upscaler: str = ""
+    clip_skip: int = 1
     scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```
 

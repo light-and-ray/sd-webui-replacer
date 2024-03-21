@@ -44,6 +44,8 @@ def replacer_api(_, app: FastAPI):
         fix_steps : bool = False
         inpainting_fill : int = 0
         sd_model_checkpoint : str = ""
+        lama_cleaner_upscaler: str = ""
+        clip_skip: int = 1
         scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 
 
@@ -58,7 +60,7 @@ def replacer_api(_, app: FastAPI):
             data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
             data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, data.height, 1, 1,
             data.inpainting_mask_invert, [], data.fix_steps, True, data.sd_model_checkpoint, 'Random', [], None,
-            False, [], None, False, None, *replacer_scripts.prepareScriptsArgs_api(data.scripts)
+            False, [], None, False, None, data.lama_cleaner_upscaler, data.clip_skip, *replacer_scripts.prepareScriptsArgs_api(data.scripts)
         )[0][0]
 
         return {"image": encode_pil_to_base64(result).decode()}

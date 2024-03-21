@@ -245,11 +245,14 @@ def getReplacerTabUI(isDedicatedPage):
                                     label='Reuse seed'
                                 )
                             
-                            if not isDedicatedPage:
-                                with gr.Row():
+                            with gr.Row():
+                                if not isDedicatedPage:
                                     sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                                     override_sd_model = gr.Checkbox(label='Override stable diffusion model',
                                         value=False, elem_id="replacer_override_sd_model")
+
+                                clip_skip = ui_settings.create_setting_component('CLIP_stop_at_last_layers')
+
 
                         with gr.Tab('Detection'):
                             with gr.Row():
@@ -805,6 +808,7 @@ def getReplacerTabUI(isDedicatedPage):
                 use_inpaint_diff,
                 inpaint_diff_mask_view,
                 lama_cleaner_upscaler,
+                clip_skip,
             ] + cn_inputs
               + soft_inpaint_inputs,
             outputs=[

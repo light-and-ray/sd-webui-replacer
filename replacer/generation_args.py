@@ -46,6 +46,7 @@ class GenerationArgs:
     custom_mask: Image
     use_inpaint_diff: bool
     lama_cleaner_upscaler: str
+    clip_skip: int
 
     cn_args: list
     soft_inpaint_args: list

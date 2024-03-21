@@ -43,6 +43,7 @@ def inpaint(
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
     if replacer_scripts.script_lama_cleaner_as_masked_content:
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
+    override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
     mask = gArgs.mask.resize(image.size).convert('L')
 
@@ -240,6 +241,7 @@ def generate(
     use_inpaint_diff,
     inpaint_diff_mask_view,
     lama_cleaner_upscaler,
+    clip_skip,
     *scripts_args,
 ):
     restoreList = []
@@ -388,6 +390,7 @@ def generate(
                 replacer_scripts.InpaintDifferenceGlobals is not None and \
                 replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
             lama_cleaner_upscaler,
+            clip_skip,
 
             *replacer_scripts.prepareScriptsArgs(scripts_args),
             )
