@@ -305,7 +305,7 @@ def getReplacerTabUI(isDedicatedPage):
                                     minimum=0, maximum=100, step=1)
                                 inpaint_padding = gr.Slider(label='Padding',
                                     value=40, elem_id="replacer_inpaint_padding",
-                                    minimum=0, maximum=250, step=1)
+                                    minimum=0, maximum=1000, step=1)
 
                             with gr.Row():
                                 denoise = gr.Slider(label='Denoising',
@@ -614,7 +614,7 @@ def getReplacerTabUI(isDedicatedPage):
 
                                     hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
                                         value=250, elem_id="replacer_hf_extra_inpaint_padding",
-                                        minimum=0, maximum=1000, step=1)
+                                        minimum=0, maximum=3000, step=1)
                                     
                                     hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
                                         value=2, elem_id="replacer_hf_extra_mask_blur",

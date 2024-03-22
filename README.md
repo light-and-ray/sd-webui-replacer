@@ -221,6 +221,7 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - ☑️ progress bar + interrupt
 - option for pass into hires fix automatically
 - ☑️ control net
+- pass previous frame into ControlNet for video
 - tiled vae
 - ☑️ "hide segment anything extention" option
 - txt2img script
