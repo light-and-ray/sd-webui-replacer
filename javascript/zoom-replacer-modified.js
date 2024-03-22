@@ -939,9 +939,6 @@ onUiLoaded(async() => {
 
     }
 
-    elementIDs.sketch && applyZoomAndPan(elementIDs.sketch, false);
-    elementIDs.inpaint && applyZoomAndPan(elementIDs.inpaint, false);
-    elementIDs.inpaintSketch && applyZoomAndPan(elementIDs.inpaintSketch, false);
 
     // Make the function global so that other extensions can take advantage of this solution
     const applyZoomAndPanIntegration = async(id, elementIDs) => {

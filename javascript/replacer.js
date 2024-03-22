@@ -47,13 +47,13 @@ onAfterUiUpdate(function() {
 function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxResolutionOnDetection) {
         const img = gradioApp().querySelector('#replacer_image div div img');
         var maskId = '';
-        if (isAvoid){
+        if (isAvoid) {
             maskId = 'replacer_avoidance_mask';
         } else {
             maskId = 'replacer_custom_mask';
         }
         const removeButton = gradioApp().getElementById(maskId).querySelector('button[aria-label="Remove Image"]');
-        if (removeButton){
+        if (removeButton) {
             removeButton.click();
         }
         let resImg = img ? img.src : null;
@@ -101,12 +101,12 @@ onUiUpdate(async() => {
 
 function replacerRemoveInpaintDiffMaskUpload() {
     const mask = gradioApp().getElementById('replacer_inpaint_diff_mask_view');
-    if (!mask){ return; }
+    if (!mask) return;
     var imageContainer = mask.getElementsByClassName('image-container')[0];
-    if (!imageContainer){ return; }
+    if (!imageContainer) return;
     const images = imageContainer.getElementsByTagName('img');
 
-    if (images.length == 0){
+    if (images.length == 0) {
         imageContainer.style.visibility='hidden';
     } else {
         imageContainer.style.visibility='visible';
@@ -125,7 +125,7 @@ onUiLoaded(function() {
 
 
 
-function SendBackToReplacer() {
+function sendBackToReplacer() {
     let image = gradioApp().getElementById('replacer_gallery').querySelector('img');
     let input = gradioApp().getElementById('replacer_image').querySelector('img');
 
@@ -146,26 +146,18 @@ function addSendBackToReplacerButton() {
     }
 
     btn.textContent = "↙️";
-
-    btn.addEventListener('click', () => {
-        SendBackToReplacer();
-    }); 
-
+    btn.addEventListener('click', sendBackToReplacer); 
     row.appendChild(btn);
 }
 
-onUiLoaded(async () => {
-    addSendBackToReplacerButton();
-});
-
+onUiLoaded(addSendBackToReplacerButton);
 
 
 function replacer_imageComparisonloadImage() {
     let source_a = gradioApp().getElementById('replacer_image').querySelector('img');
     let source_b = gradioApp().getElementById('replacer_gallery').querySelector('img');
 
-    if (source_a == null || source_b == null)
-    return;
+    if (source_a == null || source_b == null) return;
 
     ImageComparator.img_A.src = source_a.src;
     ImageComparator.img_B.src = source_b.src;
@@ -193,32 +185,27 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
         }
     }
 
-    if (option === 0)
-        return;
+    if (option === 0) return;
 
-    ['replacer'].forEach((mode) => {
-        const row = gradioApp().getElementById(`image_buttons_${mode}`).querySelector('.form');
-        const btn = row.lastElementChild.cloneNode();
+    const row = gradioApp().getElementById("image_buttons_replacer").querySelector('.form');
+    const btn = row.lastElementChild.cloneNode();
 
-        btn.id = `${mode}_send_to_comp`;
-        btn.title = "Send images to comparison tab.";
-        if (btn.classList.contains("hidden")) {
-            btn.classList.remove("hidden");
-        }
-        if (option === 1)
-            btn.textContent = "Send to Comparison";
-        else
-            btn.textContent = "🆚";
+    btn.id = "replacer_send_to_comp";
+    btn.title = "Send images to comparison tab.";
+    if (btn.classList.contains("hidden")) {
+        btn.classList.remove("hidden");
+    }
+    if (option === 1) {
+        btn.textContent = "Send to Comparison";
+    } else {
+        btn.textContent = "🆚";
+    }
 
-        btn.addEventListener('click', () => {
-            replacer_imageComparisonloadImage();
-            ImageComparator.switch_to_comparison();
-        }); 
-
-        row.appendChild(btn);
+    btn.addEventListener('click', () => {
+        replacer_imageComparisonloadImage();
+        ImageComparator.switch_to_comparison();
     });
+    row.appendChild(btn);
 }
 
-onUiLoaded(async () => {
-    replacer_imageComparisonAddButton();
-});
+onUiLoaded(replacer_imageComparisonAddButton);
