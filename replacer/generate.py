@@ -146,7 +146,7 @@ def generate(
                 if gArgs.pass_into_hires_fix_automatically:
                     saveSuffix = "-before-hires-fix"
                 saveDir_ = saveDir
-                if not gArgs.save_before_hires_fix:
+                if gArgs.pass_into_hires_fix_automatically and not gArgs.save_before_hires_fix:
                     saveDir_ = None
                 lenImagesBefore = len(batch_processed.images) if batch_processed else 0
 

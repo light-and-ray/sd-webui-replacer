@@ -251,4 +251,5 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - allow multiply instances
 
 ### small todo:
-- addHiresFixIntoMetadata
+- add hires fix args into metadata
+- make apply hires fix consider gallery index

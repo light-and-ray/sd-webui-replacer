@@ -1,6 +1,6 @@
 import gradio as gr
 import modules
-from modules import shared, sd_samplers, ui, ui_settings, errors
+from modules import shared, sd_samplers, ui, ui_settings, errors, infotext_utils
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_components import ToolButton
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info, create_refresh_button
@@ -86,6 +86,12 @@ def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
     '}'
 
 
+def sendBackToReplacer(gallery, gallery_index):
+    assert len(gallery) > 0, 'No image'
+    assert 0 <= gallery_index < len(gallery), f'Bad image index: {gallery_index}'
+    image_info = gallery[gallery_index] if 0 <= gallery_index < len(gallery) else gallery[0]
+    image = infotext_utils.image_from_url_text(image_info)
+    return image
 
 
 def getReplacerTabUI(isDedicatedPage):
@@ -522,12 +528,12 @@ def getReplacerTabUI(isDedicatedPage):
                 with gr.Row():
                     if OUTPUT_PANEL_AVALIABLE:
                         outputPanel = create_output_panel('replacer', getSaveDir())
-                        img2img_gallery = outputPanel.gallery
+                        replacer_gallery = outputPanel.gallery
                         generation_info = outputPanel.generation_info
                         html_info = outputPanel.infotext
                         html_log = outputPanel.html_log
                     else:
-                        img2img_gallery, generation_info, html_info, html_log = \
+                        replacer_gallery, generation_info, html_info, html_log = \
                             create_output_panel('replacer', getSaveDir())
                     generation_info_button = gr.Button(visible=False, elem_id="replacer_generation_info_button")
                     generation_info_button.click(
@@ -840,7 +846,7 @@ def getReplacerTabUI(isDedicatedPage):
             ] + cn_inputs
               + soft_inpaint_inputs,
             outputs=[
-                img2img_gallery,
+                replacer_gallery,
                 generation_info,
                 html_info,
                 html_log,
@@ -874,7 +880,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_soft_inpaint,
             ],
             outputs=[
-                img2img_gallery,
+                replacer_gallery,
                 generation_info,
                 html_info,
                 html_log,
@@ -894,10 +900,22 @@ def getReplacerTabUI(isDedicatedPage):
 
         reuse_seed.click(
             fn=getLastUsedSeed,
-            inputs=[
-            ],
+            inputs=[],
             outputs=[
                 seed,
+            ]
+        )
+
+
+        OuputPanelWatcher.send_back_to_replacer.click(
+            fn=sendBackToReplacer,
+            _js="sendBackToReplacer",
+            inputs=[
+                replacer_gallery,
+                dummy_component
+            ],
+            outputs=[
+                image,
             ]
         )
 

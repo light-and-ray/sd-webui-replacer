@@ -125,32 +125,15 @@ onUiLoaded(function() {
 
 
 
+
 function sendBackToReplacer() {
-    let image = gradioApp().getElementById('replacer_gallery').querySelector('img');
-    let input = gradioApp().getElementById('replacer_image').querySelector('img');
+    var res = Array.from(arguments);
 
-    if (image == null) return;
+    res[1] = selected_gallery_index();
 
-    input.src = image.src;
+    return res;
 }
 
-
-function addSendBackToReplacerButton() {
-    const row = gradioApp().getElementById("image_buttons_replacer").querySelector('.form');
-    const btn = row.lastElementChild.cloneNode();
-
-    btn.id = "send_back_to_replacer";
-    btn.title = "Send image back to Replacer";
-    if (btn.classList.contains("hidden")) {
-        btn.classList.remove("hidden");
-    }
-
-    btn.textContent = "↙️";
-    btn.addEventListener('click', sendBackToReplacer); 
-    row.appendChild(btn);
-}
-
-onUiLoaded(addSendBackToReplacerButton);
 
 
 function replacer_imageComparisonloadImage() {

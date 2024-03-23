@@ -4,6 +4,7 @@ from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
 from modules import errors, shared
 from modules.ui import versions_html
+from modules.ui_components import ToolButton
 from replacer.generation_args import GenerationArgs
 from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY
 
@@ -167,6 +168,7 @@ class OuputPanelWatcher():
     send_to_img2img = None
     send_to_inpaint = None
     send_to_extras = None
+    send_back_to_replacer = None
 
 
 def watchOuputPanel(component, **kwargs):
@@ -182,6 +184,7 @@ def watchOuputPanel(component, **kwargs):
 
     if elem_id == 'replacer_send_to_extras' or elem_id == 'extras_tab':
         OuputPanelWatcher.send_to_extras = component
+        OuputPanelWatcher.send_back_to_replacer = ToolButton('↙️', elem_id=f'replacer_send_back_to_replacer', tooltip="Send image back to Replcer's input")
 
 
 def getReplacerFooter():
