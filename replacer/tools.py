@@ -28,6 +28,8 @@ def addReplacerMetadata(p, gArgs: GenerationArgs):
     p.extra_generation_params["Max resolution on detection"] = gArgs.maxResolutionOnDetection
     if gArgs.mask_num_for_metadata is not None:
         p.extra_generation_params["Mask num"] = gArgs.mask_num_for_metadata
+    if gArgs.addHiresFixIntoMetadata:
+        pass
 
 
 def areImagesTheSame(image_one, image_two):
@@ -198,4 +200,13 @@ def getReplacerFooter():
 
 def interrupted():
     return shared.state.interrupted or getattr(shared.state, 'stopping_generation', False)
+
+
+g_clear_cache = None
+def clearCache():
+    global g_clear_cache
+    if g_clear_cache is None:
+        from scripts.sam import clear_cache
+        g_clear_cache = clear_cache
+    g_clear_cache()
 

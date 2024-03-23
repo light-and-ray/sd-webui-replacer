@@ -5,7 +5,8 @@ from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_components import ToolButton
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info, create_refresh_button
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
-from replacer.generate import generate, applyHiresFix, getLastUsedSeed
+from replacer.generate_ui import generate_ui, getLastUsedSeed
+from replacer.apply_hires_fix import applyHiresFix
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
     useFirstNegativePromptFromExamples, getHiresFixPositivePromptSuffixExamples,
@@ -15,6 +16,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
 )
 from replacer import replacer_scripts
 from replacer.tools import limitSizeByOneDemention, OuputPanelWatcher
+from replacer.generate_ui import generate_ui
 
 
 try:
@@ -44,12 +46,6 @@ def getHiresFixCheckpoints():
     else:
         return ["Use same checkpoint"] + modules.sd_models.checkpoint_tiles(use_short=False)
 
-
-def generate_webui(id_task, *args, **kwargs):
-    return generate(*args, **kwargs)
-
-def applyHiresFix_webui(id_task, *args, **kwargs):
-    return applyHiresFix(*args, **kwargs)
 
 
 def update_mask_brush_color(color):
@@ -708,6 +704,17 @@ def getReplacerTabUI(isDedicatedPage):
                                     if not replacer_scripts.script_soft_inpaint:
                                         hf_soft_inpaint.visible = False
 
+                with gr.Row():
+                    pass_into_hires_fix_automatically = gr.Checkbox(
+                                    label='Pass into hires fix automatically',
+                                    value=False,
+                                    elem_id="replacer_pass_into_hires_fix_automatically",
+                                )
+                    save_before_hires_fix = gr.Checkbox(
+                                    label='Save images before hires fix',
+                                    value=False,
+                                    elem_id="replacer_save_before_hires_fix",
+                                )
 
                 with gr.Row():
                     if not isDedicatedPage:
@@ -758,7 +765,7 @@ def getReplacerTabUI(isDedicatedPage):
 
         run_button.click(
             _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf'),
-            fn=wrap_gradio_gpu_call(generate_webui, extra_outputs=[None, '', '']),
+            fn=wrap_gradio_gpu_call(generate_ui, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
                 detectionPrompt,
@@ -809,6 +816,27 @@ def getReplacerTabUI(isDedicatedPage):
                 inpaint_diff_mask_view,
                 lama_cleaner_upscaler,
                 clip_skip,
+                pass_into_hires_fix_automatically,
+                save_before_hires_fix,
+
+                hf_upscaler,
+                hf_steps,
+                hf_sampler,
+                hf_denoise,
+                hf_cfg_scale,
+                hfPositivePromptSuffix,
+                hf_size_limit,
+                hf_above_limit_upscaler,
+                hf_unload_detection_models,
+                hf_disable_cn,
+                hf_extra_mask_expand,
+                hf_positvePrompt,
+                hf_negativePrompt,
+                hf_sd_model_checkpoint,
+                hf_extra_inpaint_padding,
+                hf_extra_mask_blur,
+                hf_randomize_seed,
+                hf_soft_inpaint,
             ] + cn_inputs
               + soft_inpaint_inputs,
             outputs=[
@@ -823,7 +851,7 @@ def getReplacerTabUI(isDedicatedPage):
 
         apply_hires_fix_button.click(
             _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer'),
-            fn=wrap_gradio_gpu_call(applyHiresFix_webui, extra_outputs=[None, '', '']),
+            fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
             inputs=[
                 dummy_component,
                 hf_upscaler,

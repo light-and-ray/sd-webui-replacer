@@ -142,6 +142,7 @@ API is avaliable on `/replacer/replace`
     box_threshold: float = 0.3
     mask_expand: int = 35
     mask_blur: int = 4
+    mask_num: str = "Random"
     max_resolution_on_detection = 1280
     cfg_scale: float = 5.5
     denoise: int = 1
@@ -153,6 +154,28 @@ API is avaliable on `/replacer/replace`
     sd_model_checkpoint : str = ""
     lama_cleaner_upscaler: str = ""
     clip_skip: int = 1
+    extra_include: list = ["mask", "box", "cutted", "preview", "script"]
+
+    use_hires_fix: bool = False
+    hf_upscaler: str = "ESRGAN_4x"
+    hf_steps: int = 4
+    hf_sampler: str = "Use same sampler"
+    hf_denoise: float = 0.35
+    hf_cfg_scale: float = 1.0
+    hf_positive_prompt_suffix: str = "<lora:lcm-lora-sdv1-5:1>"
+    hf_size_limit: int = 1800
+    hf_above_limit_upscaler: str = "Lanczos"
+    hf_unload_detection_models: bool = True
+    hf_disable_cn: bool = True
+    hf_extra_mask_expand: int = 5
+    hf_positve_prompt: str = ""
+    hf_negative_prompt: str = ""
+    hf_sd_model_checkpoint: str = "Use same checkpoint"
+    hf_extra_inpaint_padding: int = 250
+    hf_extra_mask_blur: int = 2
+    hf_randomize_seed: bool = True
+    hf_soft_inpaint: str = "Same"
+
     scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```
 
@@ -219,7 +242,7 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - ☑️ "apply hires fix" button
 - ☑️ additional options
 - ☑️ progress bar + interrupt
-- option for pass into hires fix automatically
+- ☑️ option for pass into hires fix automatically
 - ☑️ control net
 - pass previous frame into ControlNet for video
 - tiled vae
@@ -228,4 +251,4 @@ In file `ui-config.json` in root of webui you can edit maximum and minimum value
 - allow multiply instances
 
 ### small todo:
-- copy `images` while appling hires fix
+- addHiresFixIntoMetadata

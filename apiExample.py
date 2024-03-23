@@ -17,6 +17,7 @@ payload = {
     "positive_prompt": "waterfall",
     "sam_model_name": "sam_hq_vit_h.pth",
     "dino_model_name": "GroundingDINO_SwinB (938MB)",
+    "use_hires_fix": True,
 
     "scripts": { # "scripts" has the same format with "alwayson_scripts" in /sdapi/v1/txt2img
         "controlnet": {

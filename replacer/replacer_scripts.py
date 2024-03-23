@@ -280,9 +280,6 @@ def initAllScripts():
 def prepareScriptsArgs(scripts_args):
     global script_controlnet, script_soft_inpaint
 
-    if len(scripts_args) > 0 and scripts_args[0] == 'args_from_api':
-        return scripts_args[1:]
-
     result = []
     lastIndex = 0
 
@@ -346,7 +343,7 @@ def prepareScriptsArgs_api(scriptsApi : dict):
         if scriptApi[0] == script_soft_inpaint.name:
             soft_inpaint_args = scriptApi[1]["args"]
             continue
-    return ['args_from_api', cn_args, soft_inpaint_args]
+    return [cn_args, soft_inpaint_args]
 
 
 def getAvaliableScripts_api():

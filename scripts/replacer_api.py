@@ -5,6 +5,8 @@ import modules.script_callbacks as script_callbacks
 from modules import shared
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generate
+from replacer.generation_args import GenerationArgs, HiresFixArgs
+from replacer.tools import generateSeed
 from replacer import replacer_scripts
 
 
@@ -35,6 +37,7 @@ def replacer_api(_, app: FastAPI):
         box_threshold: float = 0.3
         mask_expand: int = 35
         mask_blur: int = 4
+        mask_num: str = "Random"
         max_resolution_on_detection = 1280
         cfg_scale: float = 5.5
         denoise: int = 1
@@ -46,6 +49,28 @@ def replacer_api(_, app: FastAPI):
         sd_model_checkpoint : str = ""
         lama_cleaner_upscaler: str = ""
         clip_skip: int = 1
+        extra_include: list = ["mask", "box", "cutted", "preview", "script"]
+
+        use_hires_fix: bool = False
+        hf_upscaler: str = "ESRGAN_4x"
+        hf_steps: int = 4
+        hf_sampler: str = "Use same sampler"
+        hf_denoise: float = 0.35
+        hf_cfg_scale: float = 1.0
+        hf_positive_prompt_suffix: str = "<lora:lcm-lora-sdv1-5:1>"
+        hf_size_limit: int = 1800
+        hf_above_limit_upscaler: str = "Lanczos"
+        hf_unload_detection_models: bool = True
+        hf_disable_cn: bool = True
+        hf_extra_mask_expand: int = 5
+        hf_positve_prompt: str = ""
+        hf_negative_prompt: str = ""
+        hf_sd_model_checkpoint: str = "Use same checkpoint"
+        hf_extra_inpaint_padding: int = 250
+        hf_extra_mask_blur: int = 2
+        hf_randomize_seed: bool = True
+        hf_soft_inpaint: str = "Same"
+
         scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 
 
@@ -53,17 +78,88 @@ def replacer_api(_, app: FastAPI):
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_base64_to_image(data.input_image).convert("RGBA")
         
-        result = generate(
-            data.detection_prompt, data.avoidance_prompt, data.positive_prompt, data.negative_prompt,
-            0, image, [], False, "", "", False, False, "", "", 0, data.upscaler_for_img2img,
-            data.seed, data.sampler, data.steps, data.box_threshold, data.mask_expand, data.mask_blur, 
-            data.max_resolution_on_detection, data.sam_model_name, data.dino_model_name, data.cfg_scale,
-            data.denoise, data.inpaint_padding, data.inpainting_fill, data.width, data.height, 1, 1,
-            data.inpainting_mask_invert, [], data.fix_steps, True, data.sd_model_checkpoint, 'Random', [], None,
-            False, [], None, False, None, data.lama_cleaner_upscaler, data.clip_skip, *replacer_scripts.prepareScriptsArgs_api(data.scripts)
-        )[0][0]
+        if (data.seed == -1):
+            data.seed = generateSeed()
 
-        return {"image": encode_pil_to_base64(result).decode()}
+        cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs_api(data.scripts)
+
+        hires_fix_args = HiresFixArgs(
+            upscaler = data.hf_upscaler,
+            steps = data.hf_steps,
+            sampler = data.hf_sampler,
+            denoise = data.hf_denoise,
+            cfg_scale = data.hf_cfg_scale,
+            positive_prompt_suffix = data.hf_positive_prompt_suffix,
+            size_limit = data.hf_size_limit,
+            above_limit_upscaler = data.hf_above_limit_upscaler,
+            unload_detection_models = data.hf_unload_detection_models,
+            disable_cn = data.hf_disable_cn,
+            extra_mask_expand = data.hf_extra_mask_expand,
+            positve_prompt = data.hf_positve_prompt,
+            negative_prompt = data.hf_negative_prompt,
+            sd_model_checkpoint = data.hf_sd_model_checkpoint,
+            extra_inpaint_padding = data.hf_extra_inpaint_padding,
+            extra_mask_blur = data.hf_extra_mask_blur,
+            randomize_seed = data.hf_randomize_seed,
+            soft_inpaint = data.hf_soft_inpaint,
+        )
+
+        gArgs = GenerationArgs(
+            positvePrompt=data.positive_prompt,
+            negativePrompt=data.negative_prompt,
+            detectionPrompt=data.detection_prompt,
+            avoidancePrompt=data.avoidance_prompt,
+            mask=None,
+            upscalerForImg2Img=data.upscaler_for_img2img,
+            seed=data.seed,
+            samModel=data.sam_model_name,
+            grdinoModel=data.dino_model_name,
+            boxThreshold=data.box_threshold,
+            maskExpand=data.mask_expand,
+            maxResolutionOnDetection=data.max_resolution_on_detection,
+            
+            steps=data.steps,
+            sampler_name=data.sampler,
+            mask_blur=data.mask_blur,
+            inpainting_fill=data.inpainting_fill,
+            batch_count=1,
+            batch_size=1,
+            cfg_scale=data.cfg_scale,
+            denoising_strength=data.denoise,
+            height=data.height,
+            width=data.width,
+            inpaint_full_res_padding=data.inpaint_padding,
+            img2img_fix_steps=data.fix_steps,
+            inpainting_mask_invert=data.inpainting_mask_invert,
+
+            images=[image],
+            generationsN=1,
+            override_sd_model=True,
+            sd_model_checkpoint=data.sd_model_checkpoint,
+            mask_num=data.mask_num,
+            mask_num_for_metadata=None,
+            avoidance_mask=None,
+            only_custom_mask=False,
+            custom_mask=None,
+            use_inpaint_diff=False,
+            lama_cleaner_upscaler=data.lama_cleaner_upscaler,
+            clip_skip=data.clip_skip,
+            pass_into_hires_fix_automatically=data.use_hires_fix,
+            save_before_hires_fix=False,
+            hires_fix_args=hires_fix_args,
+
+            cn_args=cn_args,
+            soft_inpaint_args=soft_inpaint_args,
+            )
+
+        processed, allExtraImages = generate(gArgs, "", False, False, data.extra_include)
+
+        return {
+            "image": encode_pil_to_base64(processed.images[0]).decode(),
+            "extra_images": [encode_pil_to_base64(x).decode() for x in allExtraImages],
+            "info": processed.info,
+            "json": processed.js(),
+        }
 
 
     @app.post("/replacer/avaliable_options")
