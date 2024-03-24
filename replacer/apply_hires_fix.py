@@ -39,7 +39,7 @@ def applyHiresFix(
     hf_soft_inpaint,
 ):
     original_gallery = []
-    for i, image in enumerate(gallery):
+    for image in gallery:
         fake_image = Image.new(mode="RGB", size=(1, 1))
         fake_image.already_saved_as = image["name"].rsplit('?', 1)[0]
         original_gallery.append(fake_image)
