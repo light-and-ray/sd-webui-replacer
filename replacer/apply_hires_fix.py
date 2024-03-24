@@ -2,6 +2,7 @@ import copy, json
 from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
+from modules import errors
 from replacer.generation_args import HiresFixCacheData, HiresFixArgs
 from replacer.options import EXT_NAME, getSaveDir
 from replacer.tools import interrupted
@@ -87,30 +88,36 @@ def applyHiresFix(
     prepareGenerationArgsBeforeHiresFixPass(gArgs)
     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
 
-    shared.state.job_count = 2
-    shared.total_tqdm.clear()
-    shared.total_tqdm.updateTotal(gArgs.steps + hrGArgs.steps)
+    try:
+        shared.state.job_count = 2
+        shared.total_tqdm.clear()
+        shared.total_tqdm.updateTotal(gArgs.steps + hrGArgs.steps)
 
-    shared.state.textinfo = "inpainting with upscaler"
-    if generate_ui.lastGenerationArgs.hiresFixCacheData is not None and\
-            generate_ui.lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler and\
-            generate_ui.lastGenerationArgs.hiresFixCacheData.galleryIdx == gallery_idx:
-        generatedImage = generate_ui.lastGenerationArgs.hiresFixCacheData.generatedImage
-        print('hiresFixCacheData restored from cache')
-        shared.state.job_count = 1
-        shared.total_tqdm.updateTotal(hrGArgs.steps)
-    else:
-        processed, scriptImages = inpaint(image, gArgs)
-        generatedImage = processed.images[0]
-        if not interrupted() and not shared.state.skipped:
-            generate_ui.lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage, gallery_idx)
-            print('hiresFixCacheData cached')
+        shared.state.textinfo = "inpainting with upscaler"
+        if generate_ui.lastGenerationArgs.hiresFixCacheData is not None and\
+                generate_ui.lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler and\
+                generate_ui.lastGenerationArgs.hiresFixCacheData.galleryIdx == gallery_idx:
+            generatedImage = generate_ui.lastGenerationArgs.hiresFixCacheData.generatedImage
+            print('hiresFixCacheData restored from cache')
+            shared.state.job_count = 1
+            shared.total_tqdm.updateTotal(hrGArgs.steps)
+        else:
+            processed, scriptImages = inpaint(image, gArgs)
+            generatedImage = processed.images[0]
+            if not interrupted() and not shared.state.skipped:
+                generate_ui.lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage, gallery_idx)
+                print('hiresFixCacheData cached')
 
 
-    shared.state.textinfo = "applying hires fix"
-    processed, scriptImages = inpaint(generatedImage, hrGArgs, getSaveDir(), "-hires-fix")
+        shared.state.textinfo = "applying hires fix"
+        processed, scriptImages = inpaint(generatedImage, hrGArgs, getSaveDir(), "-hires-fix")
 
-    shared.state.end()
+        shared.state.end()
+
+    except Exception as e:
+        text = f"Error while processing hires fix: {e}"
+        errors.report(text, exc_info=True)
+        return original_gallery, generation_info, plaintext_to_html(text), ""
 
     new_gallery = []
     geninfo = json.loads(generation_info)
