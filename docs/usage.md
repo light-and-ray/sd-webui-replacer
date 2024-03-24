@@ -101,6 +101,7 @@ You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-cont
 Dedicated page (replacer tab only) is available on url `/replacer-dedicated`
 
 ## ControlNet
+![](/docs/images/controlnet.jpg)
 [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) is also avaliavle here. [Forge](https://github.com/lllyasviel/stable-diffusion-webui-forge) is also supported
 
 ## Extention name

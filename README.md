@@ -44,13 +44,14 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 <blockquote>
 
-1. [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet)
+1. [Lama cleaner as masked content](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
-2. [Lama cleaner as masked content](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
+2. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
 
-3. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
+3. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
 
-4. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
+4. [ControlNet](https://github.com/Mikubill/sd-webui-controlnet)
+
 </blockquote>
 
 
