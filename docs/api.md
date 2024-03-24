@@ -23,7 +23,7 @@ API is avaliable on `/replacer/replace`
     mask_num: str = "Random"
     max_resolution_on_detection = 1280
     cfg_scale: float = 5.5
-    denoise: int = 1
+    denoise: float = 1.0
     inpaint_padding = 40
     inpainting_mask_invert: bool = False
     upscaler_for_img2img : str = ""
