@@ -1,6 +1,6 @@
 import gradio as gr
 import modules
-from modules import shared, sd_samplers, ui, ui_settings, errors, infotext_utils
+from modules import shared, sd_samplers, ui, ui_settings, errors
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_components import ToolButton
 from modules.ui_common import create_output_panel, refresh_symbol, update_generation_info, create_refresh_button
@@ -34,14 +34,18 @@ except:
 
 try:
     from modules.ui_common import OutputPanel # webui 1.8+
-    OUTPUT_PANEL_AVALIABLE = True
+    IS_WEBUI_1_8 = True
 except Exception as e:
-    OUTPUT_PANEL_AVALIABLE = False
+    IS_WEBUI_1_8 = False
+
+if IS_WEBUI_1_8:
+    from modules import infotext_utils
 
 IS_WEBUI_1_5 = False
 if not hasattr(sd_samplers, 'visible_sampler_names'): # webui 1.5
     sd_samplers.visible_sampler_names = lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in shared.opts.hide_samplers]
     IS_WEBUI_1_5 = True
+
 
 def getHiresFixCheckpoints():
     if IS_WEBUI_1_5:
@@ -96,6 +100,7 @@ def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, fillGalleryIdx
 def sendBackToReplacer(gallery, gallery_index):
     assert len(gallery) > 0, 'No image'
     assert 0 <= gallery_index < len(gallery), f'Bad image index: {gallery_index}'
+    assert not IS_WEBUI_1_5, 'sendBackToReplacer is not supported for webui < 1.8'
     image_info = gallery[gallery_index] if 0 <= gallery_index < len(gallery) else gallery[0]
     image = infotext_utils.image_from_url_text(image_info)
     return image
@@ -190,7 +195,7 @@ def getReplacerTabUI(isDedicatedPage):
                     with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
                         with gr.Tab('Generation'):
                             with gr.Row():
-                                sampler_names = [x.name for x in sd_samplers.visible_samplers()]
+                                sampler_names = sd_samplers.visible_sampler_names()
                                 defaultSampler = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
                                 sampler = gr.Dropdown(
                                     label='Sampling method',
@@ -545,7 +550,7 @@ def getReplacerTabUI(isDedicatedPage):
 
             with gr.Column(scale=15):
                 with gr.Row():
-                    if OUTPUT_PANEL_AVALIABLE:
+                    if IS_WEBUI_1_8:
                         outputPanel = create_output_panel('replacer', getSaveDir())
                         replacer_gallery = outputPanel.gallery
                         generation_info = outputPanel.generation_info
