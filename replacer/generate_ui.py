@@ -116,12 +116,11 @@ def generate_ui(
     detectionPrompt = detectionPrompt.strip()
     avoidancePrompt = avoidancePrompt.strip()
 
+    images = []
+
     if tab_index == 0:
-        if image_single is None:
-            generationsN = 0
-        else:
+        if image_single is not None:
             images = [image_single]
-            generationsN = 1
 
     if tab_index == 1:
         def getImages(image_folder):
@@ -134,11 +133,8 @@ def generate_ui(
                     if keep_original_filenames:
                         image.additional_save_suffix = '-' + os.path.basename(filename)
                 yield image
-        if image_batch is None:
-            generationsN = 0
-        else:
+        if image_batch is not None:
             images = getImages(image_batch)
-            generationsN = len(image_batch)
 
     if tab_index == 2:
         def readImages(input_dir):
@@ -152,7 +148,6 @@ def generate_ui(
                     continue
                 yield image
         images = readImages(input_batch_dir)
-        generationsN = len(shared.listfiles(input_batch_dir))
 
     if tab_index == 3:
         shared.state.textinfo = 'video preparing'
@@ -166,7 +161,6 @@ def generate_ui(
                 if file.endswith(f'.{shared.opts.samples_format}'):
                     os.remove(os.path.join(video_output_dir, file))
         images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
-        generationsN = len(shared.listfiles(temp_batch_folder))
 
         batch_count = 1
         batch_size = 1
@@ -175,7 +169,7 @@ def generate_ui(
 
     images = list(images)
 
-    if generationsN == 0:
+    if len(images) == 0:
         return [], "", plaintext_to_html("no input images"), ""
 
     cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs(scripts_args)
@@ -231,7 +225,6 @@ def generate_ui(
         inpainting_mask_invert=inpainting_mask_invert,
 
         images=images,
-        generationsN=generationsN,
         override_sd_model=override_sd_model,
         sd_model_checkpoint=sd_model_checkpoint,
         mask_num=mask_num,

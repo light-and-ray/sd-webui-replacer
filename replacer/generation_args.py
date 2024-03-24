@@ -68,7 +68,6 @@ class GenerationArgs:
     img2img_fix_steps: bool
     inpainting_mask_invert : int
     images: Any
-    generationsN: int
     override_sd_model: bool
     sd_model_checkpoint: str
     mask_num: int

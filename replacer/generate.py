@@ -85,7 +85,7 @@ def generate(
     restoreList = []
     try:
         shared.total_tqdm.clear()
-        shared.state.job_count = gArgs.generationsN * gArgs.batch_count
+        shared.state.job_count = len(gArgs.images) * gArgs.batch_count
         totalSteps = shared.state.job_count * gArgs.steps
         if gArgs.pass_into_hires_fix_automatically:
             totalSteps += shared.state.job_count * gArgs.hires_fix_args.steps
@@ -117,7 +117,7 @@ def generate(
         if gArgs.pass_into_hires_fix_automatically:
             prepareGenerationArgsBeforeHiresFixPass(gArgs)
 
-        n = gArgs.generationsN
+        n = len(gArgs.images)
         processed = None
         allExtraImages = []
         batch_processed = None
@@ -169,7 +169,7 @@ def generate(
 
                 if needAutoUnloadModels():
                     clearCache()
-                if gArgs.generationsN == 1:
+                if n == 1:
                     raise
                 if useSaveFormatForVideo:
                     save_image(image, saveDir, "", gArgs.seed, gArgs.positvePrompt,

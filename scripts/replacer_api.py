@@ -136,7 +136,6 @@ def replacer_api(_, app: FastAPI):
             inpainting_mask_invert=data.inpainting_mask_invert,
 
             images=[image],
-            generationsN=1,
             override_sd_model=True,
             sd_model_checkpoint=data.sd_model_checkpoint,
             mask_num=data.mask_num,
