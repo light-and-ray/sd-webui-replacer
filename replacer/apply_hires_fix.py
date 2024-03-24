@@ -79,6 +79,8 @@ def applyHiresFix(
     image = gArgs.images[inputImageIdx]
     gArgs.mask = gArgs.appropriateInputImageDataList[gallery_idx].mask
     gArgs.seed = gArgs.appropriateInputImageDataList[gallery_idx].seed
+    gArgs.batch_count = 1
+    gArgs.batch_size = 1
 
     shared.state.job_count = 2
     shared.total_tqdm.clear()

@@ -86,10 +86,10 @@ class GenerationArgs:
     cn_args: list
     soft_inpaint_args: list
 
+    mask: Image = None
+    mask_num_for_metadata: int = None
     hiresFixCacheData: HiresFixCacheData = None
     addHiresFixIntoMetadata: bool = False
     appropriateInputImageDataList: List[AppropriateData] = None
-    mask: Image = None
-    mask_num_for_metadata: int = None
 
 

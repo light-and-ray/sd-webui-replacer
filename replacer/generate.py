@@ -28,7 +28,7 @@ def generateSingle(
     maskBox = None
 
     if gArgs.use_inpaint_diff:
-        gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask
+        gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask.convert('L')
 
     elif gArgs.only_custom_mask and gArgs.custom_mask is not None:
         gArgs.mask = gArgs.custom_mask
