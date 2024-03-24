@@ -119,6 +119,9 @@ def applyHiresFix(
         errors.report(text, exc_info=True)
         return original_gallery, generation_info, plaintext_to_html(text), ""
 
+    if not gallery or not generation_info:
+        return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+
     new_gallery = []
     geninfo = json.loads(generation_info)
     for i, image in enumerate(gallery):
