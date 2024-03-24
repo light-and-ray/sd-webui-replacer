@@ -76,11 +76,15 @@ def unloadModels():
 
 
 
-def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId):
+def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, fillGalleryIdx):
     if not ui_toprow:
         return ''
+    fillGalleryIdxCode = ''
+    if fillGalleryIdx:
+        fillGalleryIdxCode = 'arguments_[1] = selected_gallery_index();'
     return 'function(){'\
         'var arguments_ = Array.from(arguments);'\
+        f'{fillGalleryIdxCode}'\
         f'arguments_.push("{extraShowButtonsId}", "{buttonsId}", "{galleryId}");'\
         'return submit_replacer.apply(null, arguments_);'\
     '}'
@@ -751,29 +755,17 @@ def getReplacerTabUI(isDedicatedPage):
                 replacer_scripts.script_controlnet = None
 
 
-        def tab_single_on_select():
-            return 0, gr.Button.update(visible=True)
-
-        def tab_batch_on_select():
-            return 1, gr.Button.update(visible=False)
-
-        def tab_batch_dir_on_select():
-            return 2, gr.Button.update(visible=False)
-
-        def tab_batch_video_on_select():
-            return 3, gr.Button.update(visible=False)
-
-        tab_single.select(fn=tab_single_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
-        tab_batch.select(fn=tab_batch_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
-        tab_batch_dir.select(fn=tab_batch_dir_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
-        tab_batch_video.select(fn=tab_batch_video_on_select, inputs=[], outputs=[tab_index, apply_hires_fix_button])
+        tab_single.select(fn=lambda: 0, inputs=[], outputs=[tab_index])
+        tab_batch.select(fn=lambda: 1, inputs=[], outputs=[tab_index])
+        tab_batch_dir.select(fn=lambda: 2, inputs=[], outputs=[tab_index])
+        tab_batch_video.select(fn=lambda: 3, inputs=[], outputs=[tab_index])
 
 
         run_button.click(
-            _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf'),
+            _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf', False),
             fn=wrap_gradio_gpu_call(generate_ui, extra_outputs=[None, '', '']),
             inputs=[
-                dummy_component,
+                dummy_component, # task_id
                 detectionPrompt,
                 avoidancePrompt,
                 positvePrompt,
@@ -856,10 +848,13 @@ def getReplacerTabUI(isDedicatedPage):
 
 
         apply_hires_fix_button.click(
-            _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer'),
+            _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer', True),
             fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
             inputs=[
-                dummy_component,
+                dummy_component, # task_id
+                dummy_component, # gallery_idx
+                replacer_gallery,
+                generation_info,
                 hf_upscaler,
                 hf_steps,
                 hf_sampler,

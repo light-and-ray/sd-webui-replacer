@@ -4,7 +4,7 @@ from modules.shared import opts
 from modules.images import save_image
 from modules import sd_models
 from replacer.mask_creator import MasksCreator
-from replacer.generation_args import GenerationArgs
+from replacer.generation_args import GenerationArgs, AppropriateData
 from replacer.options import EXT_NAME, needAutoUnloadModels
 from replacer import replacer_scripts
 from replacer.tools import clearCache, interrupted
@@ -117,14 +117,13 @@ def generate(
         if gArgs.pass_into_hires_fix_automatically:
             prepareGenerationArgsBeforeHiresFixPass(gArgs)
 
-        i = 1
         n = gArgs.generationsN
         processed = None
         allExtraImages = []
         batch_processed = None
 
 
-        for image in gArgs.images:
+        for idx, image in enumerate(gArgs.images):
             if interrupted():
                 if needAutoUnloadModels():
                     clearCache()
@@ -134,8 +133,8 @@ def generate(
             if n > 1: 
                 print(flush=True)
                 print()
-                print(f'    [{EXT_NAME}]    processing {i}/{n}')
-                progressInfo += f" {i}/{n}"
+                print(f'    [{EXT_NAME}]    processing {idx+1}/{n}')
+                progressInfo += f" {idx+1}/{n}"
 
             shared.state.textinfo = progressInfo
             shared.state.skipped = False
@@ -162,10 +161,12 @@ def generate(
                         processed2, _ = inpaint(processed.images[i], hrGArgs, saveDir, "", saveToSubdirs)
                         processed.images[i] = processed2.images[0]
 
+                for i in range(lenImagesBefore, len(processed.images)):
+                    processed.images[i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
+
             except Exception as e:
                 print(f'    [{EXT_NAME}]    Exception: {e}')
 
-                i += 1
                 if needAutoUnloadModels():
                     clearCache()
                 if gArgs.generationsN == 1:
@@ -178,7 +179,6 @@ def generate(
 
             allExtraImages += extraImages
             batch_processed = processed
-            i += 1
 
         return processed, allExtraImages
 

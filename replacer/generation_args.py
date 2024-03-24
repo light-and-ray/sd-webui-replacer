@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List
 from PIL import Image
 
 
@@ -29,6 +29,14 @@ class HiresFixArgs:
 class HiresFixCacheData:
     upscaler: str
     generatedImage: Image
+    galleryIdx: int
+
+
+@dataclass
+class AppropriateData:
+    inputImageIdx: int
+    mask: Image
+    seed: int
 
 
 @dataclass
@@ -37,7 +45,6 @@ class GenerationArgs:
     negativePrompt: str
     detectionPrompt: str
     avoidancePrompt: str
-    mask: Image
     upscalerForImg2Img: str
     seed: int
     samModel: str
@@ -63,7 +70,6 @@ class GenerationArgs:
     override_sd_model: bool
     sd_model_checkpoint: str
     mask_num: int
-    mask_num_for_metadata: int
     avoidance_mask: Image
     only_custom_mask: bool
     custom_mask: Image
@@ -80,4 +86,8 @@ class GenerationArgs:
 
     hiresFixCacheData: HiresFixCacheData = None
     addHiresFixIntoMetadata: bool = False
+    appropriateInputImageDataList: List[AppropriateData] = None
+    mask: Image = None
+    mask_num_for_metadata: int = None
+
 

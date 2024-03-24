@@ -204,7 +204,6 @@ def generate_ui(
         negativePrompt=negativePrompt,
         detectionPrompt=detectionPrompt,
         avoidancePrompt=avoidancePrompt,
-        mask=None,
         upscalerForImg2Img=upscalerForImg2Img,
         seed=seed,
         samModel=sam_model_name,
@@ -232,7 +231,6 @@ def generate_ui(
         override_sd_model=override_sd_model,
         sd_model_checkpoint=sd_model_checkpoint,
         mask_num=mask_num,
-        mask_num_for_metadata=None,
         avoidance_mask=prepareMask(avoidance_mask_mode, avoidance_mask),
         only_custom_mask=only_custom_mask,
         custom_mask=prepareMask(custom_mask_mode, custom_mask),
@@ -267,7 +265,6 @@ def generate_ui(
     if processed is None:
         return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
-
     if tab_index == 3:
         shared.state.textinfo = 'video saving'
         print("generate done, generating video")
@@ -278,8 +275,9 @@ def generate_ui(
 
     global lastGenerationArgs
     if not pass_into_hires_fix_automatically:
+        gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
         lastGenerationArgs = gArgs
-        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0])
+        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
     else:
         lastGenerationArgs = None
 

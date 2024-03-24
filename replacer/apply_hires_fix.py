@@ -1,4 +1,5 @@
-import copy
+import copy, json
+from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
 from replacer.generation_args import HiresFixCacheData, HiresFixArgs
@@ -13,6 +14,9 @@ from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerati
 
 def applyHiresFix(
     id_task,
+    gallery_idx,
+    gallery,
+    generation_info,
     hf_upscaler,
     hf_steps,
     hf_sampler,
@@ -32,6 +36,15 @@ def applyHiresFix(
     hf_randomize_seed,
     hf_soft_inpaint,
 ):
+    original_gallery = []
+    for i, image in enumerate(gallery):
+        fake_image = Image.new(mode="RGB", size=(1, 1))
+        fake_image.already_saved_as = image["name"].rsplit('?', 1)[0]
+        original_gallery.append(fake_image)
+
+    if generate_ui.lastGenerationArgs is None:
+        return original_gallery, generation_info, plaintext_to_html("no last generation data"), ""
+
     gArgs = copy.copy(generate_ui.lastGenerationArgs)
     hires_fix_args = HiresFixArgs(
         upscaler = hf_upscaler,
@@ -56,25 +69,23 @@ def applyHiresFix(
     gArgs.hires_fix_args = hires_fix_args
     gArgs.pass_into_hires_fix_automatically = False
 
-    if generate_ui.lastGenerationArgs is None:
-        return [], "", plaintext_to_html("no last generation data"), ""
-
-    if gArgs.generationsN > 1 or gArgs.batch_size > 1 or gArgs.batch_count > 1:
-        errorText = f"    [{EXT_NAME}]    applyHiresFix is not supported for batch"
-        print(errorText)
-        return None, "", plaintext_to_html(errorText), ""
-
     prepareGenerationArgsBeforeHiresFixPass(gArgs)
     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
-    image = next(iter(copy.copy(gArgs.images)))
+    if gallery_idx >= len(gArgs.appropriateInputImageDataList):
+        return original_gallery, generation_info, plaintext_to_html("Cannot applyhires fix for extra included images"), ""
+    inputImageIdx = gArgs.appropriateInputImageDataList[gallery_idx].inputImageIdx
+    image = gArgs.images[inputImageIdx]
+    gArgs.mask = gArgs.appropriateInputImageDataList[gallery_idx].mask
+    gArgs.seed = gArgs.appropriateInputImageDataList[gallery_idx].seed
 
     shared.state.job_count = 2
     shared.total_tqdm.clear()
     shared.total_tqdm.updateTotal(gArgs.steps + hrGArgs.steps)
 
-    shared.state.textinfo = "inpaint with upscaler"
+    shared.state.textinfo = "inpainting with upscaler"
     if generate_ui.lastGenerationArgs.hiresFixCacheData is not None and\
-            generate_ui.lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler:
+            generate_ui.lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler and\
+            generate_ui.lastGenerationArgs.hiresFixCacheData.galleryIdx == gallery_idx:
         generatedImage = generate_ui.lastGenerationArgs.hiresFixCacheData.generatedImage
         print('hiresFixCacheData restored from cache')
         shared.state.job_count = 1
@@ -83,13 +94,26 @@ def applyHiresFix(
         processed, scriptImages = inpaint(image, gArgs)
         generatedImage = processed.images[0]
         if not interrupted() and not shared.state.skipped:
-            generate_ui.lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage)
+            generate_ui.lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(hf_upscaler, generatedImage, gallery_idx)
             print('hiresFixCacheData cached')
-        
 
-    shared.state.textinfo = "hiresfix"
+
+    shared.state.textinfo = "applying hires fix"
     processed, scriptImages = inpaint(generatedImage, hrGArgs, getSaveDir(), "-hires-fix")
 
     shared.state.end()
 
-    return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+    new_gallery = []
+    geninfo = json.loads(generation_info)
+    for i, image in enumerate(gallery):
+        if i == gallery_idx:
+            geninfo["infotexts"][gallery_idx: gallery_idx+1] = processed.infotexts
+            new_gallery.extend(processed.images)
+        else:
+            fake_image = Image.new(mode="RGB", size=(1, 1))
+            fake_image.already_saved_as = image["name"].rsplit('?', 1)[0]
+            new_gallery.append(fake_image)
+
+    geninfo["infotexts"][gallery_idx] = processed.info
+
+    return new_gallery, json.dumps(geninfo), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
