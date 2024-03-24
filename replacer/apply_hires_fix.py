@@ -68,19 +68,24 @@ def applyHiresFix(
         randomize_seed = hf_randomize_seed,
         soft_inpaint = hf_soft_inpaint,
     )
-    gArgs.hires_fix_args = hires_fix_args
-    gArgs.pass_into_hires_fix_automatically = False
 
-    prepareGenerationArgsBeforeHiresFixPass(gArgs)
-    hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
+    if len(gArgs.appropriateInputImageDataList) == 1:
+        gallery_idx = 0
+    if gallery_idx < 0:
+        return original_gallery, generation_info, plaintext_to_html("Image for hires fix is not selected"), ""
     if gallery_idx >= len(gArgs.appropriateInputImageDataList):
         return original_gallery, generation_info, plaintext_to_html("Cannot applyhires fix for extra included images"), ""
     inputImageIdx = gArgs.appropriateInputImageDataList[gallery_idx].inputImageIdx
     image = gArgs.images[inputImageIdx]
     gArgs.mask = gArgs.appropriateInputImageDataList[gallery_idx].mask
     gArgs.seed = gArgs.appropriateInputImageDataList[gallery_idx].seed
+    gArgs.hires_fix_args = hires_fix_args
+    gArgs.pass_into_hires_fix_automatically = False
     gArgs.batch_count = 1
     gArgs.batch_size = 1
+
+    prepareGenerationArgsBeforeHiresFixPass(gArgs)
+    hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
 
     shared.state.job_count = 2
     shared.total_tqdm.clear()

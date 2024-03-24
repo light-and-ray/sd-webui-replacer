@@ -95,7 +95,7 @@ def generate(
         if not gArgs.override_sd_model or gArgs.sd_model_checkpoint is None or gArgs.sd_model_checkpoint == "":
             gArgs.sd_model_checkpoint = opts.sd_model_checkpoint
         else:
-            shared.state.textinfo = "Switching sd checkpoint"
+            shared.state.textinfo = "switching sd checkpoint"
             oldModel = opts.sd_model_checkpoint
             def restore():
                 opts.sd_model_checkpoint = oldModel
@@ -129,7 +129,7 @@ def generate(
                     clearCache()
                 break
 
-            progressInfo = "Generating mask"
+            progressInfo = "generating mask"
             if n > 1: 
                 print(flush=True)
                 print()
