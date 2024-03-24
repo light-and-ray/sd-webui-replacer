@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata
+from replacer.tools import addReplacerMetadata, IS_WEBUI_1_9
 
 
 
@@ -31,6 +31,7 @@ def inpaint(
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
     mask = gArgs.mask.resize(image.size).convert('L')
+    schedulerKWargs = {"scheduler": gArgs.scheduler} if IS_WEBUI_1_9 else {}
 
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
@@ -58,6 +59,7 @@ def inpaint(
         inpainting_mask_invert=gArgs.inpainting_mask_invert,
         override_settings=override_settings,
         do_not_save_samples=True,
+        **schedulerKWargs,
     )
 
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur

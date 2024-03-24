@@ -43,6 +43,7 @@ def generate_ui(
     upscalerForImg2Img,
     seed,
     sampler,
+    scheduler,
     steps,
     box_threshold,
     mask_expand,
@@ -79,6 +80,7 @@ def generate_ui(
     hf_upscaler,
     hf_steps,
     hf_sampler,
+    hf_scheduler,
     hf_denoise,
     hf_cfg_scale,
     hf_positive_prompt_suffix,
@@ -182,6 +184,7 @@ def generate_ui(
         upscaler = hf_upscaler,
         steps = hf_steps,
         sampler = hf_sampler,
+        scheduler = hf_scheduler,
         denoise = hf_denoise,
         cfg_scale = hf_cfg_scale,
         positive_prompt_suffix = hf_positive_prompt_suffix,
@@ -214,6 +217,7 @@ def generate_ui(
         
         steps=steps,
         sampler_name=sampler,
+        scheduler=scheduler,
         mask_blur=mask_blur,
         inpainting_fill=inpainting_fill,
         batch_count=batch_count,
@@ -274,12 +278,9 @@ def generate_ui(
         save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
 
     global lastGenerationArgs
-    if not pass_into_hires_fix_automatically:
-        gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
-        lastGenerationArgs = gArgs
-        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
-    else:
-        lastGenerationArgs = None
+    gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
+    lastGenerationArgs = gArgs
+    lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
     if tab_index == 3:
         return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""

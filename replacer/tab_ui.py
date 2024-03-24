@@ -15,9 +15,12 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, getSaveDir, getDetection
     getPositivePromptExamplesNumber, getNegativePromptExamplesNumber, getMaskColorStr
 )
 from replacer import replacer_scripts
-from replacer.tools import limitSizeByOneDemention, OuputPanelWatcher
+from replacer.tools import limitSizeByOneDemention, OuputPanelWatcher, IS_WEBUI_1_9
 from replacer.generate_ui import generate_ui
 
+
+if IS_WEBUI_1_9:
+    from modules import sd_schedulers
 
 try:
     from modules import ui_toprow
@@ -187,12 +190,24 @@ def getReplacerTabUI(isDedicatedPage):
                     with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
                         with gr.Tab('Generation'):
                             with gr.Row():
+                                sampler_names = [x.name for x in sd_samplers.visible_samplers()]
+                                defaultSampler = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
                                 sampler = gr.Dropdown(
                                     label='Sampling method',
                                     elem_id="replacer_sampler",
-                                    choices=sd_samplers.visible_sampler_names(),
-                                    value="DPM++ 2M SDE Karras"
+                                    choices=sampler_names,
+                                    value=defaultSampler
                                 )
+
+                                if IS_WEBUI_1_9:
+                                    scheduler_names = [x.label for x in sd_schedulers.schedulers]
+                                    scheduler = gr.Dropdown(
+                                        label='Schedule type',
+                                        elem_id=f"replacer_scheduler",
+                                        choices=scheduler_names,
+                                        value=scheduler_names[0])
+                                else:
+                                    scheduler = gr.Textbox("", visible=False)
 
                                 steps = gr.Slider(
                                     label='Steps',
@@ -641,6 +656,16 @@ def getReplacerTabUI(isDedicatedPage):
                                         choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
                                         value="Use same sampler"
                                     )
+                                    if IS_WEBUI_1_9:
+                                        hf_scheduler = gr.Dropdown(
+                                            label='Hires schedule type',
+                                            elem_id="replacer_hf_scheduler",
+                                            choices=["Use same scheduler"] + [x.label for x in sd_schedulers.schedulers],
+                                            value="Use same scheduler"
+                                        )
+                                    else:
+                                        hf_scheduler = gr.Textbox("", visible=False)
+
                                     hf_cfg_scale = gr.Slider(
                                         label='Hires CFG Scale',
                                         value=1.0,
@@ -649,6 +674,8 @@ def getReplacerTabUI(isDedicatedPage):
                                         maximum=30.0,
                                         elem_id="replacer_hf_cfg_scale"
                                     )
+
+                                with gr.Row():
                                     hf_unload_detection_models = gr.Checkbox(
                                         label='Unload detection models before hires fix',
                                         value=True,
@@ -784,6 +811,7 @@ def getReplacerTabUI(isDedicatedPage):
                 upscaler_for_img2img,
                 seed,
                 sampler,
+                scheduler,
                 steps,
                 box_threshold,
                 mask_expand,
@@ -820,6 +848,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_upscaler,
                 hf_steps,
                 hf_sampler,
+                hf_scheduler,
                 hf_denoise,
                 hf_cfg_scale,
                 hfPositivePromptSuffix,
@@ -858,6 +887,7 @@ def getReplacerTabUI(isDedicatedPage):
                 hf_upscaler,
                 hf_steps,
                 hf_sampler,
+                hf_scheduler,
                 hf_denoise,
                 hf_cfg_scale,
                 hfPositivePromptSuffix,

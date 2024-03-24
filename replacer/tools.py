@@ -15,6 +15,8 @@ except Exception:
     REPLACER_VERSION = "None"
 
 
+IS_WEBUI_1_9 = hasattr(shared.cmd_opts, 'unix_filenames_sanitization')
+
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):
     p.extra_generation_params["Extension"] = f'sd-webui-replacer {REPLACER_VERSION}'

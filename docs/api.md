@@ -14,7 +14,8 @@ API is avaliable on `/replacer/replace`
     sam_model_name: str = sam_model_list[0] if sam_model_list else ""
     dino_model_name: str = dino_model_list[0]
     seed: int = -1
-    sampler: str = "DPM++ 2M SDE Karras"
+    sampler: str = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
+    scheduler: str = "Automatic"
     steps: int = 20
     box_threshold: float = 0.3
     mask_expand: int = 35
@@ -37,6 +38,7 @@ API is avaliable on `/replacer/replace`
     hf_upscaler: str = "ESRGAN_4x"
     hf_steps: int = 4
     hf_sampler: str = "Use same sampler"
+    hf_scheduler: str = "Use same scheduler"
     hf_denoise: float = 0.35
     hf_cfg_scale: float = 1.0
     hf_positive_prompt_suffix: str = "<lora:lcm-lora-sdv1-5:1>"

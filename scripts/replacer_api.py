@@ -6,7 +6,7 @@ from modules import shared
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.generate import generate
 from replacer.generation_args import GenerationArgs, HiresFixArgs
-from replacer.tools import generateSeed
+from replacer.tools import generateSeed, IS_WEBUI_1_9
 from replacer import replacer_scripts
 
 
@@ -32,7 +32,8 @@ def replacer_api(_, app: FastAPI):
         sam_model_name: str = sam_model_list[0] if sam_model_list else ""
         dino_model_name: str = dino_model_list[0]
         seed: int = -1
-        sampler: str = "DPM++ 2M SDE Karras"
+        sampler: str = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
+        scheduler: str = "Automatic"
         steps: int = 20
         box_threshold: float = 0.3
         mask_expand: int = 35
@@ -55,6 +56,7 @@ def replacer_api(_, app: FastAPI):
         hf_upscaler: str = "ESRGAN_4x"
         hf_steps: int = 4
         hf_sampler: str = "Use same sampler"
+        hf_scheduler: str = "Use same scheduler"
         hf_denoise: float = 0.35
         hf_cfg_scale: float = 1.0
         hf_positive_prompt_suffix: str = "<lora:lcm-lora-sdv1-5:1>"
@@ -87,6 +89,7 @@ def replacer_api(_, app: FastAPI):
             upscaler = data.hf_upscaler,
             steps = data.hf_steps,
             sampler = data.hf_sampler,
+            scheduler=data.hf_scheduler,
             denoise = data.hf_denoise,
             cfg_scale = data.hf_cfg_scale,
             positive_prompt_suffix = data.hf_positive_prompt_suffix,
@@ -119,6 +122,7 @@ def replacer_api(_, app: FastAPI):
             
             steps=data.steps,
             sampler_name=data.sampler,
+            scheduler=data.scheduler,
             mask_blur=data.mask_blur,
             inpainting_fill=data.inpainting_fill,
             batch_count=1,

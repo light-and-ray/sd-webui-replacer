@@ -8,6 +8,7 @@ class HiresFixArgs:
     upscaler: str
     steps: int
     sampler: str
+    scheduler: str
     denoise: float
     cfg_scale: float
     positive_prompt_suffix: str
@@ -54,6 +55,7 @@ class GenerationArgs:
     maxResolutionOnDetection: int
     steps: int
     sampler_name: str
+    scheduler: str
     mask_blur: int
     inpainting_fill: int
     batch_count: int

@@ -21,6 +21,8 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     hrGArgs.denoising_strength = hf.denoise
     if not hf.sampler == 'Use same sampler':
         hrGArgs.sampler_name = hf.sampler
+    if not hf.scheduler == 'Use same scheduler':
+        hrGArgs.scheduler == hf.scheduler
     if hf.steps != 0:
         hrGArgs.steps = hf.steps
     if hf.extra_mask_expand != 0:
