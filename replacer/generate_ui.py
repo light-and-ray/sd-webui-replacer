@@ -244,7 +244,7 @@ def generate_ui(
         soft_inpaint_args=soft_inpaint_args,
         )
 
-    saveDir = ""
+    saveDir = getSaveDir()
     saveToSubdirs = True
     if tab_index == 2 and output_batch_dir != "":
         saveDir = output_batch_dir
@@ -252,15 +252,16 @@ def generate_ui(
     elif tab_index == 3:
         saveDir = video_output_dir
         saveToSubdirs = False
-    else:
-        saveDir = getSaveDir()
-    
+
     useSaveFormatForVideo = tab_index == 3
-    
+
+
 
     processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, useSaveFormatForVideo, extra_includes)
     if processed is None:
         return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
+
+
 
     if tab_index == 3:
         shared.state.textinfo = 'video saving'
@@ -276,10 +277,10 @@ def generate_ui(
     lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
     if tab_index == 3:
-        return [], "", plaintext_to_html(f"Saved into {save_video_path}"), ""
+        return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
     
     if tab_index == 2 and not show_batch_dir_results:
-        return [], "", plaintext_to_html(f"Saved into {output_batch_dir or getSaveDir()}"), ""
+        return [], "", plaintext_to_html(f"Saved into {saveDir}"), ""
 
     processed.images += allExtraImages
     processed.infotexts += [processed.info] * len(allExtraImages)

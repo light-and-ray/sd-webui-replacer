@@ -124,7 +124,7 @@ def applyHiresFix(
     for i, image in enumerate(gallery):
         if i == gallery_idx:
             geninfo["infotexts"][gallery_idx: gallery_idx+1] = processed.infotexts
-            new_gallery.extend(processed.images)
+            new_gallery.append(processed.images[0])
         else:
             fake_image = Image.new(mode="RGB", size=(1, 1))
             fake_image.already_saved_as = image["name"].rsplit('?', 1)[0]
