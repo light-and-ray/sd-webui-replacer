@@ -98,10 +98,9 @@ negativePromptExamples_defaults = [
 
 hiresFixPositivePromptSuffixExamples_defaults = [
     "<lora:lcm-lora-sdv1-5:1>",
-    "<lora:lcm-lora-sdxl:1>",
+    "<lora:sdxl_lightning_2step_lora:1>",
     " ",
 ]
-
 
 
 
