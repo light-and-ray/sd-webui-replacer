@@ -4,9 +4,9 @@ import modules.shared as shared
 from modules.ui import plaintext_to_html
 from modules import errors
 from replacer.generation_args import HiresFixCacheData, HiresFixArgs
-from replacer.options import EXT_NAME, getSaveDir
+from replacer.options import getSaveDir
 from replacer.tools import interrupted
-from replacer import generate_ui
+from replacer.ui import generate_ui
 from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
 

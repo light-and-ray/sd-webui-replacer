@@ -7,7 +7,8 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata, IS_WEBUI_1_9
+from replacer.tools import addReplacerMetadata
+from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
 

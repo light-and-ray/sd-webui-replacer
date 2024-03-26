@@ -4,16 +4,17 @@ from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
     getDedicatedPagePath, on_ui_settings,
 )
-from replacer.tab_ui import IS_WEBUI_1_5
-from replacer import tab_ui
-from replacer.tools import watchOuputPanel, getReplacerFooter
+from replacer.ui.tools_ui import IS_WEBUI_1_5
+from replacer.ui import replacer_main_ui
+from replacer.tools import getReplacerFooter
+from replacer.ui.tools_ui import watchOuputPanel
 from replacer import replacer_scripts
 
 
 
 def on_ui_tabs():
     replacer_scripts.initAllScripts()
-    tab = tab_ui.replacerMainUI.getReplacerTabUI()
+    tab = replacer_main_ui.replacerMainUI.getReplacerTabUI()
     tab.render()
     return [(tab, EXT_NAME, EXT_NAME)]
 
@@ -34,7 +35,7 @@ def mountDedicatedPage(demo, app):
 
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
-                    tab = tab_ui.replacerMainUI_dedicated.getReplacerTabUI()
+                    tab = replacer_main_ui.replacerMainUI_dedicated.getReplacerTabUI()
                     tab.render()
                 replacer_scripts.mountImageComparisonTab()
 
@@ -75,7 +76,7 @@ if needHideSegmentAnythingAccordions():
     script_callbacks.on_app_started(hideSegmentAnythingAccordions)
 
 
-script_callbacks.on_before_ui(tab_ui.initMainUI)
+script_callbacks.on_before_ui(replacer_main_ui.initMainUI)
 script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOuputPanel)

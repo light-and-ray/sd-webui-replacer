@@ -4,7 +4,6 @@ from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
 from modules import errors, shared
 from modules.ui import versions_html
-from modules.ui_components import ToolButton
 from replacer.generation_args import GenerationArgs
 from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY
 
@@ -14,8 +13,6 @@ except Exception:
     errors.report(f"Error reading replacer git info from {__file__}", exc_info=True)
     REPLACER_VERSION = "None"
 
-
-IS_WEBUI_1_9 = hasattr(shared.cmd_opts, 'unix_filenames_sanitization')
 
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):
@@ -166,28 +163,6 @@ def generateSeed():
 
 
 
-class OuputPanelWatcher():
-    send_to_img2img = None
-    send_to_inpaint = None
-    send_to_extras = None
-    send_back_to_replacer = None
-
-
-def watchOuputPanel(component, **kwargs):
-    elem_id = kwargs.get('elem_id', None)
-    if elem_id is None:
-        return
-
-    if elem_id == 'replacer_send_to_img2img' or elem_id == 'img2img_tab':
-        OuputPanelWatcher.send_to_img2img = component
-
-    if elem_id == 'replacer_send_to_inpaint' or elem_id == 'inpaint_tab':
-        OuputPanelWatcher.send_to_inpaint = component
-
-    if elem_id == 'replacer_send_to_extras' or elem_id == 'extras_tab':
-        OuputPanelWatcher.send_to_extras = component
-        OuputPanelWatcher.send_back_to_replacer = ToolButton('↙️', elem_id=f'replacer_send_back_to_replacer', tooltip="Send image back to Replcer's input")
-
 
 def getReplacerFooter():
     footer = ""
@@ -214,4 +189,5 @@ def clearCache():
         from scripts.sam import clear_cache
         g_clear_cache = clear_cache
     g_clear_cache()
+
 

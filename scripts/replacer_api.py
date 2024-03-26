@@ -7,7 +7,8 @@ from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from modules.call_queue import queue_lock
 from replacer.generate import generate
 from replacer.generation_args import GenerationArgs, HiresFixArgs
-from replacer.tools import generateSeed, IS_WEBUI_1_9
+from replacer.tools import generateSeed
+from replacer.ui.tools_ui import IS_WEBUI_1_9
 from replacer import replacer_scripts
 
 
