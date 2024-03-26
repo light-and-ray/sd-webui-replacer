@@ -232,7 +232,6 @@ class ReplacerMainUI:
 
 
 
-
                     with gr.Row():
                         comp.pass_into_hires_fix_automatically = gr.Checkbox(
                                         label='Pass into hires fix automatically',
@@ -497,7 +496,7 @@ class ReplacerMainUI:
                     outputs=[comp.inpaint_diff_mask_view],
                 )
 
-            self.components = comp
+        self.components = comp
 
 
     def getReplacerTabUI(self):

@@ -1,0 +1,281 @@
+import gradio as gr
+from modules import scripts, scripts_postprocessing
+from modules.processing import Processed, StableDiffusionProcessing
+from replacer.options import EXT_NAME
+from replacer.ui import replacer_tab_ui
+from replacer.generation_args import GenerationArgs, HiresFixArgs
+from replacer import replacer_scripts
+from replacer.tools import prepareMask
+from replacer.generate import generate
+
+if hasattr(scripts_postprocessing.ScriptPostprocessing, 'process_firstpass'):  # webui >= 1.7
+    from modules.ui_components import InputAccordion
+else:
+    InputAccordion = None
+
+
+
+class ReplacerScript(scripts.Script):
+    def __init__(self):
+        self.gArgs: GenerationArgs = None
+        self.extra_includes = []
+        self.enable = False
+        self.save_originals = True
+
+    def title(self):
+        return EXT_NAME
+
+    def show(self, is_img2img):
+        return scripts.AlwaysVisible
+
+    def ui(self, is_img2img):
+        tabName = 'img2img' if is_img2img else 'txt2img'
+        with (
+            InputAccordion(False, label=EXT_NAME) if InputAccordion
+            else gr.Accordion(EXT_NAME, open=False)
+            as enable
+        ):
+            if not InputAccordion:
+                enable = gr.Checkbox(False, label="Enable")
+            gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
+            save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
+        
+        
+            comp = replacer_tab_ui.replacerMainUI.components
+            inputs = [
+                enable,
+                save_originals,
+
+                comp.detectionPrompt,
+                comp.avoidancePrompt,
+                comp.positvePrompt,
+                comp.negativePrompt,
+                comp.upscaler_for_img2img,
+                comp.seed,
+                comp.sampler,
+                comp.scheduler,
+                comp.steps,
+                comp.box_threshold,
+                comp.mask_expand,
+                comp.mask_blur,
+                comp.max_resolution_on_detection,
+                comp.sam_model_name,
+                comp.dino_model_name,
+                comp.cfg_scale,
+                comp.denoise,
+                comp.inpaint_padding,
+                comp.inpainting_fill,
+                comp.width,
+                comp.height,
+                comp.batch_count,
+                comp.batch_size,
+                comp.inpainting_mask_invert,
+                comp.extra_includes,
+                comp.fix_steps,
+                comp.override_sd_model,
+                comp.sd_model_checkpoint,
+                comp.mask_num,
+                comp.avoid_mask_mode,
+                comp.avoidance_mask,
+                comp.only_custom_mask,
+                comp.custom_mask_mode,
+                comp.custom_mask,
+                comp.use_inpaint_diff,
+                comp.inpaint_diff_mask_view,
+                comp.lama_cleaner_upscaler,
+                comp.clip_skip,
+                comp.pass_into_hires_fix_automatically,
+                comp.save_before_hires_fix,
+
+                comp.hf_upscaler,
+                comp.hf_steps,
+                comp.hf_sampler,
+                comp.hf_scheduler,
+                comp.hf_denoise,
+                comp.hf_cfg_scale,
+                comp.hfPositivePromptSuffix,
+                comp.hf_size_limit,
+                comp.hf_above_limit_upscaler,
+                comp.hf_unload_detection_models,
+                comp.hf_disable_cn,
+                comp.hf_extra_mask_expand,
+                comp.hf_positvePrompt,
+                comp.hf_negativePrompt,
+                comp.hf_sd_model_checkpoint,
+                comp.hf_extra_inpaint_padding,
+                comp.hf_extra_mask_blur,
+                comp.hf_randomize_seed,
+                comp.hf_soft_inpaint,
+            ] + comp.cn_inputs \
+              + comp.soft_inpaint_inputs
+
+        return inputs
+
+    def before_process(self, p,
+        enable,
+        save_originals,
+
+        detectionPrompt,
+        avoidancePrompt,
+        positvePrompt,
+        negativePrompt,
+        upscaler_for_img2img,
+        seed,
+        sampler,
+        scheduler,
+        steps,
+        box_threshold,
+        mask_expand,
+        mask_blur,
+        max_resolution_on_detection,
+        sam_model_name,
+        dino_model_name,
+        cfg_scale,
+        denoise,
+        inpaint_padding,
+        inpainting_fill,
+        width,
+        height,
+        batch_count,
+        batch_size,
+        inpainting_mask_invert,
+        extra_includes,
+        fix_steps,
+        override_sd_model,
+        sd_model_checkpoint,
+        mask_num,
+        avoid_mask_mode,
+        avoidance_mask,
+        only_custom_mask,
+        custom_mask_mode,
+        custom_mask,
+        use_inpaint_diff,
+        inpaint_diff_mask_view,
+        lama_cleaner_upscaler,
+        clip_skip,
+        pass_into_hires_fix_automatically,
+        save_before_hires_fix,
+
+        hf_upscaler,
+        hf_steps,
+        hf_sampler,
+        hf_scheduler,
+        hf_denoise,
+        hf_cfg_scale,
+        hfPositivePromptSuffix,
+        hf_size_limit,
+        hf_above_limit_upscaler,
+        hf_unload_detection_models,
+        hf_disable_cn,
+        hf_extra_mask_expand,
+        hf_positvePrompt,
+        hf_negativePrompt,
+        hf_sd_model_checkpoint,
+        hf_extra_inpaint_padding,
+        hf_extra_mask_blur,
+        hf_randomize_seed,
+        hf_soft_inpaint,
+        
+        *scripts_args,
+    ):
+        self.enable = enable
+        self.save_originals = save_originals
+        self.extra_includes = extra_includes
+        cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs(scripts_args)
+
+        hires_fix_args = HiresFixArgs(
+            upscaler = hf_upscaler,
+            steps = hf_steps,
+            sampler = hf_sampler,
+            scheduler = hf_scheduler,
+            denoise = hf_denoise,
+            cfg_scale = hf_cfg_scale,
+            positive_prompt_suffix = hfPositivePromptSuffix,
+            size_limit = hf_size_limit,
+            above_limit_upscaler = hf_above_limit_upscaler,
+            unload_detection_models = hf_unload_detection_models,
+            disable_cn = hf_disable_cn,
+            extra_mask_expand = hf_extra_mask_expand,
+            positve_prompt = hf_positvePrompt,
+            negative_prompt = hf_negativePrompt,
+            sd_model_checkpoint = hf_sd_model_checkpoint,
+            extra_inpaint_padding = hf_extra_inpaint_padding,
+            extra_mask_blur = hf_extra_mask_blur,
+            randomize_seed = hf_randomize_seed,
+            soft_inpaint = hf_soft_inpaint,
+        )
+
+        self.gArgs = GenerationArgs(
+            positvePrompt=positvePrompt,
+            negativePrompt=negativePrompt,
+            detectionPrompt=detectionPrompt,
+            avoidancePrompt=avoidancePrompt,
+            upscalerForImg2Img=upscaler_for_img2img,
+            seed=seed,
+            samModel=sam_model_name,
+            grdinoModel=dino_model_name,
+            boxThreshold=box_threshold,
+            maskExpand=mask_expand,
+            maxResolutionOnDetection=max_resolution_on_detection,
+            
+            steps=steps,
+            sampler_name=sampler,
+            scheduler=scheduler,
+            mask_blur=mask_blur,
+            inpainting_fill=inpainting_fill,
+            batch_count=batch_count,
+            batch_size=batch_size,
+            cfg_scale=cfg_scale,
+            denoising_strength=denoise,
+            height=height,
+            width=width,
+            inpaint_full_res_padding=inpaint_padding,
+            img2img_fix_steps=fix_steps,
+            inpainting_mask_invert=inpainting_mask_invert,
+
+            images=None,
+            override_sd_model=override_sd_model,
+            sd_model_checkpoint=sd_model_checkpoint,
+            mask_num=mask_num,
+            avoidance_mask=prepareMask(avoid_mask_mode, avoidance_mask),
+            only_custom_mask=only_custom_mask,
+            custom_mask=prepareMask(custom_mask_mode, custom_mask),
+            use_inpaint_diff=use_inpaint_diff and inpaint_diff_mask_view is not None and \
+                replacer_scripts.InpaintDifferenceGlobals is not None and \
+                replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
+            lama_cleaner_upscaler=lama_cleaner_upscaler,
+            clip_skip=clip_skip,
+            pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
+            save_before_hires_fix=save_before_hires_fix,
+            hires_fix_args=hires_fix_args,
+
+            cn_args=cn_args,
+            soft_inpaint_args=soft_inpaint_args,
+            )
+
+
+
+    def postprocess(self, p: StableDiffusionProcessing, processed: Processed, *args):
+        if not self.enable:
+            return
+        self.gArgs.images = processed.images[:len(processed.all_seeds)]
+
+        saveDir = p.outpath_samples if p.save_samples() else None
+        saveToSubdirs = True
+
+        try:
+            processedReplacer, allExtraImages = generate(self.gArgs, saveDir, saveToSubdirs, False, self.extra_includes)
+        except Exception as e:
+            print(f"[{EXT_NAME}] Exception: {e}")
+            return
+        if processedReplacer is None:
+            print(f"[{EXT_NAME}] No one image was processed")
+            return
+
+        if self.save_originals:
+            processed.images.extend(processedReplacer, allExtraImages)
+        else:
+            processed.images = processed.images[len(processed.all_seeds):]
+            processed.images = processedReplacer.images + processed.images + allExtraImages
+
+del ReplacerScript
