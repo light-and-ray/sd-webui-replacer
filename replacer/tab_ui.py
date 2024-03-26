@@ -106,899 +106,936 @@ def sendBackToReplacer(gallery, gallery_index):
     return image
 
 
-def getReplacerTabUI(isDedicatedPage):
-    with gr.Blocks(analytics_enabled=False) as replacerTabUI:
-        tab_index = gr.Number(value=0, visible=False)
-        dummy_component = gr.Label(visible=False)
-        trueComponent = gr.Checkbox(value=True, visible=False)
-        falseComponent = gr.Checkbox(value=False, visible=False)
-        if replacer_scripts.script_controlnet:
-            try:
-                cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
-            except Exception as e:
-                errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
-                replacer_scripts.script_controlnet = None
-
-        with ResizeHandleRow():
-
-            with gr.Column(scale=16):
-
-                with gr.Row():
-                    placeholder = getDetectionPromptExamples()[0]
-                    detectionPrompt = gr.Textbox(label="Detection prompt",
-                                        show_label=True,
-                                        lines=1,
-                                        elem_classes=["detectionPrompt"],
-                                        placeholder=placeholder,
-                                        elem_id="replacer_detectionPrompt")
-
-                    gr.Examples(
-                        examples=getDetectionPromptExamples(),
-                        inputs=detectionPrompt,
-                        label="",
-                        elem_id="replacer_detectionPrompt_examples",
-                        examples_per_page=getDetectionPromptExamplesNumber(),
-                    )
-
-                with gr.Row():
-                    placeholder = None
-                    if (useFirstPositivePromptFromExamples()):
-                        placeholder = getPositivePromptExamples()[0]
-
-                    positvePrompt = gr.Textbox(label="Positive prompt",
-                                        show_label=True,
-                                        lines=1,
-                                        elem_classes=["positvePrompt"],
-                                        placeholder=placeholder,
-                                        elem_id="replacer_positvePrompt")
-
-                    gr.Examples(
-                        examples=getPositivePromptExamples(),
-                        inputs=positvePrompt,
-                        label="",
-                        elem_id="replacer_positvePrompt_examples",
-                        examples_per_page=getPositivePromptExamplesNumber(),
-                    )
-
-                with gr.Row():
-                    placeholder = None
-                    if (useFirstNegativePromptFromExamples()):
-                        placeholder = getNegativePromptExamples()[0]
-
-                    negativePrompt = gr.Textbox(label="Negative prompt",
-                                        show_label=True,
-                                        lines=1,
-                                        elem_classes=["negativePrompt"],
-                                        placeholder=placeholder,
-                                        elem_id="replacer_negativePrompt")
-
-
-                    gr.Examples(
-                        examples=getNegativePromptExamples(),
-                        inputs=negativePrompt,
-                        label="",
-                        elem_id="replacer_negativePrompt_examples",
-                        examples_per_page=getNegativePromptExamplesNumber(),
-                    )
-
-                if ui_toprow:
-                    toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
-                    toprow.create_inline_toprow_image()
-                    run_button = toprow.submit
-                    run_button.variant = 'secondary'
-                    run_button.value = 'Run'
-                else:
-                    run_button = gr.Button('Run', elem_id='replacer_generate')
-
-
-                with gr.Accordion("Advanced options", open=False, elem_id='replacer_advanced_options'):
-                    with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
-                        with gr.Tab('Generation'):
-                            with gr.Row():
-                                sampler_names = sd_samplers.visible_sampler_names()
-                                defaultSampler = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
-                                sampler = gr.Dropdown(
-                                    label='Sampling method',
-                                    elem_id="replacer_sampler",
-                                    choices=sampler_names,
-                                    value=defaultSampler
-                                )
-
-                                if IS_WEBUI_1_9:
-                                    scheduler_names = [x.label for x in sd_schedulers.schedulers]
-                                    scheduler = gr.Dropdown(
-                                        label='Schedule type',
-                                        elem_id=f"replacer_scheduler",
-                                        choices=scheduler_names,
-                                        value=scheduler_names[0])
-                                else:
-                                    scheduler = gr.Textbox("", visible=False)
-
-                                steps = gr.Slider(
-                                    label='Steps',
-                                    value=20,
-                                    step=1,
-                                    minimum=1,
-                                    maximum=150,
-                                    elem_id="replacer_steps"
-                                )
-                            
-                            with gr.Row():
-                                cfg_scale = gr.Slider(label='CFG Scale',
-                                    value=5.5, elem_id="replacer_cfg_scale",
-                                    minimum=1.0, maximum=30.0, step=0.5)
-
-                                fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
-                                    value=False, elem_id="replacer_fix_steps")
-
-                            with gr.Row():
-                                with gr.Column(elem_id="replacer_width_height_column", elem_classes="replacer-generation-size"):
-                                    width = gr.Slider(label='width',
-                                        value=512, elem_id="replacer_width",
-                                        minimum=64, maximum=2048, step=8)
-                                    height = gr.Slider(label='height',
-                                        value=512, elem_id="replacer_height",
-                                        minimum=64, maximum=2048, step=8)
-                                with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="replacer-batch-count-size"):
-                                    batch_count = gr.Slider(label='batch count',
-                                        value=1, elem_id="replacer_batch_count",
-                                        minimum=1, maximum=10, step=1)
-                                    batch_size = gr.Slider(label='batch size',
-                                        value=1, elem_id="replacer_batch_size",
-                                        minimum=1, maximum=10, step=1)
-
-                            with gr.Row():
-                                upscaler_for_img2img = gr.Dropdown(
-                                    value="None",
-                                    choices=[x.name for x in shared.sd_upscalers],
-                                    label="Upscaler for img2Img",
-                                    elem_id="replacer_upscaler_for_img2img",
-                                )
-
-                                if shared.cmd_opts.use_textbox_seed:
-                                    seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
-                                else:
-                                    seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
-
-                                random_seed = ToolButton(
-                                    ui.random_symbol,
-                                    elem_id="replacer_random_seed",
-                                    label='Random seed'
-                                )
-                                reuse_seed = ToolButton(
-                                    ui.reuse_symbol,
-                                    elem_id="replacer_reuse_seed",
-                                    label='Reuse seed'
-                                )
-                            
-                            with gr.Row():
-                                if not isDedicatedPage:
-                                    sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
-                                    override_sd_model = gr.Checkbox(label='Override stable diffusion model',
-                                        value=False, elem_id="replacer_override_sd_model")
-
-                                clip_skip = ui_settings.create_setting_component('CLIP_stop_at_last_layers')
-
-
-                        with gr.Tab('Detection'):
-                            with gr.Row():
-                                box_threshold = gr.Slider(label='Box Threshold',
-                                    value=0.3, elem_id="replacer_box_threshold",
-                                    minimum=0.0, maximum=1.0, step=0.05)
-                                mask_expand = gr.Slider(label='Mask Expand',
-                                    value=35, elem_id="replacer_mask_expand",
-                                    minimum=-50, maximum=100, step=1)
-
-                            with gr.Row():
-                                if not doNotShowUnloadButton():
-                                    unload = gr.Button(
-                                        value="Unload detection models",
-                                        elem_id="replacer_unload_detection_models")
-
-                                max_resolution_on_detection = gr.Slider(
-                                    label='Max resolution on detection',
-                                    value=1280,
-                                    step=1,
-                                    minimum=64,
-                                    maximum=2560,
-                                    elem_id="replacer_max_resolution_on_detection"
-                                )
-
-                            with gr.Row():
-                                from scripts.sam import sam_model_list, refresh_sam_models
-                                from scripts.dino import dino_model_list
-
-                                sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
-                                    value=sam_model_list[0] if len(sam_model_list) > 0 else None)
-                                sam_refresh_models = ToolButton(value=refresh_symbol)
-                                sam_refresh_models.click(refresh_sam_models, sam_model_name, sam_model_name)
-
-                                dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
-                            
-                            with gr.Row():
-                                mask_num = gr.Radio(label='Mask num',
-                                    choices=['Random', '1', '2', '3'],
-                                    value='Random', type="value", elem_id="replacer_mask_num")
-
-                            with gr.Row():
-                                extra_includes = ui_settings.create_setting_component(EXT_NAME_LOWER + "_default_extra_includes")
-                                extra_includes.label = 'Extra include in gallery'
-
-                        with gr.Tab('Inpainting'):
-                            with gr.Row():
-                                mask_blur = gr.Slider(label='Mask Blur',
-                                    value=4, elem_id="replacer_mask_blur",
-                                    minimum=0, maximum=100, step=1)
-                                inpaint_padding = gr.Slider(label='Padding',
-                                    value=40, elem_id="replacer_inpaint_padding",
-                                    minimum=0, maximum=1000, step=1)
-
-                            with gr.Row():
-                                denoise = gr.Slider(label='Denoising',
-                                    value=1.0, elem_id="replacer_denoise",
-                                    minimum=0.0, maximum=1.0, step=0.01)
-
-                            with gr.Row():
-                                inpainting_fill = gr.Radio(label='Masked content',
-                                    choices=['fill', 'original', 'latent noise', 'latent nothing'],
-                                    value='fill', type="index", elem_id="replacer_inpainting_fill")
-
-                            with gr.Row():
-                                if replacer_scripts.script_lama_cleaner_as_masked_content:
-                                    lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
-                                else:
-                                    lama_cleaner_upscaler = gr.Textbox(visible=False)
-
-                            with gr.Row():
-                                inpainting_mask_invert = gr.Radio(
-                                    label='Mask mode',
-                                    choices=['Inpaint masked', 'Inpaint not masked'],
-                                    value='Inpaint masked',
-                                    type="index",
-                                    elem_id="replacer_mask_mode")
-
-                            soft_inpaint_inputs = []
-                            if replacer_scripts.script_soft_inpaint:
-                                try:
-                                    with gr.Row():
-                                        replacer_scripts.needWatchSoftInpaintUI = True
-                                        soft_inpaint_inputs = list(replacer_scripts.script_soft_inpaint.ui(True))
-                                        replacer_scripts.needWatchSoftInpaintUI = False
-                                        from modules.ui_components import InputAccordion
-                                        new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
-                                        new_soft_inpaint_accordion.accordion.children = soft_inpaint_inputs[0].accordion.children
-                                        for child in new_soft_inpaint_accordion.accordion.children:
-                                            child.parent = new_soft_inpaint_accordion.accordion
-                                        soft_inpaint_inputs[0].accordion.visible = False
-                                        soft_inpaint_inputs[0] = new_soft_inpaint_accordion
-                                except Exception as e:
-                                    errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
-                                    replacer_scripts.script_soft_inpaint = None
-
-
-                        with gr.Tab('Avoidance'):
-                            with gr.Row():
-                                avoidancePrompt = gr.Textbox(label="Avoidance prompt",
-                                                    show_label=True,
-                                                    lines=1,
-                                                    elem_classes=["avoidancePrompt"],
-                                                    placeholder=None,
-                                                    elem_id="replacer_avoidancePrompt")
-
-                                gr.Examples(
-                                    examples=getAvoidancePromptExamples(),
-                                    inputs=avoidancePrompt,
-                                    label="",
-                                    elem_id="replacer_avoidancePrompt_examples",
-                                    examples_per_page=getAvoidancePromptExamplesNumber(),
-                                )
-
-                            with gr.Row():
-                                avoid_mask_create_canvas = gr.Button('Create canvas', elem_id='replacer_avoid_mask_create_canvas')
-                                avoid_mask_need_limit = gr.Checkbox(value=True, label='Limit avoidance mask canvas resolution on creating')
-                                avoid_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
-                            with gr.Row():
-                                avoidance_mask = gr.Image(
-                                    label="Avoidance mask",
-                                    show_label=False,
-                                    elem_id="replacer_avoidance_mask",
-                                    source="upload",
-                                    interactive=True,
-                                    type="pil",
-                                    tool="sketch",
-                                    image_mode="RGBA",
-                                    brush_color=getMaskColorStr()
-                                )
-                            with gr.Row():
-                                avoid_mask_brush_color = gr.ColorPicker(
-                                    getMaskColorStr(), label='Brush color',
-                                    info='visual only, use when brush color is hard to see'
-                                )
-                                if IS_WEBUI_1_5:
-                                    avoid_mask_brush_color.visible = False
-                        
-                        with gr.Tab('Custom mask'):
-                            with gr.Row():
-                                only_custom_mask = gr.Checkbox(label='Do not use detection prompt if use custom mask',
-                                    value=True, elem_id="replacer_only_custom_mask")
-
-                            with gr.Row():
-                                create_canvas_custom_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_custom_mask')
-                                custom_mask_need_limit = gr.Checkbox(value=True, label='Limit custom mask canvas resolution on creating')
-                                custom_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
-                            with gr.Row():
-                                custom_mask = gr.Image(
-                                    label="Custom mask",
-                                    show_label=False,
-                                    elem_id="replacer_custom_mask",
-                                    source="upload",
-                                    interactive=True,
-                                    type="pil",
-                                    tool="sketch",
-                                    image_mode="RGBA",
-                                    brush_color=getMaskColorStr()
-                                )
-                            with gr.Row():
-                                custom_mask_brush_color = gr.ColorPicker(
-                                    getMaskColorStr(), label='Brush color',
-                                    info='visual only, use when brush color is hard to see')
-                                if IS_WEBUI_1_5:
-                                    custom_mask_brush_color.visible = False
-
-                        with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
-                                else gr.Group()) as inpaint_diff_tab:
-                            with gr.Row():
-                                inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
-                                use_inpaint_diff = gr.Checkbox(label='Use inpaint difference',
-                                    value=True, elem_id="replacer_use_inpaint_diff")
-                            with gr.Row():
-                                non_altered_image_for_inpaint_diff = gr.Image(
-                                    label="Non altered image",
-                                    show_label=True,
-                                    elem_id="replacer_non_altered_image_for_inpaint_diff",
-                                    source="upload",
-                                    type="pil",
-                                    image_mode="RGBA",
-                                )
-                                inpaint_diff_mask_view = gr.Image(label="Difference mask",
-                                    interactive=True, type="pil",
-                                    elem_id="replacer_inpaint_diff_mask_view")
-                            with gr.Row():
-                                inpaint_diff_threshold = gr.Slider(label='Difference threshold',
-                                    maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
-                                inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
-                                    value=5, elem_id="replacer_inpaint_diff_mask_expand",
-                                    minimum=0, maximum=100, step=1)
-                                inpaint_diff_mask_erosion = gr.Slider(label='Mask erosion',
-                                    maximum=100, step=1, value=0, elem_id='inpaint_difference_mask_erosion')
-                            with gr.Row():
-                                inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
-                                    value=False, elem_id='inpaint_difference_contours_only')
-                        if not replacer_scripts.InpaintDifferenceGlobals:
-                            inpaint_diff_tab.visible = False
-                            inpaint_diff_tab.render = False
-
-
-                with gr.Tabs(elem_id="replacer_input_modes"):
-                    with gr.TabItem('Single Image', id="single_image", elem_id="replacer_single_tab") as tab_single:
-                        image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="replacer_image", image_mode="RGBA")
-
-                    with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as tab_batch:
-                        image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
-                        keep_original_filenames = gr.Checkbox(
-                            label='Keep original filenames', value=True, elem_id="replacer_keep_original_filenames")
-
-                    with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="replacer_batch_directory_tab") as tab_batch_dir:
-                        input_batch_dir = gr.Textbox(
-                            label="Input directory", **shared.hide_dirs,
-                            placeholder="A directory on the same machine where the server is running.",
-                            elem_id="replacer_input_batch_dir")
-                        output_batch_dir = gr.Textbox(
-                            label="Output directory", **shared.hide_dirs,
-                            placeholder="Leave blank to save images to the default path.",
-                            elem_id="replacer_output_batch_dir")
-                        keep_original_filenames_from_dir = gr.Checkbox(
-                            label='Keep original filenames (batch from dir)', value=True, elem_id="replacer_keep_original_filenames_from_dir")
-                        show_batch_dir_results = gr.Checkbox(
-                            label='Show result images', value=False, elem_id="replacer_show_batch_dir_results")
-
-                    with gr.TabItem('Video', id="batch_from_video", elem_id="replacer_batch_video_tab") as tab_batch_video:
-                        input_video = gr.Textbox(
-                            label="Input video",
-                            placeholder="A video on the same machine where the server is running.",
-                            elem_id="replacer_input_video")
-                        target_video_fps = gr.Slider(
-                            label='FPS', value=10.0, step=0.1, minimum=0.0, maximum=60.0, 
-                            info="(0 = fps from input video)",
-                            elem_id="replacer_video_fps")
-                        video_output_dir = gr.Textbox(
-                            label="Output directory", **shared.hide_dirs,
-                            placeholder="Leave blank to save images to the default path.",
-                            info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
-                            elem_id="replacer_video_output_dir")
-                        gr.Markdown("To increase consistency it's better to inpaint clear "\
-                            "objects on video with good quality and enough context. "\
-                            "Your prompts need to produce consistent results\n\n"\
-                            "To suppress flickering you can generate in little fps (e.g. 10), "\
-                            "then interpolate (x2) it with ai interpolation algorithm "\
-                            "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
-                            "[frame interpolation in deforum sd-webui extension]("\
-                            "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
-                            "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
-                            "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
-                            "extensions to increase consistency, if it fits to your scenario")
-                
-                cn_inputs = []
-                if replacer_scripts.script_controlnet:
-                    try:
-                        with gr.Row():
-                            replacer_scripts.needWatchControlNetUI = True
-                            cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
-                            replacer_scripts.needWatchControlNetUI = False
-
-                            if not replacer_scripts.controlNetAccordion:
-                                errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
-                                replacer_scripts.script_controlnet = None
-                            else:
-                                with replacer_scripts.controlNetAccordion:
-                                    with gr.Row():
-                                        gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
-                    except Exception as e:
-                        errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
-                        replacer_scripts.script_controlnet = None
-
-
-            with gr.Column(scale=15):
-                with gr.Row():
-                    if IS_WEBUI_1_8:
-                        outputPanel = create_output_panel('replacer', getSaveDir())
-                        replacer_gallery = outputPanel.gallery
-                        generation_info = outputPanel.generation_info
-                        html_info = outputPanel.infotext
-                        html_log = outputPanel.html_log
-                    else:
-                        replacer_gallery, generation_info, html_info, html_log = \
-                            create_output_panel('replacer', getSaveDir())
-                    generation_info_button = gr.Button(visible=False, elem_id="replacer_generation_info_button")
-                    generation_info_button.click(
-                        fn=update_generation_info,
-                        _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
-                        inputs=[generation_info, html_info, html_info],
-                        outputs=[html_info, html_info],
-                        show_progress=False,
-                    )
-                    if isDedicatedPage and OuputPanelWatcher.send_to_img2img:
-                        OuputPanelWatcher.send_to_img2img.visible = False
-                        OuputPanelWatcher.send_to_inpaint.visible = False
-                        OuputPanelWatcher.send_to_extras.visible = False
-
-                with gr.Row():
-                    if ui_toprow:
-                        toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
-                        toprow.create_inline_toprow_image()
-                        apply_hires_fix_button = toprow.submit
-                        apply_hires_fix_button.variant = 'secondary'
-                        apply_hires_fix_button.value = 'Apply HiresFix ✨'
-                    else:
-                        apply_hires_fix_button = gr.Button('Apply HiresFix ✨', elem_id='replacer_hf_generate')
-
-                with gr.Row():
-                    with gr.Accordion("HiresFix options", open=False):
-                        with gr.Tabs():
-                            with gr.Tab('General'):
-                                with gr.Row():
-                                    hf_upscaler = gr.Dropdown(
-                                        value="ESRGAN_4x",
-                                        choices=[x.name for x in shared.sd_upscalers],
-                                        label="Upscaler",
-                                    )
-
-                                    hf_steps = gr.Slider(
-                                        label='Hires steps',
-                                        value=4,
-                                        step=1,
-                                        minimum=0,
-                                        maximum=150,
-                                        elem_id="replacer_hf_steps"
-                                    )
-
-                                with gr.Row():
-                                    hf_denoise = gr.Slider(
-                                        label='Hires Denoising',
-                                        value=0.35,
-                                        step=0.01,
-                                        minimum=0.0,
-                                        maximum=1.0,
-                                        elem_id="replacer_hf_denoise",
-                                    )
-
-                                with gr.Row():
-                                    hf_size_limit = gr.Slider(
-                                        label='Limit render size',
-                                        value=1800,
-                                        step=1,
-                                        minimum=700,
-                                        maximum=10000,
-                                        elem_id="replacer_hf_size_limit",
-                                    )
-
-                                    hf_above_limit_upscaler = gr.Dropdown(
-                                        value="Lanczos",
-                                        choices=[x.name for x in shared.sd_upscalers],
-                                        label="Above limit upscaler",
-                                    )
-                                
-                                with gr.Row():
-                                    hf_extra_mask_expand = gr.Slider(
-                                        label='Extra mask expand',
-                                        value=5,
-                                        step=1,
-                                        minimum=0,
-                                        maximum=200,
-                                        elem_id="replacer_hf_extra_mask_expand",
-                                    )
-
-                                    hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
-                                        value=250, elem_id="replacer_hf_extra_inpaint_padding",
-                                        minimum=0, maximum=3000, step=1)
-                                    
-                                    hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
-                                        value=2, elem_id="replacer_hf_extra_mask_blur",
-                                        minimum=0, maximum=150, step=1)
-
-                                with gr.Row():
-                                    hf_randomize_seed = gr.Checkbox(
-                                        label='Randomize seed for hires fix',
-                                        value=True,
-                                        elem_id="replacer_hf_randomize_seed",
-                                    )
-
-                            with gr.Tab('Advanced'):
-                                with gr.Row():
-                                    hf_sampler = gr.Dropdown(
-                                        label='Hires sampling method',
-                                        elem_id="replacer_hf_sampler",
-                                        choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
-                                        value="Use same sampler"
-                                    )
-                                    if IS_WEBUI_1_9:
-                                        hf_scheduler = gr.Dropdown(
-                                            label='Hires schedule type',
-                                            elem_id="replacer_hf_scheduler",
-                                            choices=["Use same scheduler"] + [x.label for x in sd_schedulers.schedulers],
-                                            value="Use same scheduler"
-                                        )
-                                    else:
-                                        hf_scheduler = gr.Textbox("", visible=False)
-
-                                    hf_cfg_scale = gr.Slider(
-                                        label='Hires CFG Scale',
-                                        value=1.0,
-                                        step=0.5,
-                                        minimum=1.0,
-                                        maximum=30.0,
-                                        elem_id="replacer_hf_cfg_scale"
-                                    )
-
-                                with gr.Row():
-                                    hf_unload_detection_models = gr.Checkbox(
-                                        label='Unload detection models before hires fix',
-                                        value=True,
-                                        elem_id="replacer_hf_unload_detection_models",
-                                    )
-                                    if doNotShowUnloadButton():
-                                        hf_unload_detection_models.visible = False
-
-                                with gr.Row():
-                                    placeholder = None
-                                    placeholder = getHiresFixPositivePromptSuffixExamples()[0]
-
-                                    hfPositivePromptSuffix = gr.Textbox(
-                                        label="Suffix for positive prompt",
-                                        show_label=True,
-                                        lines=1,
-                                        elem_classes=["hfPositivePromptSuffix"],
-                                        placeholder=placeholder,
-                                        elem_id="replacer_hfPositivePromptSuffix",
-                                    )
-
-                                    gr.Examples(
-                                        examples=getHiresFixPositivePromptSuffixExamples(),
-                                        inputs=hfPositivePromptSuffix,
-                                        label="",
-                                        elem_id="replacer_hfPositivePromptSuffix_examples",
-                                    )
-
-                                with gr.Row():
-                                    hf_positvePrompt = gr.Textbox(label="Override positive prompt",
+class AttrDict(dict):
+    def __getattr__(self, key):
+        return self[key]
+
+    def __setattr__(self, key, value):
+        self[key] = value
+
+
+class ReplacerMainUI:
+    def __init__(self, isDedicatedPage):
+        self.replacerTabUI = None
+        self.components = AttrDict()
+        self.init_tab(isDedicatedPage)
+
+    def init_tab(self, isDedicatedPage):
+        comp = AttrDict()
+        with gr.Blocks(analytics_enabled=False) as self.replacerTabUI:
+            comp.tab_index = gr.Number(value=0, visible=False)
+            comp.dummy_component = gr.Label(visible=False)
+            comp.trueComponent = gr.Checkbox(value=True, visible=False)
+            comp.falseComponent = gr.Checkbox(value=False, visible=False)
+            if replacer_scripts.script_controlnet:
+                try:
+                    cnUiGroupsLenBefore = len(replacer_scripts.ControlNetUiGroup.all_ui_groups)
+                except Exception as e:
+                    errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
+                    replacer_scripts.script_controlnet = None
+
+            with ResizeHandleRow():
+
+                with gr.Column(scale=16):
+
+                    with gr.Row():
+                        placeholder = getDetectionPromptExamples()[0]
+                        comp.detectionPrompt = gr.Textbox(label="Detection prompt",
+                                            show_label=True,
+                                            lines=1,
+                                            elem_classes=["detectionPrompt"],
+                                            placeholder=placeholder,
+                                            elem_id="replacer_detectionPrompt")
+
+                        gr.Examples(
+                            examples=getDetectionPromptExamples(),
+                            inputs=comp.detectionPrompt,
+                            label="",
+                            elem_id="replacer_detectionPrompt_examples",
+                            examples_per_page=getDetectionPromptExamplesNumber(),
+                        )
+
+                    with gr.Row():
+                        placeholder = None
+                        if (useFirstPositivePromptFromExamples()):
+                            placeholder = getPositivePromptExamples()[0]
+
+                        comp.positvePrompt = gr.Textbox(label="Positive prompt",
                                             show_label=True,
                                             lines=1,
                                             elem_classes=["positvePrompt"],
-                                            placeholder='leave empty to use the same prompt',
-                                            elem_id="replacer_hf_positvePrompt")
+                                            placeholder=placeholder,
+                                            elem_id="replacer_positvePrompt")
 
-                                    hf_negativePrompt = gr.Textbox(label="Override negative prompt",
+                        gr.Examples(
+                            examples=getPositivePromptExamples(),
+                            inputs=comp.positvePrompt,
+                            label="",
+                            elem_id="replacer_positvePrompt_examples",
+                            examples_per_page=getPositivePromptExamplesNumber(),
+                        )
+
+                    with gr.Row():
+                        placeholder = None
+                        if (useFirstNegativePromptFromExamples()):
+                            placeholder = getNegativePromptExamples()[0]
+
+                        comp.negativePrompt = gr.Textbox(label="Negative prompt",
                                             show_label=True,
                                             lines=1,
                                             elem_classes=["negativePrompt"],
-                                            placeholder='leave empty to use the same prompt',
-                                            elem_id="replacer_hf_negativePrompt")
+                                            placeholder=placeholder,
+                                            elem_id="replacer_negativePrompt")
 
+
+                        gr.Examples(
+                            examples=getNegativePromptExamples(),
+                            inputs=comp.negativePrompt,
+                            label="",
+                            elem_id="replacer_negativePrompt_examples",
+                            examples_per_page=getNegativePromptExamplesNumber(),
+                        )
+
+                    if ui_toprow:
+                        toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
+                        toprow.create_inline_toprow_image()
+                        comp.run_button = toprow.submit
+                        comp.run_button.variant = 'secondary'
+                        comp.run_button.value = 'Run'
+                    else:
+                        comp.run_button = gr.Button('Run', elem_id='replacer_generate')
+
+
+                    with gr.Accordion("Advanced options", open=False, elem_id='replacer_advanced_options'):
+                        with gr.Tabs(elem_id="replacer_advanced_options_tabs"):
+                            with gr.Tab('Generation'):
                                 with gr.Row():
-                                    hf_sd_model_checkpoint = gr.Dropdown(label='Hires checkpoint',
-                                        elem_id="replacer_hf_sd_model_checkpoint",
-                                        choices=getHiresFixCheckpoints(), value="Use same checkpoint")
-                                    create_refresh_button(hf_sd_model_checkpoint, modules.sd_models.list_models,
-                                        lambda: {"choices": getHiresFixCheckpoints()}, "replacer_hf_sd_model_checkpoint")
-                                    
-                                    hf_disable_cn = gr.Checkbox(
-                                        label='Disable ControlNet while hires fix',
-                                        value=True,
-                                        elem_id="replacer_hf_disable_cn",
+                                    sampler_names = sd_samplers.visible_sampler_names()
+                                    defaultSampler = "DPM++ 2M SDE" if IS_WEBUI_1_9 else "DPM++ 2M SDE Karras"
+                                    comp.sampler = gr.Dropdown(
+                                        label='Sampling method',
+                                        elem_id="replacer_sampler",
+                                        choices=sampler_names,
+                                        value=defaultSampler
                                     )
-                                    if not replacer_scripts.script_controlnet:
-                                        hf_disable_cn.visible = False
+
+                                    if IS_WEBUI_1_9:
+                                        scheduler_names = [x.label for x in sd_schedulers.schedulers]
+                                        comp.scheduler = gr.Dropdown(
+                                            label='Schedule type',
+                                            elem_id=f"replacer_scheduler",
+                                            choices=scheduler_names,
+                                            value=scheduler_names[0])
+                                    else:
+                                        comp.scheduler = gr.Textbox("", visible=False)
+
+                                    comp.steps = gr.Slider(
+                                        label='Steps',
+                                        value=20,
+                                        step=1,
+                                        minimum=1,
+                                        maximum=150,
+                                        elem_id="replacer_steps"
+                                    )
                                 
                                 with gr.Row():
-                                    hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
-                                        choices=['Same', 'Enable', 'Disable'],
-                                        value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
-                                    if not replacer_scripts.script_soft_inpaint:
-                                        hf_soft_inpaint.visible = False
+                                    comp.cfg_scale = gr.Slider(label='CFG Scale',
+                                        value=5.5, elem_id="replacer_cfg_scale",
+                                        minimum=1.0, maximum=30.0, step=0.5)
 
-                with gr.Row():
-                    pass_into_hires_fix_automatically = gr.Checkbox(
-                                    label='Pass into hires fix automatically',
-                                    value=False,
-                                    elem_id="replacer_pass_into_hires_fix_automatically",
-                                )
-                    save_before_hires_fix = gr.Checkbox(
-                                    label='Save images before hires fix',
-                                    value=False,
-                                    elem_id="replacer_save_before_hires_fix",
-                                )
+                                    comp.fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
+                                        value=False, elem_id="replacer_fix_steps")
 
-                with gr.Row():
-                    if not isDedicatedPage:
-                        gr.Markdown(f'[Open dedicated page]({getDedicatedPagePath()})')
-                    else:
-                        sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
-                        override_sd_model = gr.Checkbox(label='Override sd model dedicated',
-                            value=True, elem_id="replacer_override_sd_model", visible=False)
+                                with gr.Row():
+                                    with gr.Column(elem_id="replacer_width_height_column", elem_classes="replacer-generation-size"):
+                                        comp.width = gr.Slider(label='width',
+                                            value=512, elem_id="replacer_width",
+                                            minimum=64, maximum=2048, step=8)
+                                        comp.height = gr.Slider(label='height',
+                                            value=512, elem_id="replacer_height",
+                                            minimum=64, maximum=2048, step=8)
+                                    with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="replacer-batch-count-size"):
+                                        comp.batch_count = gr.Slider(label='batch count',
+                                            value=1, elem_id="replacer_batch_count",
+                                            minimum=1, maximum=10, step=1)
+                                        comp.batch_size = gr.Slider(label='batch size',
+                                            value=1, elem_id="replacer_batch_size",
+                                            minimum=1, maximum=10, step=1)
 
+                                with gr.Row():
+                                    comp.upscaler_for_img2img = gr.Dropdown(
+                                        value="None",
+                                        choices=[x.name for x in shared.sd_upscalers],
+                                        label="Upscaler for img2Img",
+                                        elem_id="replacer_upscaler_for_img2img",
+                                    )
 
+                                    if shared.cmd_opts.use_textbox_seed:
+                                        comp.seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
+                                    else:
+                                        comp.seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
 
-        if replacer_scripts.script_controlnet:
-            try:
-                replacer_scripts.ControlNetUiGroup.a1111_context.img2img_w_slider = width
-                replacer_scripts.ControlNetUiGroup.a1111_context.img2img_h_slider = height
+                                    comp.random_seed = ToolButton(
+                                        ui.random_symbol,
+                                        elem_id="replacer_random_seed",
+                                        label='Random seed'
+                                    )
+                                    comp.reuse_seed = ToolButton(
+                                        ui.reuse_symbol,
+                                        elem_id="replacer_reuse_seed",
+                                        label='Reuse seed'
+                                    )
+                                
+                                with gr.Row():
+                                    if not isDedicatedPage:
+                                        comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                                        comp.override_sd_model = gr.Checkbox(label='Override stable diffusion model',
+                                            value=False, elem_id="replacer_override_sd_model")
 
-                for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
-                    ui_group.register_run_annotator()
-                    if not replacer_scripts.IS_SD_WEBUI_FORGE:
-                        ui_group.inpaint_crop_input_image.value = True
-                        ui_group.inpaint_crop_input_image.visible = True
-                        ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
-                    # if isDedicatedPage: 
-                    #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
-                    # ui_group.register_sd_version_changed()
-            except Exception as e:
-                errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
-                replacer_scripts.script_controlnet = None
-
-
-        tab_single.select(fn=lambda: 0, inputs=[], outputs=[tab_index])
-        tab_batch.select(fn=lambda: 1, inputs=[], outputs=[tab_index])
-        tab_batch_dir.select(fn=lambda: 2, inputs=[], outputs=[tab_index])
-        tab_batch_video.select(fn=lambda: 3, inputs=[], outputs=[tab_index])
-
-
-        run_button.click(
-            _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf', False),
-            fn=wrap_gradio_gpu_call(generate_ui, extra_outputs=[None, '', '']),
-            inputs=[
-                dummy_component, # task_id
-                detectionPrompt,
-                avoidancePrompt,
-                positvePrompt,
-                negativePrompt,
-                tab_index,
-                image,
-                image_batch,
-                keep_original_filenames,
-                input_batch_dir,
-                output_batch_dir,
-                keep_original_filenames_from_dir,
-                show_batch_dir_results,
-                input_video,
-                video_output_dir,
-                target_video_fps,
-                upscaler_for_img2img,
-                seed,
-                sampler,
-                scheduler,
-                steps,
-                box_threshold,
-                mask_expand,
-                mask_blur,
-                max_resolution_on_detection,
-                sam_model_name,
-                dino_model_name,
-                cfg_scale,
-                denoise,
-                inpaint_padding,
-                inpainting_fill,
-                width,
-                height,
-                batch_count,
-                batch_size,
-                inpainting_mask_invert,
-                extra_includes,
-                fix_steps,
-                override_sd_model,
-                sd_model_checkpoint,
-                mask_num,
-                avoid_mask_mode,
-                avoidance_mask,
-                only_custom_mask,
-                custom_mask_mode,
-                custom_mask,
-                use_inpaint_diff,
-                inpaint_diff_mask_view,
-                lama_cleaner_upscaler,
-                clip_skip,
-                pass_into_hires_fix_automatically,
-                save_before_hires_fix,
-
-                hf_upscaler,
-                hf_steps,
-                hf_sampler,
-                hf_scheduler,
-                hf_denoise,
-                hf_cfg_scale,
-                hfPositivePromptSuffix,
-                hf_size_limit,
-                hf_above_limit_upscaler,
-                hf_unload_detection_models,
-                hf_disable_cn,
-                hf_extra_mask_expand,
-                hf_positvePrompt,
-                hf_negativePrompt,
-                hf_sd_model_checkpoint,
-                hf_extra_inpaint_padding,
-                hf_extra_mask_blur,
-                hf_randomize_seed,
-                hf_soft_inpaint,
-            ] + cn_inputs
-              + soft_inpaint_inputs,
-            outputs=[
-                replacer_gallery,
-                generation_info,
-                html_info,
-                html_log,
-            ],
-            show_progress=ui_toprow is None,
-        )
+                                    comp.clip_skip = ui_settings.create_setting_component('CLIP_stop_at_last_layers')
 
 
-        apply_hires_fix_button.click(
-            _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer', True),
-            fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
-            inputs=[
-                dummy_component, # task_id
-                dummy_component, # gallery_idx
-                replacer_gallery,
-                generation_info,
-                hf_upscaler,
-                hf_steps,
-                hf_sampler,
-                hf_scheduler,
-                hf_denoise,
-                hf_cfg_scale,
-                hfPositivePromptSuffix,
-                hf_size_limit,
-                hf_above_limit_upscaler,
-                hf_unload_detection_models,
-                hf_disable_cn,
-                hf_extra_mask_expand,
-                hf_positvePrompt,
-                hf_negativePrompt,
-                hf_sd_model_checkpoint,
-                hf_extra_inpaint_padding,
-                hf_extra_mask_blur,
-                hf_randomize_seed,
-                hf_soft_inpaint,
-            ],
-            outputs=[
-                replacer_gallery,
-                generation_info,
-                html_info,
-                html_log,
-            ],
-            show_progress=ui_toprow is None,
-        )
+                            with gr.Tab('Detection'):
+                                with gr.Row():
+                                    comp.box_threshold = gr.Slider(label='Box Threshold',
+                                        value=0.3, elem_id="replacer_box_threshold",
+                                        minimum=0.0, maximum=1.0, step=0.05)
+                                    comp.mask_expand = gr.Slider(label='Mask Expand',
+                                        value=35, elem_id="replacer_mask_expand",
+                                        minimum=-50, maximum=100, step=1)
+
+                                with gr.Row():
+                                    if not doNotShowUnloadButton():
+                                        comp.unload = gr.Button(
+                                            value="Unload detection models",
+                                            elem_id="replacer_unload_detection_models")
+
+                                    comp.max_resolution_on_detection = gr.Slider(
+                                        label='Max resolution on detection',
+                                        value=1280,
+                                        step=1,
+                                        minimum=64,
+                                        maximum=2560,
+                                        elem_id="replacer_max_resolution_on_detection"
+                                    )
+
+                                with gr.Row():
+                                    from scripts.sam import sam_model_list, refresh_sam_models
+                                    from scripts.dino import dino_model_list
+
+                                    comp.sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
+                                        value=sam_model_list[0] if len(sam_model_list) > 0 else None)
+                                    comp.sam_refresh_models = ToolButton(value=refresh_symbol)
+                                    comp.sam_refresh_models.click(refresh_sam_models, comp.sam_model_name, comp.sam_model_name)
+
+                                    comp.dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
+                                
+                                with gr.Row():
+                                    comp.mask_num = gr.Radio(label='Mask num',
+                                        choices=['Random', '1', '2', '3'],
+                                        value='Random', type="value", elem_id="replacer_mask_num")
+
+                                with gr.Row():
+                                    comp.extra_includes = ui_settings.create_setting_component(EXT_NAME_LOWER + "_default_extra_includes")
+                                    comp.extra_includes.label = 'Extra include in gallery'
+
+                            with gr.Tab('Inpainting'):
+                                with gr.Row():
+                                    comp.mask_blur = gr.Slider(label='Mask Blur',
+                                        value=4, elem_id="replacer_mask_blur",
+                                        minimum=0, maximum=100, step=1)
+                                    comp.inpaint_padding = gr.Slider(label='Padding',
+                                        value=40, elem_id="replacer_inpaint_padding",
+                                        minimum=0, maximum=1000, step=1)
+
+                                with gr.Row():
+                                    comp.denoise = gr.Slider(label='Denoising',
+                                        value=1.0, elem_id="replacer_denoise",
+                                        minimum=0.0, maximum=1.0, step=0.01)
+
+                                with gr.Row():
+                                    comp.inpainting_fill = gr.Radio(label='Masked content',
+                                        choices=['fill', 'original', 'latent noise', 'latent nothing'],
+                                        value='fill', type="index", elem_id="replacer_inpainting_fill")
+
+                                with gr.Row():
+                                    if replacer_scripts.script_lama_cleaner_as_masked_content:
+                                        comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
+                                    else:
+                                        comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
+
+                                with gr.Row():
+                                    comp.inpainting_mask_invert = gr.Radio(
+                                        label='Mask mode',
+                                        choices=['Inpaint masked', 'Inpaint not masked'],
+                                        value='Inpaint masked',
+                                        type="index",
+                                        elem_id="replacer_mask_mode")
+
+                                comp.soft_inpaint_inputs = []
+                                if replacer_scripts.script_soft_inpaint:
+                                    try:
+                                        with gr.Row():
+                                            replacer_scripts.needWatchSoftInpaintUI = True
+                                            comp.soft_inpaint_inputs = list(replacer_scripts.script_soft_inpaint.ui(True))
+                                            replacer_scripts.needWatchSoftInpaintUI = False
+                                            from modules.ui_components import InputAccordion
+                                            new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
+                                            new_soft_inpaint_accordion.accordion.children = soft_inpaint_inputs[0].accordion.children
+                                            for child in new_soft_inpaint_accordion.accordion.children:
+                                                child.parent = new_soft_inpaint_accordion.accordion
+                                            comp.soft_inpaint_inputs[0].accordion.visible = False
+                                            comp.soft_inpaint_inputs[0] = new_soft_inpaint_accordion
+                                    except Exception as e:
+                                        errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
+                                        replacer_scripts.script_soft_inpaint = None
 
 
-        random_seed.click(
-            fn=lambda: -1,
-            inputs=[
-            ],
-            outputs=[
-                seed,
-            ]
-        )
+                            with gr.Tab('Avoidance'):
+                                with gr.Row():
+                                    comp.avoidancePrompt = gr.Textbox(label="Avoidance prompt",
+                                                        show_label=True,
+                                                        lines=1,
+                                                        elem_classes=["avoidancePrompt"],
+                                                        placeholder=None,
+                                                        elem_id="replacer_avoidancePrompt")
 
-        reuse_seed.click(
-            fn=getLastUsedSeed,
-            inputs=[],
-            outputs=[
-                seed,
-            ]
-        )
+                                    gr.Examples(
+                                        examples=getAvoidancePromptExamples(),
+                                        inputs=comp.avoidancePrompt,
+                                        label="",
+                                        elem_id="replacer_avoidancePrompt_examples",
+                                        examples_per_page=getAvoidancePromptExamplesNumber(),
+                                    )
+
+                                with gr.Row():
+                                    comp.avoid_mask_create_canvas = gr.Button('Create canvas', elem_id='replacer_avoid_mask_create_canvas')
+                                    comp.avoid_mask_need_limit = gr.Checkbox(value=True, label='Limit avoidance mask canvas resolution on creating')
+                                    comp.avoid_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
+                                with gr.Row():
+                                    comp.avoidance_mask = gr.Image(
+                                        label="Avoidance mask",
+                                        show_label=False,
+                                        elem_id="replacer_avoidance_mask",
+                                        source="upload",
+                                        interactive=True,
+                                        type="pil",
+                                        tool="sketch",
+                                        image_mode="RGBA",
+                                        brush_color=getMaskColorStr()
+                                    )
+                                with gr.Row():
+                                    comp.avoid_mask_brush_color = gr.ColorPicker(
+                                        getMaskColorStr(), label='Brush color',
+                                        info='visual only, use when brush color is hard to see'
+                                    )
+                                    if IS_WEBUI_1_5:
+                                        comp.avoid_mask_brush_color.visible = False
+                            
+                            with gr.Tab('Custom mask'):
+                                with gr.Row():
+                                    comp.only_custom_mask = gr.Checkbox(label='Do not use detection prompt if use custom mask',
+                                        value=True, elem_id="replacer_only_custom_mask")
+
+                                with gr.Row():
+                                    comp.create_canvas_custom_mask = gr.Button('Create canvas', elem_id='replacer_create_canvas_custom_mask')
+                                    comp.custom_mask_need_limit = gr.Checkbox(value=True, label='Limit custom mask canvas resolution on creating')
+                                    comp.custom_mask_mode = gr.CheckboxGroup(['Draw mask', 'Upload mask'], value=['Draw mask'], label="Canvas mask source")
+                                with gr.Row():
+                                    comp.custom_mask = gr.Image(
+                                        label="Custom mask",
+                                        show_label=False,
+                                        elem_id="replacer_custom_mask",
+                                        source="upload",
+                                        interactive=True,
+                                        type="pil",
+                                        tool="sketch",
+                                        image_mode="RGBA",
+                                        brush_color=getMaskColorStr()
+                                    )
+                                with gr.Row():
+                                    comp.custom_mask_brush_color = gr.ColorPicker(
+                                        getMaskColorStr(), label='Brush color',
+                                        info='visual only, use when brush color is hard to see')
+                                    if IS_WEBUI_1_5:
+                                        comp.custom_mask_brush_color.visible = False
+
+                            with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
+                                    else gr.Group()) as comp.inpaint_diff_tab:
+                                with gr.Row():
+                                    comp.inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
+                                    comp.use_inpaint_diff = gr.Checkbox(label='Use inpaint difference',
+                                        value=True, elem_id="replacer_use_inpaint_diff")
+                                with gr.Row():
+                                    comp.non_altered_image_for_inpaint_diff = gr.Image(
+                                        label="Non altered image",
+                                        show_label=True,
+                                        elem_id="replacer_non_altered_image_for_inpaint_diff",
+                                        source="upload",
+                                        type="pil",
+                                        image_mode="RGBA",
+                                    )
+                                    comp.inpaint_diff_mask_view = gr.Image(label="Difference mask",
+                                        interactive=True, type="pil",
+                                        elem_id="replacer_inpaint_diff_mask_view")
+                                with gr.Row():
+                                    comp.inpaint_diff_threshold = gr.Slider(label='Difference threshold',
+                                        maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
+                                    comp.inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
+                                        value=5, elem_id="replacer_inpaint_diff_mask_expand",
+                                        minimum=0, maximum=100, step=1)
+                                    comp.inpaint_diff_mask_erosion = gr.Slider(label='Mask erosion',
+                                        maximum=100, step=1, value=0, elem_id='inpaint_difference_mask_erosion')
+                                with gr.Row():
+                                    comp.inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
+                                        value=False, elem_id='inpaint_difference_contours_only')
+                            if not replacer_scripts.InpaintDifferenceGlobals:
+                                comp.inpaint_diff_tab.visible = False
+                                comp.inpaint_diff_tab.render = False
 
 
-        OuputPanelWatcher.send_back_to_replacer.click(
-            fn=sendBackToReplacer,
-            _js="sendBackToReplacer",
-            inputs=[
-                replacer_gallery,
-                dummy_component
-            ],
-            outputs=[
-                image,
-            ]
-        )
+                    with gr.Tabs(elem_id="replacer_input_modes"):
+                        with gr.TabItem('Single Image', id="single_image", elem_id="replacer_single_tab") as comp.tab_single:
+                            comp.image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="replacer_image", image_mode="RGBA")
 
-        if not doNotShowUnloadButton():
-            unload.click(
-                fn=wrap_queued_call(unloadModels),
-                inputs=[],
-                outputs=[])
+                        with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as comp.tab_batch:
+                            comp.image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
+                            comp.keep_original_filenames = gr.Checkbox(
+                                label='Keep original filenames', value=True, elem_id="replacer_keep_original_filenames")
 
-        avoid_mask_brush_color.change(
-            fn=update_mask_brush_color,
-            inputs=[avoid_mask_brush_color],
-            outputs=[avoidance_mask]
-        )
+                        with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="replacer_batch_directory_tab") as comp.tab_batch_dir:
+                            comp.input_batch_dir = gr.Textbox(
+                                label="Input directory", **shared.hide_dirs,
+                                placeholder="A directory on the same machine where the server is running.",
+                                elem_id="replacer_input_batch_dir")
+                            comp.output_batch_dir = gr.Textbox(
+                                label="Output directory", **shared.hide_dirs,
+                                placeholder="Leave blank to save images to the default path.",
+                                elem_id="replacer_output_batch_dir")
+                            comp.keep_original_filenames_from_dir = gr.Checkbox(
+                                label='Keep original filenames (batch from dir)', value=True, elem_id="replacer_keep_original_filenames_from_dir")
+                            comp.show_batch_dir_results = gr.Checkbox(
+                                label='Show result images', value=False, elem_id="replacer_show_batch_dir_results")
 
-        avoid_mask_create_canvas.click(
-            fn=get_current_image,
-            _js='replacerGetCurrentSourceImg',
-            inputs=[dummy_component, trueComponent, avoid_mask_need_limit, max_resolution_on_detection],
-            outputs=[avoidance_mask],
-            postprocess=False,
-        )
+                        with gr.TabItem('Video', id="batch_from_video", elem_id="replacer_batch_video_tab") as comp.tab_batch_video:
+                            comp.input_video = gr.Textbox(
+                                label="Input video",
+                                placeholder="A video on the same machine where the server is running.",
+                                elem_id="replacer_input_video")
+                            comp.target_video_fps = gr.Slider(
+                                label='FPS', value=10.0, step=0.1, minimum=0.0, maximum=60.0, 
+                                info="(0 = fps from input video)",
+                                elem_id="replacer_video_fps")
+                            comp.video_output_dir = gr.Textbox(
+                                label="Output directory", **shared.hide_dirs,
+                                placeholder="Leave blank to save images to the default path.",
+                                info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
+                                elem_id="replacer_video_output_dir")
+                            gr.Markdown("To increase consistency it's better to inpaint clear "\
+                                "objects on video with good quality and enough context. "\
+                                "Your prompts need to produce consistent results\n\n"\
+                                "To suppress flickering you can generate in little fps (e.g. 10), "\
+                                "then interpolate (x2) it with ai interpolation algorithm "\
+                                "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
+                                "[frame interpolation in deforum sd-webui extension]("\
+                                "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
+                                "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
+                                "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
+                                "extensions to increase consistency, if it fits to your scenario")
+                    
+                    comp.cn_inputs = []
+                    if replacer_scripts.script_controlnet:
+                        try:
+                            with gr.Row():
+                                replacer_scripts.needWatchControlNetUI = True
+                                comp.cn_inputs = list(replacer_scripts.script_controlnet.ui(True))
+                                replacer_scripts.needWatchControlNetUI = False
+
+                                if not replacer_scripts.controlNetAccordion:
+                                    errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
+                                    replacer_scripts.script_controlnet = None
+                                else:
+                                    with replacer_scripts.controlNetAccordion:
+                                        with gr.Row():
+                                            gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
+                        except Exception as e:
+                            errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
+                            replacer_scripts.script_controlnet = None
 
 
-        custom_mask_brush_color.change(
-            fn=update_mask_brush_color,
-            inputs=[custom_mask_brush_color],
-            outputs=[custom_mask]
-        )
+                with gr.Column(scale=15):
+                    with gr.Row():
+                        if IS_WEBUI_1_8:
+                            outputPanel = create_output_panel('replacer', getSaveDir())
+                            comp.replacer_gallery = outputPanel.gallery
+                            comp.generation_info = outputPanel.generation_info
+                            comp.html_info = outputPanel.infotext
+                            comp.html_log = outputPanel.html_log
+                        else:
+                            comp.replacer_gallery, comp.generation_info, comp.html_info, comp.html_log = \
+                                create_output_panel('replacer', getSaveDir())
+                        comp.generation_info_button = gr.Button(visible=False, elem_id="replacer_generation_info_button")
+                        comp.generation_info_button.click(
+                            fn=update_generation_info,
+                            _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
+                            inputs=[comp.generation_info, comp.html_info, comp.html_info],
+                            outputs=[comp.html_info, comp.html_info],
+                            show_progress=False,
+                        )
+                        if isDedicatedPage and OuputPanelWatcher.send_to_img2img:
+                            OuputPanelWatcher.send_to_img2img.visible = False
+                            OuputPanelWatcher.send_to_inpaint.visible = False
+                            OuputPanelWatcher.send_to_extras.visible = False
 
-        create_canvas_custom_mask.click(
-            fn=get_current_image,
-            _js='replacerGetCurrentSourceImg',
-            inputs=[dummy_component, falseComponent, custom_mask_need_limit, max_resolution_on_detection],
-            outputs=[custom_mask],
-            postprocess=False,
-        )
+                    with gr.Row():
+                        if ui_toprow:
+                            toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer_hf')
+                            toprow.create_inline_toprow_image()
+                            comp.apply_hires_fix_button = toprow.submit
+                            comp.apply_hires_fix_button.variant = 'secondary'
+                            comp.apply_hires_fix_button.value = 'Apply HiresFix ✨'
+                        else:
+                            comp.apply_hires_fix_button = gr.Button('Apply HiresFix ✨', elem_id='replacer_hf_generate')
 
-        
-        if replacer_scripts.InpaintDifferenceGlobals:
-            inpaint_diff_create.click(
-                fn=replacer_scripts.computeInpaintDifference,
+                    with gr.Row():
+                        with gr.Accordion("HiresFix options", open=False):
+                            with gr.Tabs():
+                                with gr.Tab('General'):
+                                    with gr.Row():
+                                        comp.hf_upscaler = gr.Dropdown(
+                                            value="ESRGAN_4x",
+                                            choices=[x.name for x in shared.sd_upscalers],
+                                            label="Upscaler",
+                                        )
+
+                                        comp.hf_steps = gr.Slider(
+                                            label='Hires steps',
+                                            value=4,
+                                            step=1,
+                                            minimum=0,
+                                            maximum=150,
+                                            elem_id="replacer_hf_steps"
+                                        )
+
+                                    with gr.Row():
+                                        comp.hf_denoise = gr.Slider(
+                                            label='Hires Denoising',
+                                            value=0.35,
+                                            step=0.01,
+                                            minimum=0.0,
+                                            maximum=1.0,
+                                            elem_id="replacer_hf_denoise",
+                                        )
+
+                                    with gr.Row():
+                                        comp.hf_size_limit = gr.Slider(
+                                            label='Limit render size',
+                                            value=1800,
+                                            step=1,
+                                            minimum=700,
+                                            maximum=10000,
+                                            elem_id="replacer_hf_size_limit",
+                                        )
+
+                                        comp.hf_above_limit_upscaler = gr.Dropdown(
+                                            value="Lanczos",
+                                            choices=[x.name for x in shared.sd_upscalers],
+                                            label="Above limit upscaler",
+                                        )
+                                    
+                                    with gr.Row():
+                                        comp.hf_extra_mask_expand = gr.Slider(
+                                            label='Extra mask expand',
+                                            value=5,
+                                            step=1,
+                                            minimum=0,
+                                            maximum=200,
+                                            elem_id="replacer_hf_extra_mask_expand",
+                                        )
+
+                                        comp.hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
+                                            value=250, elem_id="replacer_hf_extra_inpaint_padding",
+                                            minimum=0, maximum=3000, step=1)
+                                        
+                                        comp.hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
+                                            value=2, elem_id="replacer_hf_extra_mask_blur",
+                                            minimum=0, maximum=150, step=1)
+
+                                    with gr.Row():
+                                        comp.hf_randomize_seed = gr.Checkbox(
+                                            label='Randomize seed for hires fix',
+                                            value=True,
+                                            elem_id="replacer_hf_randomize_seed",
+                                        )
+
+                                with gr.Tab('Advanced'):
+                                    with gr.Row():
+                                        comp.hf_sampler = gr.Dropdown(
+                                            label='Hires sampling method',
+                                            elem_id="replacer_hf_sampler",
+                                            choices=["Use same sampler"] + sd_samplers.visible_sampler_names(),
+                                            value="Use same sampler"
+                                        )
+                                        if IS_WEBUI_1_9:
+                                            comp.hf_scheduler = gr.Dropdown(
+                                                label='Hires schedule type',
+                                                elem_id="replacer_hf_scheduler",
+                                                choices=["Use same scheduler"] + [x.label for x in sd_schedulers.schedulers],
+                                                value="Use same scheduler"
+                                            )
+                                        else:
+                                            comp.hf_scheduler = gr.Textbox("", visible=False)
+
+                                        comp.hf_cfg_scale = gr.Slider(
+                                            label='Hires CFG Scale',
+                                            value=1.0,
+                                            step=0.5,
+                                            minimum=1.0,
+                                            maximum=30.0,
+                                            elem_id="replacer_hf_cfg_scale"
+                                        )
+
+                                    with gr.Row():
+                                        comp.hf_unload_detection_models = gr.Checkbox(
+                                            label='Unload detection models before hires fix',
+                                            value=True,
+                                            elem_id="replacer_hf_unload_detection_models",
+                                        )
+                                        if doNotShowUnloadButton():
+                                            comp.hf_unload_detection_models.visible = False
+
+                                    with gr.Row():
+                                        placeholder = None
+                                        placeholder = getHiresFixPositivePromptSuffixExamples()[0]
+
+                                        comp.hfPositivePromptSuffix = gr.Textbox(
+                                            label="Suffix for positive prompt",
+                                            show_label=True,
+                                            lines=1,
+                                            elem_classes=["hfPositivePromptSuffix"],
+                                            placeholder=placeholder,
+                                            elem_id="replacer_hfPositivePromptSuffix",
+                                        )
+
+                                        gr.Examples(
+                                            examples=getHiresFixPositivePromptSuffixExamples(),
+                                            inputs=comp.hfPositivePromptSuffix,
+                                            label="",
+                                            elem_id="replacer_hfPositivePromptSuffix_examples",
+                                        )
+
+                                    with gr.Row():
+                                        comp.hf_positvePrompt = gr.Textbox(label="Override positive prompt",
+                                                show_label=True,
+                                                lines=1,
+                                                elem_classes=["positvePrompt"],
+                                                placeholder='leave empty to use the same prompt',
+                                                elem_id="replacer_hf_positvePrompt")
+
+                                        comp.hf_negativePrompt = gr.Textbox(label="Override negative prompt",
+                                                show_label=True,
+                                                lines=1,
+                                                elem_classes=["negativePrompt"],
+                                                placeholder='leave empty to use the same prompt',
+                                                elem_id="replacer_hf_negativePrompt")
+
+                                    with gr.Row():
+                                        comp.hf_sd_model_checkpoint = gr.Dropdown(label='Hires checkpoint',
+                                            elem_id="replacer_hf_sd_model_checkpoint",
+                                            choices=getHiresFixCheckpoints(), value="Use same checkpoint")
+                                        create_refresh_button(comp.hf_sd_model_checkpoint, modules.sd_models.list_models,
+                                            lambda: {"choices": getHiresFixCheckpoints()}, "replacer_hf_sd_model_checkpoint")
+                                        
+                                        comp.hf_disable_cn = gr.Checkbox(
+                                            label='Disable ControlNet while hires fix',
+                                            value=True,
+                                            elem_id="replacer_hf_disable_cn",
+                                        )
+                                        if not replacer_scripts.script_controlnet:
+                                            comp.hf_disable_cn.visible = False
+                                    
+                                    with gr.Row():
+                                        comp.hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
+                                            choices=['Same', 'Enable', 'Disable'],
+                                            value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
+                                        if not replacer_scripts.script_soft_inpaint:
+                                            comp.hf_soft_inpaint.visible = False
+
+                    with gr.Row():
+                        comp.pass_into_hires_fix_automatically = gr.Checkbox(
+                                        label='Pass into hires fix automatically',
+                                        value=False,
+                                        elem_id="replacer_pass_into_hires_fix_automatically",
+                                    )
+                        comp.save_before_hires_fix = gr.Checkbox(
+                                        label='Save images before hires fix',
+                                        value=False,
+                                        elem_id="replacer_save_before_hires_fix",
+                                    )
+
+                    with gr.Row():
+                        if not isDedicatedPage:
+                            gr.Markdown(f'[Open dedicated page]({getDedicatedPagePath()})')
+                        else:
+                            comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                            comp.override_sd_model = gr.Checkbox(label='Override sd model dedicated',
+                                value=True, elem_id="replacer_override_sd_model", visible=False)
+
+
+
+            if replacer_scripts.script_controlnet:
+                try:
+                    replacer_scripts.ControlNetUiGroup.a1111_context.img2img_w_slider = comp.width
+                    replacer_scripts.ControlNetUiGroup.a1111_context.img2img_h_slider = comp.height
+
+                    for ui_group in replacer_scripts.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
+                        ui_group.register_run_annotator()
+                        if not replacer_scripts.IS_SD_WEBUI_FORGE:
+                            ui_group.inpaint_crop_input_image.value = True
+                            ui_group.inpaint_crop_input_image.visible = True
+                            ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
+                        # if isDedicatedPage: 
+                        #     replacer_scripts.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
+                        # ui_group.register_sd_version_changed()
+                except Exception as e:
+                    errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
+                    replacer_scripts.script_controlnet = None
+
+
+            comp.tab_single.select(fn=lambda: 0, inputs=[], outputs=[comp.tab_index])
+            comp.tab_batch.select(fn=lambda: 1, inputs=[], outputs=[comp.tab_index])
+            comp.tab_batch_dir.select(fn=lambda: 2, inputs=[], outputs=[comp.tab_index])
+            comp.tab_batch_video.select(fn=lambda: 3, inputs=[], outputs=[comp.tab_index])
+
+
+            comp.run_button.click(
+                _js=getSubmitJsFunction('replacer', 'replacer', 'replacer_hf', False),
+                fn=wrap_gradio_gpu_call(generate_ui, extra_outputs=[None, '', '']),
                 inputs=[
-                    non_altered_image_for_inpaint_diff,
-                    image,
-                    mask_blur,
-                    inpaint_diff_mask_expand,
-                    inpaint_diff_mask_erosion,
-                    inpaint_diff_threshold,
-                    inpaint_diff_contours_only,
+                    comp.dummy_component, # task_id
+                    comp.detectionPrompt,
+                    comp.avoidancePrompt,
+                    comp.positvePrompt,
+                    comp.negativePrompt,
+                    comp.tab_index,
+                    comp.image,
+                    comp.image_batch,
+                    comp.keep_original_filenames,
+                    comp.input_batch_dir,
+                    comp.output_batch_dir,
+                    comp.keep_original_filenames_from_dir,
+                    comp.show_batch_dir_results,
+                    comp.input_video,
+                    comp.video_output_dir,
+                    comp.target_video_fps,
+                    comp.upscaler_for_img2img,
+                    comp.seed,
+                    comp.sampler,
+                    comp.scheduler,
+                    comp.steps,
+                    comp.box_threshold,
+                    comp.mask_expand,
+                    comp.mask_blur,
+                    comp.max_resolution_on_detection,
+                    comp.sam_model_name,
+                    comp.dino_model_name,
+                    comp.cfg_scale,
+                    comp.denoise,
+                    comp.inpaint_padding,
+                    comp.inpainting_fill,
+                    comp.width,
+                    comp.height,
+                    comp.batch_count,
+                    comp.batch_size,
+                    comp.inpainting_mask_invert,
+                    comp.extra_includes,
+                    comp.fix_steps,
+                    comp.override_sd_model,
+                    comp.sd_model_checkpoint,
+                    comp.mask_num,
+                    comp.avoid_mask_mode,
+                    comp.avoidance_mask,
+                    comp.only_custom_mask,
+                    comp.custom_mask_mode,
+                    comp.custom_mask,
+                    comp.use_inpaint_diff,
+                    comp.inpaint_diff_mask_view,
+                    comp.lama_cleaner_upscaler,
+                    comp.clip_skip,
+                    comp.pass_into_hires_fix_automatically,
+                    comp.save_before_hires_fix,
+
+                    comp.hf_upscaler,
+                    comp.hf_steps,
+                    comp.hf_sampler,
+                    comp.hf_scheduler,
+                    comp.hf_denoise,
+                    comp.hf_cfg_scale,
+                    comp.hfPositivePromptSuffix,
+                    comp.hf_size_limit,
+                    comp.hf_above_limit_upscaler,
+                    comp.hf_unload_detection_models,
+                    comp.hf_disable_cn,
+                    comp.hf_extra_mask_expand,
+                    comp.hf_positvePrompt,
+                    comp.hf_negativePrompt,
+                    comp.hf_sd_model_checkpoint,
+                    comp.hf_extra_inpaint_padding,
+                    comp.hf_extra_mask_blur,
+                    comp.hf_randomize_seed,
+                    comp.hf_soft_inpaint,
+                ] + comp.cn_inputs
+                  + comp.soft_inpaint_inputs,
+                outputs=[
+                    comp.replacer_gallery,
+                    comp.generation_info,
+                    comp.html_info,
+                    comp.html_log,
                 ],
-                outputs=[inpaint_diff_mask_view],
+                show_progress=ui_toprow is None,
             )
 
 
-    return replacerTabUI
+            comp.apply_hires_fix_button.click(
+                _js=getSubmitJsFunction('replacer', 'replacer_hf', 'replacer', True),
+                fn=wrap_gradio_gpu_call(applyHiresFix, extra_outputs=[None, '', '']),
+                inputs=[
+                    comp.dummy_component, # task_id
+                    comp.dummy_component, # gallery_idx
+                    comp.replacer_gallery,
+                    comp.generation_info,
+                    comp.hf_upscaler,
+                    comp.hf_steps,
+                    comp.hf_sampler,
+                    comp.hf_scheduler,
+                    comp.hf_denoise,
+                    comp.hf_cfg_scale,
+                    comp.hfPositivePromptSuffix,
+                    comp.hf_size_limit,
+                    comp.hf_above_limit_upscaler,
+                    comp.hf_unload_detection_models,
+                    comp.hf_disable_cn,
+                    comp.hf_extra_mask_expand,
+                    comp.hf_positvePrompt,
+                    comp.hf_negativePrompt,
+                    comp.hf_sd_model_checkpoint,
+                    comp.hf_extra_inpaint_padding,
+                    comp.hf_extra_mask_blur,
+                    comp.hf_randomize_seed,
+                    comp.hf_soft_inpaint,
+                ],
+                outputs=[
+                    comp.replacer_gallery,
+                    comp.generation_info,
+                    comp.html_info,
+                    comp.html_log,
+                ],
+                show_progress=ui_toprow is None,
+            )
+
+
+            comp.random_seed.click(
+                fn=lambda: -1,
+                inputs=[
+                ],
+                outputs=[
+                    comp.seed,
+                ]
+            )
+
+            comp.reuse_seed.click(
+                fn=getLastUsedSeed,
+                inputs=[],
+                outputs=[
+                    comp.seed,
+                ]
+            )
+
+
+            OuputPanelWatcher.send_back_to_replacer.click(
+                fn=sendBackToReplacer,
+                _js="sendBackToReplacer",
+                inputs=[
+                    comp.replacer_gallery,
+                    comp.dummy_component
+                ],
+                outputs=[
+                    comp.image,
+                ]
+            )
+
+            if not doNotShowUnloadButton():
+                comp.unload.click(
+                    fn=wrap_queued_call(unloadModels),
+                    inputs=[],
+                    outputs=[])
+
+            comp.avoid_mask_brush_color.change(
+                fn=update_mask_brush_color,
+                inputs=[comp.avoid_mask_brush_color],
+                outputs=[comp.avoidance_mask]
+            )
+
+            comp.avoid_mask_create_canvas.click(
+                fn=get_current_image,
+                _js='replacerGetCurrentSourceImg',
+                inputs=[
+                    comp.dummy_component,
+                    comp.trueComponent,
+                    comp.avoid_mask_need_limit,
+                    comp.max_resolution_on_detection
+                ],
+                outputs=[comp.avoidance_mask],
+                postprocess=False,
+            )
+
+
+            comp.custom_mask_brush_color.change(
+                fn=update_mask_brush_color,
+                inputs=[comp.custom_mask_brush_color],
+                outputs=[comp.custom_mask]
+            )
+
+            comp.create_canvas_custom_mask.click(
+                fn=get_current_image,
+                _js='replacerGetCurrentSourceImg',
+                inputs=[
+                    comp.dummy_component,
+                    comp.falseComponent,
+                    comp.custom_mask_need_limit,
+                    comp.max_resolution_on_detection
+                ],
+                outputs=[comp.custom_mask],
+                postprocess=False,
+            )
+
+            
+            if replacer_scripts.InpaintDifferenceGlobals:
+                comp.inpaint_diff_create.click(
+                    fn=replacer_scripts.computeInpaintDifference,
+                    inputs=[
+                        comp.non_altered_image_for_inpaint_diff,
+                        comp.image,
+                        comp.mask_blur,
+                        comp.inpaint_diff_mask_expand,
+                        comp.inpaint_diff_mask_erosion,
+                        comp.inpaint_diff_threshold,
+                        comp.inpaint_diff_contours_only,
+                    ],
+                    outputs=[comp.inpaint_diff_mask_view],
+                )
+
+            self.components = comp
+
+
+    def getReplacerTabUI(self):
+        return self.replacerTabUI
+
+
+replacerMainUI: ReplacerMainUI = None
+replacerMainUI_dedicated: ReplacerMainUI = None
+
+def initMainUI(*args):
+    global replacerMainUI, replacerMainUI_dedicated
+    replacerMainUI = ReplacerMainUI(isDedicatedPage=False)
+    replacerMainUI_dedicated = ReplacerMainUI(isDedicatedPage=True)

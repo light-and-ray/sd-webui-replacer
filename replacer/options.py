@@ -169,6 +169,21 @@ def getNegativePromptExamplesNumber():
     res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_negative_prompt", 10)
     return res
 
+section = (EXT_NAME_LOWER, EXT_NAME)
+preloaded_options = {
+    EXT_NAME_LOWER + "_default_extra_includes": shared.OptionInfo(
+        ["script"],
+        "Defaults for Extra include in gallery",
+        gr.CheckboxGroup,
+        {
+            'choices' : ["mask", "box", "cutted", "preview", "script"],
+        },
+        section=section,
+    ).needs_reload_ui(),
+}
+shared.options_templates.update(shared.options_section(section, preloaded_options))
+
+
 def on_ui_settings():
     section = (EXT_NAME_LOWER, EXT_NAME)
     if not hasattr(shared.OptionInfo, 'needs_reload_ui'): # webui 1.5.0
@@ -253,19 +268,6 @@ def on_ui_settings():
         ).needs_reload_ui()
     )
 
-
-    shared.opts.add_option(
-        EXT_NAME_LOWER + "_default_extra_includes",
-        shared.OptionInfo(
-            ["script"],
-            "Defaults for Extra include in gallery",
-            gr.CheckboxGroup,
-            {
-                'choices' : ["mask", "box", "cutted", "preview", "script"],
-            },
-            section=section,
-        ).needs_reload_ui()
-    )
 
 
     shared.opts.add_option(
