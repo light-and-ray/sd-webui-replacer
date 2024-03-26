@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import modules.script_callbacks as script_callbacks
 from modules import shared
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
+from modules.call_queue import queue_lock
 from replacer.generate import generate
 from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer.tools import generateSeed, IS_WEBUI_1_9
@@ -153,7 +154,12 @@ def replacer_api(_, app: FastAPI):
             soft_inpaint_args=soft_inpaint_args,
             )
 
-        processed, allExtraImages = generate(gArgs, "", False, False, data.extra_include)
+        with queue_lock:
+            shared.state.begin('api /replacer/replace')
+            try:
+                processed, allExtraImages = generate(gArgs, "", False, False, data.extra_include)
+            finally:
+                shared.state.end()
 
         return {
             "image": encode_pil_to_base64(processed.images[0]).decode(),

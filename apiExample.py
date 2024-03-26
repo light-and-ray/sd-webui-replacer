@@ -23,13 +23,14 @@ payload = {
         "controlnet": {
             "args": [
                 { # See ControlNetUnit dataclass for all possible fields
+                    "enabled": True,
                     "module": "openpose_full",
                     "model": "control_v11p_sd15_openpose [cab727d4]",
                 },
             ]
         },
         "soft inpainting": { # Default args from UI, recommended hight "mask_blur"
-            "args": [True, 1, 0.5, 4, 0, 1, 2]
+            "args": [False, 1, 0.5, 4, 0, 1, 2]
         },
     },
 }
@@ -37,6 +38,8 @@ payload = {
 response = requests.post(url=f'{SD_WEBUI}/replacer/replace', json=payload)
 if response.status_code == 200:
     response = response.json()
+    if response['info']:
+        print(response['info'])
     if response['image']:
         Image.open(io.BytesIO(base64.b64decode(response['image']))).show()
 else:

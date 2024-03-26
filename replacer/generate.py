@@ -27,6 +27,9 @@ def generateSingle(
     maskCutted = None
     maskBox = None
 
+    if interrupted():
+        return None, []
+
     if gArgs.use_inpaint_diff:
         gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask.convert('L')
 
@@ -52,6 +55,8 @@ def generateSingle(
         else:
             gArgs.mask = gArgs.custom_mask
 
+    if interrupted():
+        return None, []
 
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpainting"
@@ -151,6 +156,9 @@ def generate(
 
                 processed, extraImages = generateSingle(image, gArgs, saveDir_, saveSuffix,
                     saveToSubdirs, extra_includes, batch_processed)
+
+                if processed is None:
+                    break
 
                 if gArgs.pass_into_hires_fix_automatically:
                     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
