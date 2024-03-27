@@ -83,7 +83,7 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 - pass previous frame into ControlNet for video
 - tiled vae
 - ☑️ "hide segment anything extention" option
-- txt2img script
+- ☑️ txt2img script
 - allow multiply instances
 
 ### small todo:
