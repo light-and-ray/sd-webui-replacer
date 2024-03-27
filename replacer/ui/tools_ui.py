@@ -105,7 +105,10 @@ def watchOuputPanel(component, **kwargs):
 
     if elem_id == 'replacer_send_to_extras' or elem_id == 'extras_tab':
         OuputPanelWatcher.send_to_extras = component
-        OuputPanelWatcher.send_back_to_replacer = ToolButton('↙️', elem_id=f'replacer_send_back_to_replacer', tooltip="Send image back to Replcer's input")
+        OuputPanelWatcher.send_back_to_replacer = ToolButton('↙️',
+            elem_id=f'replacer_send_back_to_replacer',
+            tooltip="Send image back to Replcer's input",
+            visible=elem_id=='replacer_send_to_extras')
 
 
 class AttrDict(dict):
