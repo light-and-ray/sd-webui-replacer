@@ -4,12 +4,10 @@ import modules.shared as shared
 from modules.ui import plaintext_to_html
 from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData
 from replacer.video_tools import getVideoFrames, save_video
-from replacer.options import ( getDetectionPromptExamples, getPositivePromptExamples,
-    getNegativePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
-    getSaveDir,
-)
+from replacer.options import getSaveDir
 from replacer import replacer_scripts
 from replacer.tools import prepareMask, generateSeed
+from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.generate import generate
 
 
@@ -99,22 +97,11 @@ def generate_ui(
 
     *scripts_args,
 ):
-    if detectionPrompt == '':
-        detectionPrompt = getDetectionPromptExamples()[0]
-
-    if positvePrompt == '' and useFirstPositivePromptFromExamples():
-        positvePrompt = getPositivePromptExamples()[0]
-
-    if negativePrompt == '' and useFirstNegativePromptFromExamples():
-        negativePrompt = getNegativePromptExamples()[0]
-
     if (seed == -1):
         seed = generateSeed()
 
     output_batch_dir = output_batch_dir.strip()
     video_output_dir = video_output_dir.strip()
-    detectionPrompt = detectionPrompt.strip()
-    avoidancePrompt = avoidancePrompt.strip()
 
     images = []
 
@@ -243,6 +230,7 @@ def generate_ui(
         cn_args=cn_args,
         soft_inpaint_args=soft_inpaint_args,
         )
+    prepareExpectedUIBehavior(gArgs)
 
     saveDir = getSaveDir()
     saveToSubdirs = True

@@ -8,7 +8,7 @@ from modules.call_queue import queue_lock
 from replacer.generate import generate
 from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer.tools import generateSeed
-from replacer.ui.tools_ui import IS_WEBUI_1_9
+from replacer.ui.tools_ui import IS_WEBUI_1_9, prepareExpectedUIBehavior
 from replacer import replacer_scripts
 
 
@@ -82,9 +82,6 @@ def replacer_api(_, app: FastAPI):
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_base64_to_image(data.input_image).convert("RGBA")
         
-        if (data.seed == -1):
-            data.seed = generateSeed()
-
         cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs_api(data.scripts)
 
         hires_fix_args = HiresFixArgs(
@@ -154,6 +151,7 @@ def replacer_api(_, app: FastAPI):
             cn_args=cn_args,
             soft_inpaint_args=soft_inpaint_args,
             )
+        prepareExpectedUIBehavior(gArgs)
 
         with queue_lock:
             shared.state.begin('api /replacer/replace')

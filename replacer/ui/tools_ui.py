@@ -2,8 +2,11 @@ import gradio as gr
 from modules import shared, sd_samplers
 from modules.ui_components import ToolButton
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
-from replacer.options import EXT_NAME
-from replacer.tools import limitSizeByOneDemention
+from replacer.options import ( EXT_NAME, getDetectionPromptExamples, getNegativePromptExamples,
+    getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
+)
+from replacer.tools import limitSizeByOneDemention, generateSeed
+from replacer.generation_args import GenerationArgs
 
 
 try:
@@ -115,3 +118,19 @@ class AttrDict(dict):
 IS_WEBUI_1_9 = hasattr(shared.cmd_opts, 'unix_filenames_sanitization')
 
 
+
+def prepareExpectedUIBehavior(gArgs: GenerationArgs):
+    if gArgs.detectionPrompt == '':
+        gArgs.detectionPrompt = getDetectionPromptExamples()[0]
+
+    if gArgs.positvePrompt == '' and useFirstPositivePromptFromExamples():
+        gArgs.positvePrompt = getPositivePromptExamples()[0]
+
+    if gArgs.negativePrompt == '' and useFirstNegativePromptFromExamples():
+        gArgs.negativePrompt = getNegativePromptExamples()[0]
+
+    if (gArgs.seed == -1):
+        gArgs.seed = generateSeed()
+
+    gArgs.detectionPrompt = gArgs.detectionPrompt.strip()
+    gArgs.avoidancePrompt = gArgs.avoidancePrompt.strip()

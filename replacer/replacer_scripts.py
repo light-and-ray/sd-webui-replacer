@@ -43,7 +43,19 @@ def initCNScript():
     except:
         errors.report('Cannot register ControlNetUiGroup', exc_info=True)
         script_controlnet = None
+    initCNContext()
 
+oldCNContext = None
+def initCNContext():
+    global ControlNetUiGroup, oldCNContext
+    oldCNContext = ControlNetUiGroup.a1111_context
+    ControlNetUiGroup.a1111_context.img2img_submit_button = gr.Button(visible=False)
+
+def restoreCNContext():
+    global ControlNetUiGroup, oldCNContext
+    if not ControlNetUiGroup:
+        return
+    ControlNetUiGroup.a1111_context = oldCNContext
 
 g_cn_HWC3 = None
 def convertIntoCNImageFromat(image):
@@ -275,6 +287,9 @@ def initAllScripts():
     initInpaintDiffirence()
     initSoftInpaintScript()
     initLamaCleanerAsMaskedContent()
+
+def restoreTemporartChangedThigs():
+    restoreCNContext()
 
 
 def prepareScriptsArgs(scripts_args):

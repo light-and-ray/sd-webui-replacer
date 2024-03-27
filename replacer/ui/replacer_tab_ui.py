@@ -508,5 +508,9 @@ replacerMainUI_dedicated: ReplacerMainUI = None
 
 def initMainUI(*args):
     global replacerMainUI, replacerMainUI_dedicated
-    replacerMainUI = ReplacerMainUI(isDedicatedPage=False)
-    replacerMainUI_dedicated = ReplacerMainUI(isDedicatedPage=True)
+    try:
+        replacer_scripts.initAllScripts()
+        replacerMainUI = ReplacerMainUI(isDedicatedPage=False)
+        replacerMainUI_dedicated = ReplacerMainUI(isDedicatedPage=True)
+    finally:
+        replacer_scripts.restoreTemporartChangedThigs()

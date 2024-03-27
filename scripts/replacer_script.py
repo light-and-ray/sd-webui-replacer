@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import scripts, scripts_postprocessing
+from modules import scripts, scripts_postprocessing, errors, ui_settings
 from modules.processing import Processed, StableDiffusionProcessing
 from replacer.options import EXT_NAME
 from replacer.ui import replacer_tab_ui
@@ -7,6 +7,7 @@ from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer import replacer_scripts
 from replacer.tools import prepareMask
 from replacer.generate import generate
+from replacer.ui.tools_ui import prepareExpectedUIBehavior
 
 if hasattr(scripts_postprocessing.ScriptPostprocessing, 'process_firstpass'):  # webui >= 1.7
     from modules.ui_components import InputAccordion
@@ -18,9 +19,11 @@ else:
 class ReplacerScript(scripts.Script):
     def __init__(self):
         self.gArgs: GenerationArgs = None
-        self.extra_includes = []
-        self.enable = False
-        self.save_originals = True
+        self.extra_includes: list = None
+        self.enable: bool = None
+        self.save_originals: bool = None
+        self.force_override_sd_model: bool = None
+        self.force_sd_model_checkpoint: str = None
 
     def title(self):
         return EXT_NAME
@@ -36,84 +39,96 @@ class ReplacerScript(scripts.Script):
             as enable
         ):
             if not InputAccordion:
-                enable = gr.Checkbox(False, label="Enable")
-            gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
-            save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
+                with gr.Row():
+                    enable = gr.Checkbox(False, label="Enable")
+            with gr.Row():
+                gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
+            with gr.Row():
+                save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
+            with gr.Row():
+                gr.Markdown('Be sure you use inpainting model here')
+            with gr.Row():
+                force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
+                    value=True, elem_id=f"replacer_{tabName}_force_override_sd_model")
+                force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
         
-        
-            comp = replacer_tab_ui.replacerMainUI.components
-            inputs = [
-                enable,
-                save_originals,
+        comp = replacer_tab_ui.replacerMainUI.components
+        inputs = [
+            enable,
+            save_originals,
+            force_override_sd_model,
+            force_sd_model_checkpoint,
 
-                comp.detectionPrompt,
-                comp.avoidancePrompt,
-                comp.positvePrompt,
-                comp.negativePrompt,
-                comp.upscaler_for_img2img,
-                comp.seed,
-                comp.sampler,
-                comp.scheduler,
-                comp.steps,
-                comp.box_threshold,
-                comp.mask_expand,
-                comp.mask_blur,
-                comp.max_resolution_on_detection,
-                comp.sam_model_name,
-                comp.dino_model_name,
-                comp.cfg_scale,
-                comp.denoise,
-                comp.inpaint_padding,
-                comp.inpainting_fill,
-                comp.width,
-                comp.height,
-                comp.batch_count,
-                comp.batch_size,
-                comp.inpainting_mask_invert,
-                comp.extra_includes,
-                comp.fix_steps,
-                comp.override_sd_model,
-                comp.sd_model_checkpoint,
-                comp.mask_num,
-                comp.avoid_mask_mode,
-                comp.avoidance_mask,
-                comp.only_custom_mask,
-                comp.custom_mask_mode,
-                comp.custom_mask,
-                comp.use_inpaint_diff,
-                comp.inpaint_diff_mask_view,
-                comp.lama_cleaner_upscaler,
-                comp.clip_skip,
-                comp.pass_into_hires_fix_automatically,
-                comp.save_before_hires_fix,
+            comp.detectionPrompt,
+            comp.avoidancePrompt,
+            comp.positvePrompt,
+            comp.negativePrompt,
+            comp.upscaler_for_img2img,
+            comp.seed,
+            comp.sampler,
+            comp.scheduler,
+            comp.steps,
+            comp.box_threshold,
+            comp.mask_expand,
+            comp.mask_blur,
+            comp.max_resolution_on_detection,
+            comp.sam_model_name,
+            comp.dino_model_name,
+            comp.cfg_scale,
+            comp.denoise,
+            comp.inpaint_padding,
+            comp.inpainting_fill,
+            comp.width,
+            comp.height,
+            comp.batch_count,
+            comp.batch_size,
+            comp.inpainting_mask_invert,
+            comp.extra_includes,
+            comp.fix_steps,
+            comp.override_sd_model,
+            comp.sd_model_checkpoint,
+            comp.mask_num,
+            comp.avoid_mask_mode,
+            comp.avoidance_mask,
+            comp.only_custom_mask,
+            comp.custom_mask_mode,
+            comp.custom_mask,
+            comp.use_inpaint_diff,
+            comp.inpaint_diff_mask_view,
+            comp.lama_cleaner_upscaler,
+            comp.clip_skip,
+            comp.pass_into_hires_fix_automatically,
+            comp.save_before_hires_fix,
 
-                comp.hf_upscaler,
-                comp.hf_steps,
-                comp.hf_sampler,
-                comp.hf_scheduler,
-                comp.hf_denoise,
-                comp.hf_cfg_scale,
-                comp.hfPositivePromptSuffix,
-                comp.hf_size_limit,
-                comp.hf_above_limit_upscaler,
-                comp.hf_unload_detection_models,
-                comp.hf_disable_cn,
-                comp.hf_extra_mask_expand,
-                comp.hf_positvePrompt,
-                comp.hf_negativePrompt,
-                comp.hf_sd_model_checkpoint,
-                comp.hf_extra_inpaint_padding,
-                comp.hf_extra_mask_blur,
-                comp.hf_randomize_seed,
-                comp.hf_soft_inpaint,
-            ] + comp.cn_inputs \
-              + comp.soft_inpaint_inputs
+            comp.hf_upscaler,
+            comp.hf_steps,
+            comp.hf_sampler,
+            comp.hf_scheduler,
+            comp.hf_denoise,
+            comp.hf_cfg_scale,
+            comp.hfPositivePromptSuffix,
+            comp.hf_size_limit,
+            comp.hf_above_limit_upscaler,
+            comp.hf_unload_detection_models,
+            comp.hf_disable_cn,
+            comp.hf_extra_mask_expand,
+            comp.hf_positvePrompt,
+            comp.hf_negativePrompt,
+            comp.hf_sd_model_checkpoint,
+            comp.hf_extra_inpaint_padding,
+            comp.hf_extra_mask_blur,
+            comp.hf_randomize_seed,
+            comp.hf_soft_inpaint,
+        ] + comp.cn_inputs \
+            + comp.soft_inpaint_inputs
 
         return inputs
 
     def before_process(self, p,
         enable,
         save_originals,
+        force_override_sd_model,
+        force_sd_model_checkpoint,
 
         detectionPrompt,
         avoidancePrompt,
@@ -181,6 +196,10 @@ class ReplacerScript(scripts.Script):
         self.enable = enable
         self.save_originals = save_originals
         self.extra_includes = extra_includes
+        self.force_override_sd_model = force_override_sd_model
+        self.force_sd_model_checkpoint = force_sd_model_checkpoint
+
+
         cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs(scripts_args)
 
         hires_fix_args = HiresFixArgs(
@@ -252,13 +271,17 @@ class ReplacerScript(scripts.Script):
             cn_args=cn_args,
             soft_inpaint_args=soft_inpaint_args,
             )
+        prepareExpectedUIBehavior(self.gArgs)
 
 
 
     def postprocess(self, p: StableDiffusionProcessing, processed: Processed, *args):
         if not self.enable:
             return
-        self.gArgs.images = processed.images[:len(processed.all_seeds)]
+        self.gArgs.images = [x.convert('RGBA') for x in processed.images[:len(processed.all_seeds)]]
+        if self.force_override_sd_model:
+            self.gArgs.override_sd_model = True
+            self.gArgs.sd_model_checkpoint = self.force_sd_model_checkpoint
 
         saveDir = p.outpath_samples if p.save_samples() else None
         saveToSubdirs = True
@@ -273,9 +296,11 @@ class ReplacerScript(scripts.Script):
             return
 
         if self.save_originals:
-            processed.images.extend(processedReplacer, allExtraImages)
+            processed.images.extend(processedReplacer.images + allExtraImages)
+            processed.infotexts += [processed.info] * len(processedReplacer.images + allExtraImages)
         else:
             processed.images = processed.images[len(processed.all_seeds):]
+            processed.infotexts = processed.processed.infotexts[len(processed.all_seeds):]
             processed.images = processedReplacer.images + processed.images + allExtraImages
+            processed.infotexts = [processed.info]*len(processedReplacer.images) + processed.infotexts + [processed.info]*len(allExtraImages) 
 
-del ReplacerScript

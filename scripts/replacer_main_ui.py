@@ -13,7 +13,6 @@ from replacer import replacer_scripts
 
 
 def on_ui_tabs():
-    replacer_scripts.initAllScripts()
     tab = replacer_tab_ui.replacerMainUI.getReplacerTabUI()
     return [(tab, EXT_NAME, EXT_NAME)]
 
