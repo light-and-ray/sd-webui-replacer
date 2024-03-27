@@ -1,6 +1,6 @@
 import gradio as gr
 from modules import scripts, scripts_postprocessing, errors, ui_settings
-from modules.processing import Processed, StableDiffusionProcessing
+from modules.processing import Processed, StableDiffusionProcessingTxt2Img
 from replacer.options import EXT_NAME, needHideReplacerScript
 from replacer.ui import replacer_tab_ui
 from replacer.generation_args import GenerationArgs, HiresFixArgs
@@ -45,6 +45,7 @@ class ReplacerScript(scripts.Script):
                 gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
             with gr.Row():
                 save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
+                follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix', visible=not is_img2img)
             with gr.Row():
                 gr.Markdown('Be sure you use inpainting model here')
             with gr.Row():
@@ -58,6 +59,7 @@ class ReplacerScript(scripts.Script):
             save_originals,
             force_override_sd_model,
             force_sd_model_checkpoint,
+            follow_txt2img_hires_fix,
 
             comp.detectionPrompt,
             comp.avoidancePrompt,
@@ -124,11 +126,12 @@ class ReplacerScript(scripts.Script):
 
         return inputs
 
-    def before_process(self, p,
+    def before_process(self, p: StableDiffusionProcessingTxt2Img,
         enable,
         save_originals,
         force_override_sd_model,
         force_sd_model_checkpoint,
+        follow_txt2img_hires_fix,
 
         detectionPrompt,
         avoidancePrompt,
@@ -193,11 +196,16 @@ class ReplacerScript(scripts.Script):
         
         *scripts_args,
     ):
+        p.do_not_save_grid = True
+        if not save_originals:
+            p.do_not_save_samples = True
+
         self.enable = enable
         self.save_originals = save_originals
         self.extra_includes = extra_includes
         self.force_override_sd_model = force_override_sd_model
         self.force_sd_model_checkpoint = force_sd_model_checkpoint
+        self.follow_txt2img_hires_fix = follow_txt2img_hires_fix
 
 
         cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs(scripts_args)
@@ -275,13 +283,15 @@ class ReplacerScript(scripts.Script):
 
 
 
-    def postprocess(self, p: StableDiffusionProcessing, processed: Processed, *args):
+    def postprocess(self, p: StableDiffusionProcessingTxt2Img, processed: Processed, *args):
         if not self.enable:
             return
         self.gArgs.images = [x.convert('RGBA') for x in processed.images[:len(processed.all_seeds)]]
         if self.force_override_sd_model:
             self.gArgs.override_sd_model = True
             self.gArgs.sd_model_checkpoint = self.force_sd_model_checkpoint
+        if self.follow_txt2img_hires_fix:
+            self.gArgs.pass_into_hires_fix_automatically = getattr(p, 'enable_hr', False)
 
         saveDir = p.outpath_samples if getattr(p, 'save_samples', lambda: True)() else None
         saveToSubdirs = True
@@ -300,7 +310,7 @@ class ReplacerScript(scripts.Script):
             processed.infotexts += [processed.info] * len(processedReplacer.images + allExtraImages)
         else:
             processed.images = processed.images[len(processed.all_seeds):]
-            processed.infotexts = processed.processed.infotexts[len(processed.all_seeds):]
+            processed.infotexts = processed.infotexts[len(processed.all_seeds):]
             processed.images = processedReplacer.images + processed.images + allExtraImages
             processed.infotexts = [processed.info]*len(processedReplacer.images) + processed.infotexts + [processed.info]*len(allExtraImages) 
 

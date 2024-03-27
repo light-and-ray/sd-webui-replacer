@@ -2,8 +2,8 @@ from PIL import Image
 import modules.shared as shared
 from modules.shared import opts
 from modules.images import save_image
-from modules import sd_models
-from replacer.mask_creator import MasksCreator
+from modules import sd_models, errors
+from replacer.mask_creator import MasksCreator, NothingDetectedError
 from replacer.generation_args import GenerationArgs, AppropriateData
 from replacer.options import EXT_NAME, needAutoUnloadModels
 from replacer import replacer_scripts
@@ -174,7 +174,8 @@ def generate(
 
             except Exception as e:
                 print(f'    [{EXT_NAME}]    Exception: {e}')
-
+                if type(e) is not NothingDetectedError:
+                    errors.report('***', exc_info=True)
                 if needAutoUnloadModels():
                     clearCache()
                 if n == 1:
