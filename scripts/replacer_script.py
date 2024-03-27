@@ -120,7 +120,7 @@ class ReplacerScript(scripts.Script):
             comp.hf_randomize_seed,
             comp.hf_soft_inpaint,
         ] + comp.cn_inputs \
-            + comp.soft_inpaint_inputs
+          + comp.soft_inpaint_inputs
 
         return inputs
 
