@@ -104,6 +104,12 @@ Dedicated page (replacer tab only) is available on url `/replacer-dedicated`
 ![](/docs/images/controlnet.jpg)
 [ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) is also avaliavle here. [Forge](https://github.com/lllyasviel/stable-diffusion-webui-forge) is also supported
 
+## Replacer script in txt2img/img2img tabs
+![](/docs/images/replacer_script.jpg)
+
+You can use it to pass generated images into replacer immediately
+
+
 ## Extention name
 Replacer" name of this extension, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
