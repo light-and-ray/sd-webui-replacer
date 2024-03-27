@@ -53,26 +53,14 @@ def mountDedicatedPage(demo, app):
 script_callbacks.on_app_started(mountDedicatedPage)
 
 
-def hideSegmentAnythingAccordions(demo, app):
-    try:
-        if IS_WEBUI_1_5:
-            print('hideSegmentAnythingAccordions is not avaliable for webui 1.5')
-            return
+def hideSegmentAnythingAccordions(component, **kwargs):
+    if type(component) is gr.Accordion and\
+        getattr(component, 'label', "") == "Segment Anything":
 
-        for tab in ['txt2img', 'img2img']:
-            samUseCpuPath = f"{tab}/Use CPU for SAM/value"
-            samUseCpu = demo.ui_loadsave.component_mapping[samUseCpuPath]
-            accordion = samUseCpu.parent.parent.parent.parent
-            accordion.visible = False
-            accordion.render = False
-
-        print(f"[{EXT_NAME}] Segment Anythings accordions are hidden")
-    except Exception as e:
-        errors.report(f"[{EXT_NAME}] not possible to hide Segment Anythings accordions: {e}", exc_info=True)
-
+        component.visible = False
 
 if needHideSegmentAnythingAccordions():
-    script_callbacks.on_app_started(hideSegmentAnythingAccordions)
+    script_callbacks.on_after_component(hideSegmentAnythingAccordions)
 
 
 script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)

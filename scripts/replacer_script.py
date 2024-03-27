@@ -1,7 +1,7 @@
 import gradio as gr
 from modules import scripts, scripts_postprocessing, errors, ui_settings
 from modules.processing import Processed, StableDiffusionProcessing
-from replacer.options import EXT_NAME
+from replacer.options import EXT_NAME, needHideReplacerScript
 from replacer.ui import replacer_tab_ui
 from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer import replacer_scripts
@@ -304,3 +304,6 @@ class ReplacerScript(scripts.Script):
             processed.images = processedReplacer.images + processed.images + allExtraImages
             processed.infotexts = [processed.info]*len(processedReplacer.images) + processed.infotexts + [processed.info]*len(allExtraImages) 
 
+
+if needHideReplacerScript():
+    del ReplacerScript

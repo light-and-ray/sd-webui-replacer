@@ -152,6 +152,10 @@ def needHideSegmentAnythingAccordions():
     res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_segment_anything_accordions", False)
     return res
 
+def needHideReplacerScript():
+    res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_replacer_script", False)
+    return res
+
 
 def getDetectionPromptExamplesNumber():
     res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_detection_prompt", 10)
@@ -217,7 +221,17 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_hide_segment_anything_accordions",
         shared.OptionInfo(
             False,
-            f"Hide Segment Anything accordions at txt2img and img2img tabs. Useful if you installed it only for {EXT_NAME}",
+            f"Hide Segment Anything accordions in txt2img and img2img tabs. Useful if you installed it only for {EXT_NAME}",
+            gr.Checkbox,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_hide_replacer_script",
+        shared.OptionInfo(
+            False,
+            f"Hide {EXT_NAME} accordions in txt2img and img2img tabs",
             gr.Checkbox,
             section=section,
         ).needs_reload_ui()
