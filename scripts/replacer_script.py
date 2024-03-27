@@ -283,7 +283,7 @@ class ReplacerScript(scripts.Script):
             self.gArgs.override_sd_model = True
             self.gArgs.sd_model_checkpoint = self.force_sd_model_checkpoint
 
-        saveDir = p.outpath_samples if p.save_samples() else None
+        saveDir = p.outpath_samples if getattr(p, 'save_samples', lambda: True)() else None
         saveToSubdirs = True
 
         try:
