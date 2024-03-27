@@ -183,7 +183,6 @@ class ReplacerMainUI:
 
                                 if not replacer_scripts.controlNetAccordion:
                                     errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
-                                    replacer_scripts.script_controlnet = None
                                 else:
                                     with replacer_scripts.controlNetAccordion:
                                         with gr.Row():
