@@ -289,8 +289,8 @@ class ReplacerScript(scripts.Script):
         if self.force_override_sd_model:
             self.gArgs.override_sd_model = True
             self.gArgs.sd_model_checkpoint = self.force_sd_model_checkpoint
-        if self.follow_txt2img_hires_fix:
-            self.gArgs.pass_into_hires_fix_automatically = getattr(p, 'enable_hr', False)
+        if self.follow_txt2img_hires_fix and hasattr(p, 'enable_hr'):
+            self.gArgs.pass_into_hires_fix_automatically = p.enable_hr
 
         saveDir = p.outpath_samples if getattr(p, 'save_samples', lambda: True)() else None
         saveToSubdirs = True
