@@ -70,25 +70,7 @@ Note: hires fix is designed for single-user server
 
 You can use Replacer to inpaint video with a regular stable diffusion inpaint method. It is very inconsistent, but in a few cases it can produce good enough results
 
-Example:
-```
-size: 768x512
-detection prompt: hands
-positive prompt: photo of dog
-negative prompt: clothes, cartoon, painting, illustration, (worst quality, low quality, normal quality:2)
-denoising: 0.3
-masked content: lama cleaner
-fps: 10
-postprocessed with RIFE
-```
-
-**Before:**
-
-https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/a9816404-fea3-4d9d-ac82-81ed596a86f4
-
-**After:**
-
-https://github.com/light-and-ray/sd-webui-replacer/assets/33491867/20a01878-6361-4dc3-a30f-be92ff85dc85
+![](/docs/images/replacer_video.jpg)
 
 To increase consistency, it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
 

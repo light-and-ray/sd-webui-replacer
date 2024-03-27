@@ -112,10 +112,9 @@ def enableInpaintModeForCN(gArgs, p, previousFrame):
 
         if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
             if previousFrame:
-                print(f'Passing the previous frame CN unit {i}')
+                print(f'Passing the previous frame into CN unit {i}')
                 gArgs.cn_args[i].image = {
                     "image": convertIntoCNImageFromat(previousFrame),
-                    # "mask": convertIntoCNImageFromat(p.image_mask),
                 }
                 gArgs.cn_args[i].enabled = True
             else:
