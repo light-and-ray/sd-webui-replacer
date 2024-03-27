@@ -80,7 +80,7 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 - ☑️ progress bar + interrupt
 - ☑️ option for pass into hires fix automatically
 - ☑️ control net
-- pass previous frame into ControlNet for video
+- ☑️ pass previous frame into ControlNet for video
 - tiled vae
 - ☑️ "hide segment anything extention" option
 - ☑️ txt2img script

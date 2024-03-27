@@ -160,17 +160,30 @@ class ReplacerMainUI:
                                 placeholder="Leave blank to save images to the default path.",
                                 info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
                                 elem_id="replacer_video_output_dir")
-                            gr.Markdown("To increase consistency it's better to inpaint clear "\
-                                "objects on video with good quality and enough context. "\
-                                "Your prompts need to produce consistent results\n\n"\
-                                "To suppress flickering you can generate in little fps (e.g. 10), "\
-                                "then interpolate (x2) it with ai interpolation algorithm "\
-                                "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
-                                "[frame interpolation in deforum sd-webui extension]("\
-                                "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
-                                "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
-                                "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
-                                "extensions to increase consistency, if it fits to your scenario")
+                            with gr.Accordion("Help", open=False):
+                                gr.Markdown(
+                                    "To increase consistency it's better to inpaint clear "\
+                                    "objects on video with good quality and enough context. "\
+                                    "Your prompts need to produce consistent results\n\n"\
+                                    \
+                                    "To suppress flickering you can generate in little fps (e.g. 10), "\
+                                    "then interpolate (x2) it with ai interpolation algorithm "\
+                                    "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
+                                    "[frame interpolation in deforum sd-webui extension]("\
+                                    "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
+                                    \
+                                    "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
+                                    "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
+                                    "extensions to increase consistency, if it fits to your scenario\n\n"\
+                                    \
+                                    "Also a good can be to use `Pass previous frame into ControlNet` "\
+                                    "with _IP-Adapter_, _Reference_, _Revision_, _T2IA Color_, _T2IA Style_"
+                                    )
+                            if replacer_scripts.script_controlnet:
+                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass previous frame into ControlNet',
+                                    choices=[f"Unit {x}" for x in range(shared.opts.control_net_unit_count)], elem_id='replacer_previous_frame_into_controlnet')
+                            else:
+                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)
                     
                     comp.cn_inputs = []
                     setCustomScriptSourceForComponents("controlnet")
@@ -337,6 +350,7 @@ class ReplacerMainUI:
                     comp.clip_skip,
                     comp.pass_into_hires_fix_automatically,
                     comp.save_before_hires_fix,
+                    comp.previous_frame_into_controlnet,
 
                     comp.hf_upscaler,
                     comp.hf_steps,

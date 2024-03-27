@@ -74,6 +74,7 @@ def generate_ui(
     clip_skip,
     pass_into_hires_fix_automatically,
     save_before_hires_fix,
+    previous_frame_into_controlnet,
 
     hf_upscaler,
     hf_steps,
@@ -225,8 +226,9 @@ def generate_ui(
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,
-        hires_fix_args=hires_fix_args,
+        previous_frame_into_controlnet=previous_frame_into_controlnet if tab_index == 3 else [],
 
+        hires_fix_args=hires_fix_args,
         cn_args=cn_args,
         soft_inpaint_args=soft_inpaint_args,
         )

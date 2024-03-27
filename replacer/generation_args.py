@@ -80,8 +80,9 @@ class GenerationArgs:
 
     pass_into_hires_fix_automatically: bool
     save_before_hires_fix: bool
-    hires_fix_args: HiresFixArgs
+    previous_frame_into_controlnet: list
 
+    hires_fix_args: HiresFixArgs
     cn_args: list
     soft_inpaint_args: list
 

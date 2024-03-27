@@ -1,3 +1,4 @@
+import copy
 import gradio as gr
 from modules import scripts, scripts_postprocessing, errors, ui_settings
 from modules.processing import Processed, StableDiffusionProcessingTxt2Img
@@ -122,6 +123,10 @@ class ReplacerScript(scripts.Script):
             comp.hf_soft_inpaint,
         ] + comp.cn_inputs \
           + comp.soft_inpaint_inputs
+
+        for i in range(len(inputs)):
+            inputs[i] = copy.copy(inputs[i])
+            inputs[i].do_not_save_to_config = True
 
         return inputs
 
@@ -273,8 +278,9 @@ class ReplacerScript(scripts.Script):
             clip_skip=clip_skip,
             pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
             save_before_hires_fix=save_before_hires_fix,
-            hires_fix_args=hires_fix_args,
+            previous_frame_into_controlnet=[],
 
+            hires_fix_args=hires_fix_args,
             cn_args=cn_args,
             soft_inpaint_args=soft_inpaint_args,
             )

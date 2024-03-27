@@ -101,18 +101,32 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
         processed.images[i] = imageOrg
 
 
-def enableInpaintModeForCN(cn_args, p):
+def enableInpaintModeForCN(gArgs, p, previousFrame):
     if IS_SD_WEBUI_FORGE: return
     global external_code
+    gArgs.cn_args = list(gArgs.cn_args)
     mask = None
 
-    for controlNetUnit in cn_args:
-        controlNetUnit = external_code.to_processing_unit(controlNetUnit)
+    for i in range(len(gArgs.cn_args)):
+        gArgs.cn_args[i] = external_code.to_processing_unit(gArgs.cn_args[i])
 
-        if not controlNetUnit.enabled:
+        if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
+            if previousFrame:
+                print(f'Passing the previous frame CN unit {i}')
+                gArgs.cn_args[i].image = {
+                    "image": convertIntoCNImageFromat(previousFrame),
+                    # "mask": convertIntoCNImageFromat(p.image_mask),
+                }
+                gArgs.cn_args[i].enabled = True
+            else:
+                print(f'Disabling CN unit {i} for the first frame')
+                gArgs.cn_args[i].enabled = False
+                continue
+
+        if not gArgs.cn_args[i].enabled:
             continue
 
-        if not IS_SD_WEBUI_FORGE and controlNetUnit.module == 'inpaint_only':
+        if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module == 'inpaint_only':
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:
@@ -121,15 +135,15 @@ def enableInpaintModeForCN(cn_args, p):
 
             print('Use cn inpaint instead of sd inpaint')
             image = limitSizeByOneDemention(p.init_images[0], max(p.width, p.height))
-            controlNetUnit.image = {
+            gArgs.cn_args[i].image = {
                 "image": convertIntoCNImageFromat(image),
                 "mask": convertIntoCNImageFromat(mask.resize(image.size)),
             }
             p.image_mask = None
             p.inpaint_full_res = False
             p.width, p.height = image.size
-            controlNetUnit.inpaint_crop_input_image = False
-            controlNetUnit.resize_mode = external_code.ResizeMode.RESIZE
+            gArgs.cn_args[i].inpaint_crop_input_image = False
+            gArgs.cn_args[i].resize_mode = external_code.ResizeMode.RESIZE
             p.needRestoreAfterCN = True
 
 
