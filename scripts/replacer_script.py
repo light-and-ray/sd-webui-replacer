@@ -45,12 +45,11 @@ class ReplacerScript(scripts.Script):
                 gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
             with gr.Row():
                 save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
-                follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix', visible=not is_img2img)
-            with gr.Row():
-                gr.Markdown('Be sure you use inpainting model here')
+                follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix',visible=not is_img2img)
             with gr.Row():
                 force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
-                    value=True, elem_id=f"replacer_{tabName}_force_override_sd_model")
+                    value=True, elem_id=f"replacer_{tabName}_force_override_sd_model",
+                    info='Be sure you use inpainting model here')
                 force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
         
         comp = replacer_tab_ui.replacerMainUI.components
