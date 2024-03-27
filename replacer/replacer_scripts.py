@@ -45,17 +45,32 @@ def initCNScript():
         script_controlnet = None
     initCNContext()
 
+
+def reinitCNScript():
+    global script_controlnet
+    if script_controlnet is None:
+        return
+    cnet_idx = None
+    for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
+        if script.title().lower() == "controlnet":
+            cnet_idx = idx
+            break
+    if cnet_idx is not None:
+        script_controlnet.args_from =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_from
+        script_controlnet.args_to =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_to
+
+
 oldCNContext = None
 def initCNContext():
     global ControlNetUiGroup, oldCNContext
-    oldCNContext = ControlNetUiGroup.a1111_context
+    oldCNContext = copy.copy(ControlNetUiGroup.a1111_context)
     ControlNetUiGroup.a1111_context.img2img_submit_button = gr.Button(visible=False)
 
 def restoreCNContext():
     global ControlNetUiGroup, oldCNContext
     if not ControlNetUiGroup:
         return
-    ControlNetUiGroup.a1111_context = oldCNContext
+    ControlNetUiGroup.a1111_context = copy.copy(oldCNContext)
 
 g_cn_HWC3 = None
 def convertIntoCNImageFromat(image):
@@ -197,6 +212,21 @@ def initSoftInpaintScript():
         script_soft_inpaint = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
 
 
+def reinitSoftInpaintScript():
+    global script_soft_inpaint
+    if script_soft_inpaint is None:
+        return
+    index = None
+    for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
+        if script.title() == "Soft Inpainting":
+            index = idx
+            break
+    if index is not None:
+        script_soft_inpaint.args_from = scripts.scripts_img2img.alwayson_scripts[index].args_from
+        script_soft_inpaint.args_to = scripts.scripts_img2img.alwayson_scripts[index].args_to
+
+
+
 
 needWatchSoftInpaintUI = False
 
@@ -283,6 +313,7 @@ def mountImageComparisonTab():
 
 
 def initAllScripts():
+    scripts.scripts_img2img.initialize_scripts(is_img2img=True)
     initCNScript()
     initInpaintDiffirence()
     initSoftInpaintScript()
@@ -291,6 +322,10 @@ def initAllScripts():
 def restoreTemporartChangedThigs():
     restoreCNContext()
 
+def reinitAllScreiptsAfterUICreated(*args):
+    reinitCNScript()
+    reinitSoftInpaintScript()
+    initLamaCleanerAsMaskedContent()
 
 def prepareScriptsArgs(scripts_args):
     global script_controlnet, script_soft_inpaint

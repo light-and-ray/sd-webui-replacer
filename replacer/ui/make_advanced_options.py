@@ -187,7 +187,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                             replacer_scripts.needWatchSoftInpaintUI = False
                             from modules.ui_components import InputAccordion
                             new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
-                            new_soft_inpaint_accordion.accordion.children = soft_inpaint_inputs[0].accordion.children
+                            new_soft_inpaint_accordion.accordion.children = comp.soft_inpaint_inputs[0].accordion.children
                             for child in new_soft_inpaint_accordion.accordion.children:
                                 child.parent = new_soft_inpaint_accordion.accordion
                             comp.soft_inpaint_inputs[0].accordion.visible = False
