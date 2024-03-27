@@ -134,3 +134,16 @@ def prepareExpectedUIBehavior(gArgs: GenerationArgs):
 
     gArgs.detectionPrompt = gArgs.detectionPrompt.strip()
     gArgs.avoidancePrompt = gArgs.avoidancePrompt.strip()
+
+
+custom_script_source = None
+
+def setCustomScriptSourceForComponents(text: str):
+    global custom_script_source
+    custom_script_source = text
+
+
+def watchSetCustomScriptSourceForComponents(component, **kwargs):
+    global custom_script_source
+    if custom_script_source is not None:
+        component.custom_script_source = custom_script_source

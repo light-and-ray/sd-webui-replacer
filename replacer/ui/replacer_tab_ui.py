@@ -13,7 +13,8 @@ from replacer import replacer_scripts
 from replacer.ui.make_advanced_options import makeAdvancedOptions
 from replacer.ui.make_hiresfix_options import makeHiresFixOptions
 from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, unloadModels, AttrDict,
-    getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow
+    getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow,
+    setCustomScriptSourceForComponents,
 )
 
 
@@ -172,6 +173,7 @@ class ReplacerMainUI:
                                 "extensions to increase consistency, if it fits to your scenario")
                     
                     comp.cn_inputs = []
+                    setCustomScriptSourceForComponents("controlnet")
                     if replacer_scripts.script_controlnet:
                         try:
                             with gr.Row():
@@ -189,6 +191,7 @@ class ReplacerMainUI:
                         except Exception as e:
                             errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
                             replacer_scripts.script_controlnet = None
+                    setCustomScriptSourceForComponents(None)
 
 
                 with gr.Column(scale=15):

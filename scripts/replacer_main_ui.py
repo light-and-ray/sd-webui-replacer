@@ -7,7 +7,7 @@ from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingA
 from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_tab_ui
 from replacer.tools import getReplacerFooter
-from replacer.ui.tools_ui import watchOuputPanel
+from replacer.ui.tools_ui import watchOuputPanel, watchSetCustomScriptSourceForComponents
 from replacer import replacer_scripts
 
 
@@ -67,6 +67,7 @@ script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)
 script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
 script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOuputPanel)
+script_callbacks.on_after_component(watchSetCustomScriptSourceForComponents)
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_after_component(replacer_scripts.addButtonIntoComparisonTab)
 script_callbacks.on_after_component(replacer_scripts.watchImageComparison)

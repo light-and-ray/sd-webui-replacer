@@ -6,7 +6,7 @@ from replacer.options import (EXT_NAME_LOWER, doNotShowUnloadButton, getAvoidanc
     getAvoidancePromptExamplesNumber, getMaskColorStr
 )
 from replacer import replacer_scripts
-from replacer.ui.tools_ui import IS_WEBUI_1_9, AttrDict, IS_WEBUI_1_5
+from replacer.ui.tools_ui import IS_WEBUI_1_9, AttrDict, IS_WEBUI_1_5, setCustomScriptSourceForComponents
 
 
 
@@ -179,6 +179,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         elem_id="replacer_mask_mode")
 
                 comp.soft_inpaint_inputs = []
+                setCustomScriptSourceForComponents("soft_inpainting")
                 if replacer_scripts.script_soft_inpaint:
                     try:
                         with gr.Row():
@@ -195,6 +196,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     except Exception as e:
                         errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
                         replacer_scripts.script_soft_inpaint = None
+                setCustomScriptSourceForComponents(None)
 
 
             with gr.Tab('Avoidance'):
@@ -266,6 +268,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     if IS_WEBUI_1_5:
                         comp.custom_mask_brush_color.visible = False
 
+            setCustomScriptSourceForComponents("inpaint_diff")
             with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
                     else gr.Group()) as comp.inpaint_diff_tab:
                 with gr.Row():
@@ -298,4 +301,5 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
             if not replacer_scripts.InpaintDifferenceGlobals:
                 comp.inpaint_diff_tab.visible = False
                 comp.inpaint_diff_tab.render = False
+            setCustomScriptSourceForComponents(None)
 

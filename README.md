@@ -88,4 +88,3 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 
 ### small todo:
 - add hires fix args into metadata
-- add scripts paths inside ui-config
