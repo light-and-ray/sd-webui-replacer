@@ -63,6 +63,9 @@ def inpaint(
         **schedulerKWargs,
     )
 
+    if gArgs.do_not_use_mask:
+        p.inpaint_full_res = False
+        p.resize_mode = 1 # crop and resize
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed

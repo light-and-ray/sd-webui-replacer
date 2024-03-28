@@ -81,6 +81,7 @@ class GenerationArgs:
     pass_into_hires_fix_automatically: bool
     save_before_hires_fix: bool
     previous_frame_into_controlnet: list
+    do_not_use_mask: bool
 
     hires_fix_args: HiresFixArgs
     cn_args: list

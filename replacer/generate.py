@@ -30,7 +30,9 @@ def generateSingle(
     if interrupted():
         return None, []
 
-    if gArgs.use_inpaint_diff:
+    if gArgs.do_not_use_mask:
+        gArgs.mask = Image.new('L', image.size, 255)
+    elif gArgs.use_inpaint_diff:
         gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask.convert('L')
 
     elif gArgs.only_custom_mask and gArgs.custom_mask is not None:

@@ -267,6 +267,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         info='visual only, use when brush color is hard to see')
                     if IS_WEBUI_1_5:
                         comp.custom_mask_brush_color.visible = False
+                    comp.do_not_use_mask = gr.Checkbox(value=False, label="Do not use mask", info="Ignore any masks, equivalent of img2img")
 
             setCustomScriptSourceForComponents("inpaint_diff")
             with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals

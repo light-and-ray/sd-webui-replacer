@@ -147,6 +147,7 @@ def replacer_api(_, app: FastAPI):
             pass_into_hires_fix_automatically=data.use_hires_fix,
             save_before_hires_fix=False,
             previous_frame_into_controlnet=[],
+            do_not_use_mask=False,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

@@ -75,6 +75,7 @@ def generate_ui(
     pass_into_hires_fix_automatically,
     save_before_hires_fix,
     previous_frame_into_controlnet,
+    do_not_use_mask,
 
     hf_upscaler,
     hf_steps,
@@ -227,6 +228,7 @@ def generate_ui(
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,
         previous_frame_into_controlnet=previous_frame_into_controlnet if tab_index == 3 else [],
+        do_not_use_mask=do_not_use_mask,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,

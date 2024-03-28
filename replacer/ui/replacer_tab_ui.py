@@ -351,6 +351,7 @@ class ReplacerMainUI:
                     comp.pass_into_hires_fix_automatically,
                     comp.save_before_hires_fix,
                     comp.previous_frame_into_controlnet,
+                    comp.do_not_use_mask,
 
                     comp.hf_upscaler,
                     comp.hf_steps,
