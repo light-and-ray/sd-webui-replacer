@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 from modules import devices
 from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
-from replacer.tools import areImagesTheSame, limitSizeByOneDemention, fastMaskDilate
+from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -87,7 +87,7 @@ class MasksCreator:
         self.cutted = []
         self.boxes = []
 
-        imageResized = limitSizeByOneDemention(self.image, self.maxResolutionOnDetection)
+        imageResized = limitImageByOneDemention(self.image, self.maxResolutionOnDetection)
         if self.avoidance_mask is None:
             customAvoidanceMaskResized = None
         else:

@@ -5,7 +5,7 @@ from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.options import ( EXT_NAME, getDetectionPromptExamples, getNegativePromptExamples,
     getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
 )
-from replacer.tools import limitSizeByOneDemention, generateSeed
+from replacer.tools import limitImageByOneDemention, generateSeed
 from replacer.generation_args import GenerationArgs
 
 
@@ -40,7 +40,7 @@ def get_current_image(image, isAvoid, needLimit, maxResolutionOnDetection):
         return
     if needLimit:
         image = decode_base64_to_image(image)
-        image = limitSizeByOneDemention(image, maxResolutionOnDetection)
+        image = limitImageByOneDemention(image, maxResolutionOnDetection)
         image = 'data:image/png;base64,' + encode_pil_to_base64(image).decode()
     return gr.Image.update(image)
 

@@ -4,7 +4,7 @@ import gradio as gr
 from PIL import ImageChops
 from modules import scripts, errors
 from modules.images import resize_image
-from replacer.tools import limitSizeByOneDemention, applyMaskBlur
+from replacer.tools import limitImageByOneDemention, applyMaskBlur
 from replacer.generation_args import GenerationArgs
 from replacer.options import EXT_NAME
 
@@ -133,7 +133,7 @@ def enableInpaintModeForCN(gArgs, p, previousFrame):
                 mask = applyMaskBlur(mask, p.mask_blur)
 
             print('Use cn inpaint instead of sd inpaint')
-            image = limitSizeByOneDemention(p.init_images[0], max(p.width, p.height))
+            image = limitImageByOneDemention(p.init_images[0], max(p.width, p.height))
             gArgs.cn_args[i].image = {
                 "image": convertIntoCNImageFromat(image),
                 "mask": convertIntoCNImageFromat(mask.resize(image.size)),

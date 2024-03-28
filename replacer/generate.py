@@ -172,6 +172,7 @@ def generate(
                             break
                         processed2, _ = inpaint(processed.images[i], hrGArgs, saveDir, "", saveToSubdirs)
                         processed.images[i] = processed2.images[0]
+                        processed.infotexts[i] = processed2.infotexts[0]
 
                 for i in range(lenImagesBefore, len(processed.images)):
                     processed.images[i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
@@ -192,6 +193,8 @@ def generate(
 
             allExtraImages += extraImages
             batch_processed = processed
+
+        processed.info = processed.infotexts[0]
 
         return processed, allExtraImages
 

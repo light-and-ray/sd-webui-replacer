@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer import replacer_scripts
-from replacer.tools import addReplacerMetadata
+from replacer.tools import addReplacerMetadata, limiSizeByOneDemention
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
@@ -63,9 +63,10 @@ def inpaint(
         **schedulerKWargs,
     )
 
-    if gArgs.do_not_use_mask:
+    if gArgs.do_not_use_mask and (not gArgs.upscalerForImg2Img or gArgs.upscalerForImg2Img == "None"):
         p.inpaint_full_res = False
-        p.resize_mode = 1 # crop and resize
+        p.resize_mode = 2 # resize and fill
+        p.width, p.height = limiSizeByOneDemention(image.size, max(p.width, p.height))
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed

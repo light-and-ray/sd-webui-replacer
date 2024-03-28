@@ -46,20 +46,24 @@ def areImagesTheSame(image_one, image_two):
         return True
 
 
-def limitSizeByOneDemention(image: Image, size: int):
+def limiSizeByOneDemention(size: tuple, limit: int):
+    w, h = size
+    if h > w:
+        if h > limit:
+            w = limit / h * w
+            h = limit
+    else:
+        if w > limit:
+            h = limit / w * h
+            w = limit
+
+    return (int(w), int(h))
+
+
+def limitImageByOneDemention(image: Image, limit: int):
     if image is None:
         return None
-    w, h = image.size
-    if h > w:
-        if h > size:
-            w = size / h * w
-            h = size
-    else:
-        if w > size:
-            h = size / w * h
-            w = size
-
-    return image.resize((int(w), int(h)))
+    return image.resize(limiSizeByOneDemention(image.size, limit))
 
 
 def fastMaskDilate_(mask, dilation_amount):
