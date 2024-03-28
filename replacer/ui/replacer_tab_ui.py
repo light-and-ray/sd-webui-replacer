@@ -181,7 +181,7 @@ class ReplacerMainUI:
                                     )
                             if replacer_scripts.script_controlnet:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
-                                    choices=[f"Unit {x}" for x in range(shared.opts.control_net_unit_count)], elem_id='replacer_previous_frame_into_controlnet')
+                                    choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')
                             else:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)
                     
