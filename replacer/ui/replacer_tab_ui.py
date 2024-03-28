@@ -176,11 +176,11 @@ class ReplacerMainUI:
                                     "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
                                     "extensions to increase consistency, if it fits to your scenario\n\n"\
                                     \
-                                    "Also a good can be to use `Pass previous frame into ControlNet` "\
-                                    "with _IP-Adapter_, _Reference_, _Revision_, _T2IA Color_, _T2IA Style_"
+                                    "Also a good can be to use `Pass the previous frame into ControlNet` "\
+                                    "with _IP-Adapter_, _Reference_, _Revision_, _T2IA-Color_, _T2IA-Style_"
                                     )
                             if replacer_scripts.script_controlnet:
-                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass previous frame into ControlNet',
+                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
                                     choices=[f"Unit {x}" for x in range(shared.opts.control_net_unit_count)], elem_id='replacer_previous_frame_into_controlnet')
                             else:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)

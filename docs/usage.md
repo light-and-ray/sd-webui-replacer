@@ -78,7 +78,7 @@ To suppress flickering you can generate in little fps (e.g. 10), then interpolat
 
 You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
 
-Also a good can be to use `Pass previous frame into ControlNet` with _IP-Adapter_, _Reference_, _Revision_, _T2IA Color_, _T2IA Style_
+Also a good can be to use `Pass the previous frame into ControlNet` with _IP-Adapter_, _Reference_, _Revision_, _T2IA-Color_, _T2IA-Style_
 
 
 ## Dedicated page

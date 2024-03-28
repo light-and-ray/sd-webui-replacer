@@ -25,6 +25,7 @@ class ReplacerScript(scripts.Script):
         self.save_originals: bool = None
         self.force_override_sd_model: bool = None
         self.force_sd_model_checkpoint: str = None
+        self.save_samples: bool = None
 
     def title(self):
         return EXT_NAME
@@ -54,13 +55,8 @@ class ReplacerScript(scripts.Script):
                 force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
         
         comp = replacer_tab_ui.replacerMainUI.components
-        inputs = [
-            enable,
-            save_originals,
-            force_override_sd_model,
-            force_sd_model_checkpoint,
-            follow_txt2img_hires_fix,
-
+        
+        main_tab_inputs = [
             comp.detectionPrompt,
             comp.avoidancePrompt,
             comp.positvePrompt,
@@ -124,11 +120,19 @@ class ReplacerScript(scripts.Script):
         ] + comp.cn_inputs \
           + comp.soft_inpaint_inputs
 
-        for i in range(len(inputs)):
-            inputs[i] = copy.copy(inputs[i])
-            inputs[i].do_not_save_to_config = True
+        for i in range(len(main_tab_inputs)):
+            main_tab_inputs[i] = copy.copy(main_tab_inputs[i])
+            main_tab_inputs[i].do_not_save_to_config = True
 
-        return inputs
+        inputs = [
+            enable,
+            save_originals,
+            force_override_sd_model,
+            force_sd_model_checkpoint,
+            follow_txt2img_hires_fix,
+        ]
+
+        return inputs + main_tab_inputs
 
     def before_process(self, p: StableDiffusionProcessingTxt2Img,
         enable,
@@ -200,11 +204,15 @@ class ReplacerScript(scripts.Script):
         
         *scripts_args,
     ):
+        self.enable = enable
+        if not self.enable:
+            return
+
         p.do_not_save_grid = True
+        self.save_samples = getattr(p, 'save_samples', lambda: True)()
         if not save_originals:
             p.do_not_save_samples = True
-
-        self.enable = enable
+        
         self.save_originals = save_originals
         self.extra_includes = extra_includes
         self.force_override_sd_model = force_override_sd_model
@@ -298,7 +306,7 @@ class ReplacerScript(scripts.Script):
         if self.follow_txt2img_hires_fix and hasattr(p, 'enable_hr'):
             self.gArgs.pass_into_hires_fix_automatically = p.enable_hr
 
-        saveDir = p.outpath_samples if getattr(p, 'save_samples', lambda: True)() else None
+        saveDir = p.outpath_samples if self.save_samples else None
         saveToSubdirs = True
 
         try:
@@ -312,12 +320,12 @@ class ReplacerScript(scripts.Script):
 
         if self.save_originals:
             processed.images.extend(processedReplacer.images + allExtraImages)
-            processed.infotexts += [processed.info] * len(processedReplacer.images + allExtraImages)
+            processed.infotexts += processedReplacer.infotexts
         else:
             processed.images = processed.images[len(processed.all_seeds):]
             processed.infotexts = processed.infotexts[len(processed.all_seeds):]
             processed.images = processedReplacer.images + processed.images + allExtraImages
-            processed.infotexts = [processed.info]*len(processedReplacer.images) + processed.infotexts + [processed.info]*len(allExtraImages) 
+            processed.infotexts = processedReplacer.infotexts[:len(processedReplacer.images)] + processed.infotexts + processedReplacer.infotexts[len(processedReplacer.images):]
 
 
 if needHideReplacerScript():
