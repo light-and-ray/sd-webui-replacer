@@ -34,7 +34,7 @@ def generateSingle(
     if gArgs.do_not_use_mask:
         gArgs.mask = Image.new('L', image.size, 255)
     elif gArgs.use_inpaint_diff:
-        gArgs.mask = replacer_extensions.InpaintDifferenceGlobals.generated_mask.convert('L')
+        gArgs.mask = replacer_extensions.inpaint_difference.Globals.generated_mask.convert('L')
 
     elif gArgs.only_custom_mask and gArgs.custom_mask is not None:
         gArgs.mask = gArgs.custom_mask

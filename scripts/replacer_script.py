@@ -282,8 +282,8 @@ class ReplacerScript(scripts.Script):
             only_custom_mask=only_custom_mask,
             custom_mask=prepareMask(custom_mask_mode, custom_mask),
             use_inpaint_diff=use_inpaint_diff and inpaint_diff_mask_view is not None and \
-                replacer_extensions.InpaintDifferenceGlobals is not None and \
-                replacer_extensions.InpaintDifferenceGlobals.generated_mask is not None,
+                replacer_extensions.inpaint_difference.Globals is not None and \
+                replacer_extensions.inpaint_difference.Globals.generated_mask is not None,
             lama_cleaner_upscaler=lama_cleaner_upscaler,
             clip_skip=clip_skip,
             pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,

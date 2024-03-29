@@ -38,12 +38,12 @@ class ReplacerMainUI:
             comp.dummy_component = gr.Label(visible=False)
             comp.trueComponent = gr.Checkbox(value=True, visible=False)
             comp.falseComponent = gr.Checkbox(value=False, visible=False)
-            if replacer_extensions.script_controlnet:
+            if replacer_extensions.controlnet.script:
                 try:
-                    cnUiGroupsLenBefore = len(replacer_extensions.ControlNetUiGroup.all_ui_groups)
+                    cnUiGroupsLenBefore = len(replacer_extensions.controlnet.ControlNetUiGroup.all_ui_groups)
                 except Exception as e:
                     errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
-                    replacer_extensions.script_controlnet = None
+                    replacer_extensions.controlnet.script = None
 
             with ResizeHandleRow():
 
@@ -179,7 +179,7 @@ class ReplacerMainUI:
                                     "Also a good can be to use `Pass the previous frame into ControlNet` "\
                                     "with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_"
                                     )
-                            if replacer_extensions.script_controlnet:
+                            if replacer_extensions.controlnet.script:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
                                     choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')
                             else:
@@ -187,22 +187,22 @@ class ReplacerMainUI:
                     
                     comp.cn_inputs = []
                     setCustomScriptSourceForComponents("controlnet")
-                    if replacer_extensions.script_controlnet:
+                    if replacer_extensions.controlnet.script:
                         try:
                             with gr.Row():
-                                replacer_extensions.needWatchControlNetUI = True
-                                comp.cn_inputs = list(replacer_extensions.script_controlnet.ui(True))
-                                replacer_extensions.needWatchControlNetUI = False
+                                replacer_extensions.controlnet.needWatchControlNetUI = True
+                                comp.cn_inputs = list(replacer_extensions.controlnet.script.ui(True))
+                                replacer_extensions.controlnet.needWatchControlNetUI = False
 
-                                if not replacer_extensions.controlNetAccordion:
+                                if not replacer_extensions.controlnet.controlNetAccordion:
                                     errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
                                 else:
-                                    with replacer_extensions.controlNetAccordion:
+                                    with replacer_extensions.controlnet.controlNetAccordion:
                                         with gr.Row():
                                             gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
                         except Exception as e:
                             errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
-                            replacer_extensions.script_controlnet = None
+                            replacer_extensions.controlnet.script = None
                     setCustomScriptSourceForComponents(None)
 
 
@@ -269,23 +269,23 @@ class ReplacerMainUI:
 
 
 
-            if replacer_extensions.script_controlnet:
+            if replacer_extensions.controlnet.script:
                 try:
-                    replacer_extensions.ControlNetUiGroup.a1111_context.img2img_w_slider = comp.width
-                    replacer_extensions.ControlNetUiGroup.a1111_context.img2img_h_slider = comp.height
+                    replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_w_slider = comp.width
+                    replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_h_slider = comp.height
 
-                    for ui_group in replacer_extensions.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
+                    for ui_group in replacer_extensions.controlnet.ControlNetUiGroup.all_ui_groups[cnUiGroupsLenBefore:]:
                         ui_group.register_run_annotator()
-                        if not replacer_extensions.IS_SD_WEBUI_FORGE:
+                        if not replacer_extensions.controlnet.IS_SD_WEBUI_FORGE:
                             ui_group.inpaint_crop_input_image.value = True
                             ui_group.inpaint_crop_input_image.visible = True
                             ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
                         # if isDedicatedPage: 
-                        #     replacer_extensions.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
+                        #     replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
                         # ui_group.register_sd_version_changed()
                 except Exception as e:
                     errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
-                    replacer_extensions.script_controlnet = None
+                    replacer_extensions.controlnet.script = None
 
 
             comp.tab_single.select(fn=lambda: 0, inputs=[], outputs=[comp.tab_index])
@@ -498,9 +498,9 @@ class ReplacerMainUI:
             )
 
             
-            if replacer_extensions.InpaintDifferenceGlobals:
+            if replacer_extensions.inpaint_difference.Globals:
                 comp.inpaint_diff_create.click(
-                    fn=replacer_extensions.computeInpaintDifference,
+                    fn=replacer_extensions.inpaint_difference.computeInpaintDifference,
                     inputs=[
                         comp.non_altered_image_for_inpaint_diff,
                         comp.image,
