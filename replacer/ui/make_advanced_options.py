@@ -165,7 +165,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    if replacer_extensions.lama_cleaner.script:
+                    if replacer_extensions.lama_cleaner.SCRIPT:
                         comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
                     else:
                         comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
@@ -180,11 +180,11 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
 
                 comp.soft_inpaint_inputs = []
                 setCustomScriptSourceForComponents("soft_inpainting")
-                if replacer_extensions.soft_inpainting.script:
+                if replacer_extensions.soft_inpainting.SCRIPT:
                     try:
                         with gr.Row():
                             replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = True
-                            comp.soft_inpaint_inputs = list(replacer_extensions.soft_inpainting.script.ui(True))
+                            comp.soft_inpaint_inputs = list(replacer_extensions.soft_inpainting.SCRIPT.ui(True))
                             replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = False
                             from modules.ui_components import InputAccordion
                             new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
@@ -195,7 +195,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                             comp.soft_inpaint_inputs[0] = new_soft_inpaint_accordion
                     except Exception as e:
                         errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
-                        replacer_extensions.soft_inpainting.script = None
+                        replacer_extensions.soft_inpainting.SCRIPT = None
                 setCustomScriptSourceForComponents(None)
 
 

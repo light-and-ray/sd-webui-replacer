@@ -18,19 +18,19 @@ except:
     external_code = None
     IS_SD_WEBUI_FORGE = False
 
-script : scripts.Script = None
+SCRIPT : scripts.Script = None
 ControlNetUiGroup = None
 
 
 def initCNScript():
-    global script, ControlNetUiGroup, external_code
+    global SCRIPT, ControlNetUiGroup, external_code
     cnet_idx = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
         if script.title().lower() == "controlnet":
             cnet_idx = idx
             break
     if cnet_idx is not None:
-        script = copy.copy(scripts.scripts_img2img.alwayson_scripts[cnet_idx])
+        SCRIPT = copy.copy(scripts.scripts_img2img.alwayson_scripts[cnet_idx])
     else:
         return
     
@@ -42,13 +42,13 @@ def initCNScript():
             from lib_controlnet.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
     except:
         errors.report('Cannot register ControlNetUiGroup', exc_info=True)
-        script = None
+        SCRIPT = None
     initCNContext()
 
 
 def reinitCNScript():
-    global script
-    if script is None:
+    global SCRIPT
+    if SCRIPT is None:
         return
     cnet_idx = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
@@ -56,8 +56,8 @@ def reinitCNScript():
             cnet_idx = idx
             break
     if cnet_idx is not None:
-        script.args_from =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_from
-        script.args_to =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_to
+        SCRIPT.args_from =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_from
+        SCRIPT.args_to =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_to
 
 
 oldCNContext = None

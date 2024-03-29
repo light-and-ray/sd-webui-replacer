@@ -171,13 +171,13 @@ def makeHiresFixOptions(comp: AttrDict):
                         value=True,
                         elem_id="replacer_hf_disable_cn",
                     )
-                    if not replacer_extensions.controlnet.script:
+                    if not replacer_extensions.controlnet.SCRIPT:
                         comp.hf_disable_cn.visible = False
                 
                 with gr.Row():
                     comp.hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
                         choices=['Same', 'Enable', 'Disable'],
                         value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
-                    if not replacer_extensions.soft_inpainting.script:
+                    if not replacer_extensions.soft_inpainting.SCRIPT:
                         comp.hf_soft_inpaint.visible = False
 

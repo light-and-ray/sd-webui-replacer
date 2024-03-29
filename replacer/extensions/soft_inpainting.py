@@ -4,23 +4,23 @@ from modules import scripts
 
 # --- SoftInpainting ----
 
-script : scripts.Script = None
+SCRIPT : scripts.Script = None
 
 
 def initSoftInpaintScript():
-    global script
+    global SCRIPT
     index = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
         if script.title() == "Soft Inpainting":
             index = idx
             break
     if index is not None:
-        script = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
+        SCRIPT = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
 
 
 def reinitSoftInpaintScript():
-    global script
-    if script is None:
+    global SCRIPT
+    if SCRIPT is None:
         return
     index = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
@@ -28,8 +28,8 @@ def reinitSoftInpaintScript():
             index = idx
             break
     if index is not None:
-        script.args_from = scripts.scripts_img2img.alwayson_scripts[index].args_from
-        script.args_to = scripts.scripts_img2img.alwayson_scripts[index].args_to
+        SCRIPT.args_from = scripts.scripts_img2img.alwayson_scripts[index].args_from
+        SCRIPT.args_to = scripts.scripts_img2img.alwayson_scripts[index].args_to
 
 
 

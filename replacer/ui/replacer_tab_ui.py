@@ -38,12 +38,12 @@ class ReplacerMainUI:
             comp.dummy_component = gr.Label(visible=False)
             comp.trueComponent = gr.Checkbox(value=True, visible=False)
             comp.falseComponent = gr.Checkbox(value=False, visible=False)
-            if replacer_extensions.controlnet.script:
+            if replacer_extensions.controlnet.SCRIPT:
                 try:
                     cnUiGroupsLenBefore = len(replacer_extensions.controlnet.ControlNetUiGroup.all_ui_groups)
                 except Exception as e:
                     errors.report(f"Cannot init cnUiGroupsLenBefore: {e}", exc_info=True)
-                    replacer_extensions.controlnet.script = None
+                    replacer_extensions.controlnet.SCRIPT = None
 
             with ResizeHandleRow():
 
@@ -179,7 +179,7 @@ class ReplacerMainUI:
                                     "Also a good can be to use `Pass the previous frame into ControlNet` "\
                                     "with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_"
                                     )
-                            if replacer_extensions.controlnet.script:
+                            if replacer_extensions.controlnet.SCRIPT:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
                                     choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')
                             else:
@@ -187,11 +187,11 @@ class ReplacerMainUI:
                     
                     comp.cn_inputs = []
                     setCustomScriptSourceForComponents("controlnet")
-                    if replacer_extensions.controlnet.script:
+                    if replacer_extensions.controlnet.SCRIPT:
                         try:
                             with gr.Row():
                                 replacer_extensions.controlnet.needWatchControlNetUI = True
-                                comp.cn_inputs = list(replacer_extensions.controlnet.script.ui(True))
+                                comp.cn_inputs = list(replacer_extensions.controlnet.SCRIPT.ui(True))
                                 replacer_extensions.controlnet.needWatchControlNetUI = False
 
                                 if not replacer_extensions.controlnet.controlNetAccordion:
@@ -202,7 +202,7 @@ class ReplacerMainUI:
                                             gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
                         except Exception as e:
                             errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
-                            replacer_extensions.controlnet.script = None
+                            replacer_extensions.controlnet.SCRIPT = None
                     setCustomScriptSourceForComponents(None)
 
 
@@ -269,7 +269,7 @@ class ReplacerMainUI:
 
 
 
-            if replacer_extensions.controlnet.script:
+            if replacer_extensions.controlnet.SCRIPT:
                 try:
                     replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_w_slider = comp.width
                     replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_h_slider = comp.height
@@ -285,7 +285,7 @@ class ReplacerMainUI:
                         # ui_group.register_sd_version_changed()
                 except Exception as e:
                     errors.report(f"Cannot change ControlNet accordion entry: {e}", exc_info=True)
-                    replacer_extensions.controlnet.script = None
+                    replacer_extensions.controlnet.SCRIPT = None
 
 
             comp.tab_single.select(fn=lambda: 0, inputs=[], outputs=[comp.tab_index])

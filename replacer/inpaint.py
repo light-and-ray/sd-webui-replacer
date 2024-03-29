@@ -27,7 +27,7 @@ def inpaint(
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
-    if replacer_extensions.lama_cleaner.script:
+    if replacer_extensions.lama_cleaner.SCRIPT:
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
@@ -72,7 +72,7 @@ def inpaint(
     p.seed = gArgs.seed
     p.do_not_save_grid = True
     try:
-        if replacer_extensions.controlnet.script and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
+        if replacer_extensions.controlnet.SCRIPT and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
             previousFrame = None
             if batch_processed:
                 previousFrame = batch_processed.images[-1]
