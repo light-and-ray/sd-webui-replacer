@@ -177,7 +177,7 @@ class ReplacerMainUI:
                                     "extensions to increase consistency, if it fits to your scenario\n\n"\
                                     \
                                     "Also a good can be to use `Pass the previous frame into ControlNet` "\
-                                    "with _IP-Adapter_, _Reference_, _Revision_, _T2IA-Color_, _T2IA-Style_"
+                                    "with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_"
                                     )
                             if replacer_scripts.script_controlnet:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
