@@ -5,7 +5,7 @@ from modules.ui_common import refresh_symbol
 from replacer.options import (EXT_NAME_LOWER, doNotShowUnloadButton, getAvoidancePromptExamples,
     getAvoidancePromptExamplesNumber, getMaskColorStr
 )
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import IS_WEBUI_1_9, AttrDict, IS_WEBUI_1_5, setCustomScriptSourceForComponents
 
 
@@ -165,7 +165,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    if replacer_scripts.script_lama_cleaner_as_masked_content:
+                    if replacer_extensions.script_lama_cleaner_as_masked_content:
                         comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
                     else:
                         comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
@@ -180,12 +180,12 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
 
                 comp.soft_inpaint_inputs = []
                 setCustomScriptSourceForComponents("soft_inpainting")
-                if replacer_scripts.script_soft_inpaint:
+                if replacer_extensions.script_soft_inpaint:
                     try:
                         with gr.Row():
-                            replacer_scripts.needWatchSoftInpaintUI = True
-                            comp.soft_inpaint_inputs = list(replacer_scripts.script_soft_inpaint.ui(True))
-                            replacer_scripts.needWatchSoftInpaintUI = False
+                            replacer_extensions.needWatchSoftInpaintUI = True
+                            comp.soft_inpaint_inputs = list(replacer_extensions.script_soft_inpaint.ui(True))
+                            replacer_extensions.needWatchSoftInpaintUI = False
                             from modules.ui_components import InputAccordion
                             new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
                             new_soft_inpaint_accordion.accordion.children = comp.soft_inpaint_inputs[0].accordion.children
@@ -195,7 +195,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                             comp.soft_inpaint_inputs[0] = new_soft_inpaint_accordion
                     except Exception as e:
                         errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
-                        replacer_scripts.script_soft_inpaint = None
+                        replacer_extensions.script_soft_inpaint = None
                 setCustomScriptSourceForComponents(None)
 
 
@@ -270,7 +270,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     comp.do_not_use_mask = gr.Checkbox(value=False, label="Do not use mask", info="Ignore any masks, equivalent of img2img")
 
             setCustomScriptSourceForComponents("inpaint_diff")
-            with (gr.Tab('Inpaint Diff') if replacer_scripts.InpaintDifferenceGlobals
+            with (gr.Tab('Inpaint Diff') if replacer_extensions.InpaintDifferenceGlobals
                     else gr.Group()) as comp.inpaint_diff_tab:
                 with gr.Row():
                     comp.inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
@@ -299,7 +299,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                 with gr.Row():
                     comp.inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
                         value=False, elem_id='inpaint_difference_contours_only')
-            if not replacer_scripts.InpaintDifferenceGlobals:
+            if not replacer_extensions.InpaintDifferenceGlobals:
                 comp.inpaint_diff_tab.visible = False
                 comp.inpaint_diff_tab.render = False
             setCustomScriptSourceForComponents(None)

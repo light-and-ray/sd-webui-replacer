@@ -8,12 +8,12 @@ from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_tab_ui
 from replacer.tools import getReplacerFooter
 from replacer.ui.tools_ui import watchOuputPanel, watchSetCustomScriptSourceForComponents
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 
 
 
 def on_ui_tabs():
-    replacer_scripts.reinitAllScreiptsAfterUICreated()
+    replacer_extensions.reinitAllScreiptsAfterUICreated()
     tab = replacer_tab_ui.replacerMainUI.getReplacerTabUI()
     return [(tab, EXT_NAME, EXT_NAME)]
 
@@ -26,7 +26,7 @@ def mountDedicatedPage(demo, app):
         app.add_api_route(f"{path}/internal/progress",
             progress.progressapi, methods=["POST"],
             response_model=progress.ProgressResponse)
-        replacer_scripts.preloadImageComparisonTab()
+        replacer_extensions.preloadImageComparisonTab()
 
         with gr.Blocks(title=EXT_NAME, analytics_enabled=False) as replacerUi:
             gr.Textbox(elem_id="txt2img_prompt", visible=False) # triggers onUiLoaded
@@ -36,7 +36,7 @@ def mountDedicatedPage(demo, app):
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     tab = replacer_tab_ui.replacerMainUI_dedicated.getReplacerTabUI()
                     tab.render()
-                replacer_scripts.mountImageComparisonTab()
+                replacer_extensions.mountImageComparisonTab()
 
             footer = getReplacerFooter()
             gr.HTML(footer, elem_id="footer")
@@ -64,10 +64,10 @@ if needHideSegmentAnythingAccordions():
 
 
 script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)
-script_callbacks.on_after_component(replacer_scripts.watchControlNetUI)
-script_callbacks.on_after_component(replacer_scripts.watchSoftInpaintUI)
+script_callbacks.on_after_component(replacer_extensions.watchControlNetUI)
+script_callbacks.on_after_component(replacer_extensions.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOuputPanel)
 script_callbacks.on_after_component(watchSetCustomScriptSourceForComponents)
 script_callbacks.on_ui_settings(on_ui_settings)
-script_callbacks.on_after_component(replacer_scripts.addButtonIntoComparisonTab)
-script_callbacks.on_after_component(replacer_scripts.watchImageComparison)
+script_callbacks.on_after_component(replacer_extensions.addButtonIntoComparisonTab)
+script_callbacks.on_after_component(replacer_extensions.watchImageComparison)

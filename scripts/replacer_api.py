@@ -9,7 +9,7 @@ from replacer.generate import generate
 from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer.tools import generateSeed
 from replacer.ui.tools_ui import IS_WEBUI_1_9, prepareExpectedUIBehavior
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 
 
 
@@ -82,7 +82,7 @@ def replacer_api(_, app: FastAPI):
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_base64_to_image(data.input_image).convert("RGBA")
         
-        cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs_api(data.scripts)
+        cn_args, soft_inpaint_args = replacer_extensions.prepareScriptsArgs_api(data.scripts)
 
         hires_fix_args = HiresFixArgs(
             upscaler = data.hf_upscaler,
@@ -177,7 +177,7 @@ def replacer_api(_, app: FastAPI):
             "dino_model_name": dino_model_list,
             "upscalers": [""] + [x.name for x in shared.sd_upscalers],
             "lama_cleaner_avaliable": lama_cleaner_avaliable, # inpainting_fill=4, https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
-            "avaliable_scripts": replacer_scripts.getAvaliableScripts_api(),
+            "avaliable_scripts": replacer_extensions.getAvaliableScripts_api(),
         }
 
 

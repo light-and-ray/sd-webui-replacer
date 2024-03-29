@@ -7,7 +7,7 @@ from modules import sd_models, errors
 from replacer.mask_creator import MasksCreator, NothingDetectedError
 from replacer.generation_args import GenerationArgs, AppropriateData
 from replacer.options import EXT_NAME, needAutoUnloadModels
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 from replacer.tools import clearCache, interrupted
 from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
@@ -34,7 +34,7 @@ def generateSingle(
     if gArgs.do_not_use_mask:
         gArgs.mask = Image.new('L', image.size, 255)
     elif gArgs.use_inpaint_diff:
-        gArgs.mask = replacer_scripts.InpaintDifferenceGlobals.generated_mask.convert('L')
+        gArgs.mask = replacer_extensions.InpaintDifferenceGlobals.generated_mask.convert('L')
 
     elif gArgs.only_custom_mask and gArgs.custom_mask is not None:
         gArgs.mask = gArgs.custom_mask

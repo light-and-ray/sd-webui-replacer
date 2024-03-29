@@ -6,7 +6,7 @@ from modules.shared import opts
 from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 from replacer.tools import addReplacerMetadata, limiSizeByOneDemention
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
@@ -27,7 +27,7 @@ def inpaint(
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
-    if replacer_scripts.script_lama_cleaner_as_masked_content:
+    if replacer_extensions.script_lama_cleaner_as_masked_content:
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
@@ -72,15 +72,15 @@ def inpaint(
     p.seed = gArgs.seed
     p.do_not_save_grid = True
     try:
-        if replacer_scripts.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
+        if replacer_extensions.script_controlnet and gArgs.cn_args is not None and len(gArgs.cn_args) != 0:
             previousFrame = None
             if batch_processed:
                 previousFrame = batch_processed.images[-1]
-            replacer_scripts.enableInpaintModeForCN(gArgs, p, previousFrame)
+            replacer_extensions.enableInpaintModeForCN(gArgs, p, previousFrame)
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
 
-    replacer_scripts.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
+    replacer_extensions.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
 
 
 
@@ -93,7 +93,7 @@ def inpaint(
 
     needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
     if needRestoreAfterCN:
-        replacer_scripts.restoreAfterCN(image, gArgs, processed)
+        replacer_extensions.restoreAfterCN(image, gArgs, processed)
 
 
     if savePath:

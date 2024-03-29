@@ -3,7 +3,7 @@ import modules
 from modules import shared, sd_samplers
 from modules.ui_common import create_refresh_button
 from replacer.options import getHiresFixPositivePromptSuffixExamples, doNotShowUnloadButton
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import IS_WEBUI_1_5, IS_WEBUI_1_9, AttrDict
 
 
@@ -171,13 +171,13 @@ def makeHiresFixOptions(comp: AttrDict):
                         value=True,
                         elem_id="replacer_hf_disable_cn",
                     )
-                    if not replacer_scripts.script_controlnet:
+                    if not replacer_extensions.script_controlnet:
                         comp.hf_disable_cn.visible = False
                 
                 with gr.Row():
                     comp.hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
                         choices=['Same', 'Enable', 'Disable'],
                         value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
-                    if not replacer_scripts.script_soft_inpaint:
+                    if not replacer_extensions.script_soft_inpaint:
                         comp.hf_soft_inpaint.visible = False
 

@@ -5,7 +5,7 @@ from modules.ui import plaintext_to_html
 from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData
 from replacer.video_tools import getVideoFrames, save_video
 from replacer.options import getSaveDir
-from replacer import replacer_scripts
+from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask, generateSeed
 from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.generate import generate
@@ -161,7 +161,7 @@ def generate_ui(
     if len(images) == 0:
         return [], "", plaintext_to_html("no input images"), ""
 
-    cn_args, soft_inpaint_args = replacer_scripts.prepareScriptsArgs(scripts_args)
+    cn_args, soft_inpaint_args = replacer_extensions.prepareScriptsArgs(scripts_args)
 
     hires_fix_args = HiresFixArgs(
         upscaler = hf_upscaler,
@@ -221,8 +221,8 @@ def generate_ui(
         only_custom_mask=only_custom_mask,
         custom_mask=prepareMask(custom_mask_mode, custom_mask),
         use_inpaint_diff=use_inpaint_diff and inpaint_diff_mask_view is not None and \
-            replacer_scripts.InpaintDifferenceGlobals is not None and \
-            replacer_scripts.InpaintDifferenceGlobals.generated_mask is not None,
+            replacer_extensions.InpaintDifferenceGlobals is not None and \
+            replacer_extensions.InpaintDifferenceGlobals.generated_mask is not None,
         lama_cleaner_upscaler=lama_cleaner_upscaler,
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
