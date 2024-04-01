@@ -94,7 +94,7 @@ def generate(
     try:
         shared.total_tqdm.clear()
         shared.state.job_count = len(gArgs.images) * gArgs.batch_count
-        totalSteps = math.ceil(shared.state.job_count * gArgs.steps * (1 if gArgs.img2img_fix_steps else gArgs.denoising_strength))
+        totalSteps = shared.state.job_count * min(math.ceil(gArgs.steps * (1 if gArgs.img2img_fix_steps else gArgs.denoising_strength) + 1), gArgs.steps)
 
         if gArgs.pass_into_hires_fix_automatically:
             totalSteps += shared.state.job_count * gArgs.hires_fix_args.steps
