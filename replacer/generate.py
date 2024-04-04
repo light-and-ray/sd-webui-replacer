@@ -175,8 +175,8 @@ def generate(
                         processed.images[i] = processed2.images[0]
                         processed.infotexts[i] = processed2.infotexts[0]
 
-                for i in range(lenImagesBefore, len(processed.images)):
-                    processed.images[i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
+                for i in range(len(processed.images) - lenImagesBefore):
+                    processed.images[lenImagesBefore+i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
 
             except Exception as e:
                 print(f'    [{EXT_NAME}]    Exception: {e}')

@@ -75,7 +75,7 @@ def applyHiresFix(
     if gallery_idx < 0:
         return original_gallery, generation_info, plaintext_to_html("Image for hires fix is not selected"), ""
     if gallery_idx >= len(gArgs.appropriateInputImageDataList):
-        return original_gallery, generation_info, plaintext_to_html("Cannot applyhires fix for extra included images"), ""
+        return original_gallery, generation_info, plaintext_to_html("Cannot apply hires fix for extra included images"), ""
     inputImageIdx = gArgs.appropriateInputImageDataList[gallery_idx].inputImageIdx
     image = gArgs.images[inputImageIdx]
     gArgs.mask = gArgs.appropriateInputImageDataList[gallery_idx].mask

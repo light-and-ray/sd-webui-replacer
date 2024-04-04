@@ -209,6 +209,8 @@ class Pause:
         text += " batch generation"
         gr.Info(text)
         print(text)
+        if Pause.paused:
+            shared.state.textinfo = "will be paused"
     
     @staticmethod
     def wait():
