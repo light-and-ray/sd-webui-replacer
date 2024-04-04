@@ -71,6 +71,7 @@ def restoreCNContext():
     if not ControlNetUiGroup:
         return
     ControlNetUiGroup.a1111_context = copy.copy(oldCNContext)
+    ControlNetUiGroup.all_ui_groups = []
 
 g_cn_HWC3 = None
 def convertIntoCNImageFromat(image):
