@@ -8,7 +8,7 @@ from replacer.mask_creator import MasksCreator, NothingDetectedError
 from replacer.generation_args import GenerationArgs, AppropriateData
 from replacer.options import EXT_NAME, needAutoUnloadModels
 from replacer.extensions import replacer_extensions
-from replacer.tools import clearCache, interrupted
+from replacer.tools import clearCache, interrupted, Pause
 from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
 
@@ -92,6 +92,7 @@ def generate(
 ):
     restoreList = []
     try:
+        Pause.paused = False
         shared.total_tqdm.clear()
         shared.state.job_count = len(gArgs.images) * gArgs.batch_count
         totalSteps = shared.state.job_count * min(math.ceil(gArgs.steps * (1 if gArgs.img2img_fix_steps else gArgs.denoising_strength) + 1), gArgs.steps)
@@ -133,21 +134,21 @@ def generate(
 
 
         for idx, image in enumerate(gArgs.images):
-            if interrupted():
-                if needAutoUnloadModels():
-                    clearCache()
-                break
-
             progressInfo = "generating mask"
             if n > 1: 
                 print(flush=True)
                 print()
                 print(f'    [{EXT_NAME}]    processing {idx+1}/{n}')
                 progressInfo += f" {idx+1}/{n}"
+                Pause.wait()
 
             shared.state.textinfo = progressInfo
             shared.state.skipped = False
 
+            if interrupted():
+                if needAutoUnloadModels():
+                    clearCache()
+                break
 
             try:
                 saveSuffix = ""

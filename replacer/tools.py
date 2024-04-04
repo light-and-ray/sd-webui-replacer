@@ -1,11 +1,12 @@
-import cv2, random, git, torch, os
+import cv2, random, git, torch, os, time
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
+import gradio as gr
 from modules import errors, shared
 from modules.ui import versions_html
 from replacer.generation_args import GenerationArgs
-from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY
+from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY, EXT_NAME
 
 try:
     REPLACER_VERSION = git.Repo(__file__, search_parent_directories=True).head.object.hexsha[:7]
@@ -195,3 +196,31 @@ def clearCache():
     g_clear_cache()
 
 
+class Pause:
+    paused = False
+
+    @staticmethod
+    def toggle():
+        if shared.state.job == '':
+            return
+        Pause.paused = not Pause.paused
+        text = f"    [{EXT_NAME}]: "
+        text += "Paused" if Pause.paused else "Resumed"
+        text += " batch generation"
+        gr.Info(text)
+        print(text)
+    
+    @staticmethod
+    def wait():
+        if not Pause.paused:
+            return
+
+        print(f"    [{EXT_NAME}] paused")
+        while Pause.paused:
+            shared.state.textinfo = "paused"
+            time.sleep(0.2)
+            if interrupted():
+                return
+
+        print(f"    [{EXT_NAME}] resumed")
+        shared.state.textinfo = "resumed"

@@ -16,6 +16,7 @@ from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, u
     getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow,
     setCustomScriptSourceForComponents,
 )
+from replacer.tools import Pause
 
 
 try:
@@ -184,7 +185,7 @@ class ReplacerMainUI:
                                     choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')
                             else:
                                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)
-                    
+
                     comp.cn_inputs = []
                     setCustomScriptSourceForComponents("controlnet")
                     if replacer_extensions.controlnet.SCRIPT:
@@ -245,7 +246,13 @@ class ReplacerMainUI:
                     with gr.Row():
                         makeHiresFixOptions(comp)
 
-
+                    comp.pause_button = gr.Button(
+                        'pause/resume batch generation',
+                        elem_id='replacer_pause',
+                        visible=False,
+                        elem_classes=["pause-button"],
+                        variant='compact'
+                    )
 
                     with gr.Row():
                         comp.pass_into_hires_fix_automatically = gr.Checkbox(
@@ -288,10 +295,15 @@ class ReplacerMainUI:
                     replacer_extensions.controlnet.SCRIPT = None
 
 
-            comp.tab_single.select(fn=lambda: 0, inputs=[], outputs=[comp.tab_index])
-            comp.tab_batch.select(fn=lambda: 1, inputs=[], outputs=[comp.tab_index])
-            comp.tab_batch_dir.select(fn=lambda: 2, inputs=[], outputs=[comp.tab_index])
-            comp.tab_batch_video.select(fn=lambda: 3, inputs=[], outputs=[comp.tab_index])
+            def tabSelected(idx, showPause):
+                def func():
+                    return idx, gr.update(visible=showPause)
+                return func
+
+            comp.tab_single.select(fn=tabSelected(0, False), inputs=[], outputs=[comp.tab_index, comp.pause_button])
+            comp.tab_batch.select(fn=tabSelected(1, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
+            comp.tab_batch_dir.select(fn=tabSelected(2, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
+            comp.tab_batch_video.select(fn=tabSelected(3, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
 
 
             comp.run_button.click(
@@ -495,6 +507,10 @@ class ReplacerMainUI:
                 ],
                 outputs=[comp.custom_mask],
                 postprocess=False,
+            )
+
+            comp.pause_button.click(
+                fn=Pause.toggle
             )
 
             
