@@ -91,7 +91,7 @@ onUiUpdate(async() => {
     if (isZoomAndPanIntegrationApplied) return;
     const opts = await replacer_waitForOpts();
 
-    if (opts.prioritized_callbacks_app_started) { // webui 1.9
+    if ('set_scale_by_when_changing_upscaler' in opts) { // webui 1.9
         replacerApplyZoomAndPanIntegration();
     } else {
         replacerApplyZoomAndPanIntegration_withMod();
