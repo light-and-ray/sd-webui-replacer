@@ -1,4 +1,4 @@
-import os
+import os, datetime
 from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
@@ -138,13 +138,13 @@ def generate_ui(
                 yield image
         images = readImages(input_batch_dir)
 
+    timestamp = int(datetime.datetime.now().timestamp())
     if tab_index == 3:
         shared.state.textinfo = 'video preparing'
-        temp_batch_folder = os.path.join(os.path.dirname(input_video), 'temp')
         if video_output_dir == "":
-            video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}')
+            video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}_{timestamp}')
         else:
-            video_output_dir = os.path.join(video_output_dir, f'out_{seed}')
+            video_output_dir = os.path.join(video_output_dir, f'out_{seed}_{timestamp}')
         if os.path.exists(video_output_dir):
             for file in os.listdir(video_output_dir):
                 if file.endswith(f'.{shared.opts.samples_format}'):
@@ -258,9 +258,9 @@ def generate_ui(
     if tab_index == 3:
         shared.state.textinfo = 'video saving'
         print("generate done, generating video")
-        save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}.mp4')
+        save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}_{timestamp}.mp4')
         if len(save_video_path) > 260:
-            save_video_path = os.path.join(video_output_dir, f'output_{seed}.mp4')
+            save_video_path = os.path.join(video_output_dir, f'output_{seed}_{timestamp}.mp4')
         save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
 
     global lastGenerationArgs

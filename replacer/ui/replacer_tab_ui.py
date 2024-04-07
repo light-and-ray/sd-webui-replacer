@@ -159,7 +159,7 @@ class ReplacerMainUI:
                             comp.video_output_dir = gr.Textbox(
                                 label="Output directory", **shared.hide_dirs,
                                 placeholder="Leave blank to save images to the default path.",
-                                info='(default is the same directory with input video. Rusult is in "output_seed" subdirectory)',
+                                info='(default is the same directory with input video. Rusult is in "out_seed_timestamp" subdirectory)',
                                 elem_id="replacer_video_output_dir")
                             with gr.Accordion("Help", open=False):
                                 gr.Markdown(

@@ -13,6 +13,10 @@ from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
 
 
+class InterrupredDetection(Exception):
+    def __init__(self):
+        super().__init__("InterrupredDetection")
+
 
 
 def generateSingle(
@@ -29,7 +33,7 @@ def generateSingle(
     maskBox = None
 
     if interrupted():
-        return None, []
+        raise InterrupredDetection()
 
     if gArgs.do_not_use_mask:
         gArgs.mask = Image.new('L', image.size, 255)
@@ -59,7 +63,7 @@ def generateSingle(
             gArgs.mask = gArgs.custom_mask
 
     if interrupted():
-        return None, []
+        raise InterrupredDetection()
 
     shared.state.assign_current_image(maskPreview)
     shared.state.textinfo = "inpainting"
@@ -162,9 +166,6 @@ def generate(
                 processed, extraImages = generateSingle(image, gArgs, saveDir_, saveSuffix,
                     saveToSubdirs, extra_includes, batch_processed)
 
-                if processed is None:
-                    break
-
                 if gArgs.pass_into_hires_fix_automatically:
                     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
                     for i in range(lenImagesBefore, len(processed.images)):
@@ -179,6 +180,8 @@ def generate(
                     processed.images[lenImagesBefore+i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
 
             except Exception as e:
+                if type(e) is InterrupredDetection:
+                    break
                 print(f'    [{EXT_NAME}]    Exception: {e}')
                 if type(e) is not NothingDetectedError:
                     errors.report('***', exc_info=True)
@@ -194,6 +197,9 @@ def generate(
 
             allExtraImages += extraImages
             batch_processed = processed
+
+        if processed is None:
+            return None, None
 
         processed.info = processed.infotexts[0]
 
