@@ -23,11 +23,11 @@ def getLastUsedSeed():
 
 def generate_ui(
     id_task,
+    selected_input_mode: str,
     detectionPrompt: str,
     avoidancePrompt: str,
     positvePrompt: str,
     negativePrompt: str,
-    tab_index,
     image_single,
     image_batch,
     keep_original_filenames,
@@ -107,11 +107,11 @@ def generate_ui(
 
     images = []
 
-    if tab_index == 0:
+    if selected_input_mode == "tab_single":
         if image_single is not None:
             images = [image_single]
 
-    if tab_index == 1:
+    if selected_input_mode == "tab_batch":
         def getImages(image_folder):
             for img in image_folder:
                 if isinstance(img, Image.Image):
@@ -125,7 +125,7 @@ def generate_ui(
         if image_batch is not None:
             images = getImages(image_batch)
 
-    if tab_index == 2:
+    if selected_input_mode == "tab_batch_dir":
         def readImages(input_dir):
             image_list = shared.listfiles(input_dir)
             for filename in image_list:
@@ -139,7 +139,7 @@ def generate_ui(
         images = readImages(input_batch_dir)
 
     timestamp = int(datetime.datetime.now().timestamp())
-    if tab_index == 3:
+    if selected_input_mode == "tab_batch_video":
         shared.state.textinfo = 'video preparing'
         if video_output_dir == "":
             video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}_{timestamp}')
@@ -227,7 +227,7 @@ def generate_ui(
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,
-        previous_frame_into_controlnet=previous_frame_into_controlnet if tab_index == 3 else [],
+        previous_frame_into_controlnet=previous_frame_into_controlnet if selected_input_mode == "tab_batch_video" else [],
         do_not_use_mask=do_not_use_mask,
 
         hires_fix_args=hires_fix_args,
@@ -238,14 +238,14 @@ def generate_ui(
 
     saveDir = getSaveDir()
     saveToSubdirs = True
-    if tab_index == 2 and output_batch_dir != "":
+    if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
         saveDir = output_batch_dir
         saveToSubdirs = False
-    elif tab_index == 3:
+    elif selected_input_mode == "tab_batch_video":
         saveDir = video_output_dir
         saveToSubdirs = False
 
-    useSaveFormatForVideo = tab_index == 3
+    useSaveFormatForVideo = selected_input_mode == "tab_batch_video"
 
 
 
@@ -255,7 +255,7 @@ def generate_ui(
 
 
 
-    if tab_index == 3:
+    if selected_input_mode == "tab_batch_video":
         shared.state.textinfo = 'video saving'
         print("generate done, generating video")
         save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}_{timestamp}.mp4')
@@ -268,10 +268,10 @@ def generate_ui(
     lastGenerationArgs = gArgs
     lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
-    if tab_index == 3:
+    if selected_input_mode == "tab_batch_video":
         return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
-    
-    if tab_index == 2 and not show_batch_dir_results:
+
+    if selected_input_mode == "tab_batch_dir" and not show_batch_dir_results:
         return [], "", plaintext_to_html(f"Saved into {saveDir}"), ""
 
     processed.images += allExtraImages

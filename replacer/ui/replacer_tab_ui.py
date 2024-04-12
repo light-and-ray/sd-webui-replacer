@@ -35,7 +35,7 @@ class ReplacerMainUI:
     def init_tab(self, isDedicatedPage: bool):
         comp = AttrDict()
         with gr.Blocks(analytics_enabled=False) as self.replacerTabUI:
-            comp.tab_index = gr.Number(value=0, visible=False)
+            comp.selected_input_mode = gr.Textbox(value=0, visible=False)
             comp.dummy_component = gr.Label(visible=False)
             comp.trueComponent = gr.Checkbox(value=True, visible=False)
             comp.falseComponent = gr.Checkbox(value=False, visible=False)
@@ -300,10 +300,10 @@ class ReplacerMainUI:
                     return idx, gr.update(visible=showPause)
                 return func
 
-            comp.tab_single.select(fn=tabSelected(0, False), inputs=[], outputs=[comp.tab_index, comp.pause_button])
-            comp.tab_batch.select(fn=tabSelected(1, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
-            comp.tab_batch_dir.select(fn=tabSelected(2, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
-            comp.tab_batch_video.select(fn=tabSelected(3, True), inputs=[], outputs=[comp.tab_index, comp.pause_button])
+            comp.tab_single.select(fn=tabSelected("tab_single", False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch.select(fn=tabSelected("tab_batch", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch_dir.select(fn=tabSelected("tab_batch_dir", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch_video.select(fn=tabSelected("tab_batch_video", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
 
 
             comp.run_button.click(
@@ -311,11 +311,11 @@ class ReplacerMainUI:
                 fn=wrap_gradio_gpu_call(generate_ui, extra_outputs=[None, '', '']),
                 inputs=[
                     comp.dummy_component, # task_id
+                    comp.selected_input_mode,
                     comp.detectionPrompt,
                     comp.avoidancePrompt,
                     comp.positvePrompt,
                     comp.negativePrompt,
-                    comp.tab_index,
                     comp.image,
                     comp.image_batch,
                     comp.keep_original_filenames,
