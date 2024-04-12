@@ -12,6 +12,7 @@ from replacer.options import (EXT_NAME, getSaveDir, getDetectionPromptExamples,
 from replacer.extensions import replacer_extensions
 from replacer.ui.make_advanced_options import makeAdvancedOptions
 from replacer.ui.make_hiresfix_options import makeHiresFixOptions
+from replacer.ui.video_ui import makeVideoUI
 from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, unloadModels, AttrDict,
     getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow,
     setCustomScriptSourceForComponents,
@@ -35,7 +36,7 @@ class ReplacerMainUI:
     def init_tab(self, isDedicatedPage: bool):
         comp = AttrDict()
         with gr.Blocks(analytics_enabled=False) as self.replacerTabUI:
-            comp.selected_input_mode = gr.Textbox(value=0, visible=False)
+            comp.selected_input_mode = gr.Textbox(value="tab_single", visible=False)
             comp.dummy_component = gr.Label(visible=False)
             comp.trueComponent = gr.Checkbox(value=True, visible=False)
             comp.falseComponent = gr.Checkbox(value=False, visible=False)
@@ -148,43 +149,7 @@ class ReplacerMainUI:
                                 label='Show result images', value=False, elem_id="replacer_show_batch_dir_results")
 
                         with gr.TabItem('Video', id="batch_from_video", elem_id="replacer_batch_video_tab") as comp.tab_batch_video:
-                            comp.input_video = gr.Textbox(
-                                label="Input video",
-                                placeholder="A video on the same machine where the server is running.",
-                                elem_id="replacer_input_video")
-                            comp.target_video_fps = gr.Slider(
-                                label='FPS', value=10.0, step=0.1, minimum=0.0, maximum=60.0, 
-                                info="(0 = fps from input video)",
-                                elem_id="replacer_video_fps")
-                            comp.video_output_dir = gr.Textbox(
-                                label="Output directory", **shared.hide_dirs,
-                                placeholder="Leave blank to save images to the default path.",
-                                info='(default is the same directory with input video. Rusult is in "out_seed_timestamp" subdirectory)',
-                                elem_id="replacer_video_output_dir")
-                            with gr.Accordion("Help", open=False):
-                                gr.Markdown(
-                                    "To increase consistency it's better to inpaint clear "\
-                                    "objects on video with good quality and enough context. "\
-                                    "Your prompts need to produce consistent results\n\n"\
-                                    \
-                                    "To suppress flickering you can generate in little fps (e.g. 10), "\
-                                    "then interpolate (x2) it with ai interpolation algorithm "\
-                                    "(e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or "\
-                                    "[frame interpolation in deforum sd-webui extension]("\
-                                    "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
-                                    \
-                                    "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
-                                    "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
-                                    "extensions to increase consistency, if it fits to your scenario\n\n"\
-                                    \
-                                    "Also a good can be to use `Pass the previous frame into ControlNet` "\
-                                    "with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_"
-                                    )
-                            if replacer_extensions.controlnet.SCRIPT:
-                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
-                                    choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')
-                            else:
-                                comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)
+                            makeVideoUI(comp)
 
                     comp.cn_inputs = []
                     setCustomScriptSourceForComponents("controlnet")
