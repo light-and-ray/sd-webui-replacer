@@ -20,6 +20,7 @@ def makeVideoUI(comp: AttrDict):
         info='(default is the same directory with input video. Rusult is in "out_seed_timestamp" subdirectory)',
         elem_id="replacer_video_output_dir")
 
+    comp.selected_video_mode = gr.Textbox(value="video_mode_animatediff", visible=False)
 
     with gr.Tabs(elem_id="replacer_video_modes"):
         with gr.Tab("AnimateDiff mode", elem_id="replacer_video_mode_animatediff") as comp.video_mode_animatediff:
@@ -51,4 +52,8 @@ def makeVideoUI(comp: AttrDict):
                     "Also a good can be to use `Pass the previous frame into ControlNet` "\
                     "with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_"
                     )
+
+    comp.video_mode_animatediff.select(fn=lambda: "video_mode_animatediff", inputs=[], outputs=[comp.selected_video_mode])
+    comp.video_mode_frame_by_frame.select(fn=lambda: "video_mode_frame_by_frame", inputs=[], outputs=[comp.selected_video_mode])
+
 

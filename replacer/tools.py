@@ -155,6 +155,7 @@ def prepareMask(mask_mode, mask_raw):
 
 def applyMaskBlur(image_mask, mask_blur):
     originalMode = image_mask.mode
+    image_mask = image_mask.convert('L')
     if mask_blur > 0:
         np_mask = np.array(image_mask).astype(np.uint8)
         kernel_size = 2 * int(2.5 * mask_blur + 0.5) + 1

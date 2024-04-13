@@ -260,9 +260,9 @@ class ReplacerMainUI:
                     replacer_extensions.controlnet.SCRIPT = None
 
 
-            def tabSelected(idx, showPause):
+            def tabSelected(tab, showPause):
                 def func():
-                    return idx, gr.update(visible=showPause)
+                    return tab, gr.update(visible=showPause)
                 return func
 
             comp.tab_single.select(fn=tabSelected("tab_single", False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
@@ -329,6 +329,7 @@ class ReplacerMainUI:
                     comp.save_before_hires_fix,
                     comp.previous_frame_into_controlnet,
                     comp.do_not_use_mask,
+                    comp.selected_video_mode,
 
                     comp.hf_upscaler,
                     comp.hf_steps,

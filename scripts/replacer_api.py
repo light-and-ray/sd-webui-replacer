@@ -6,7 +6,7 @@ from modules import shared
 from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from modules.call_queue import queue_lock
 from replacer.generate import generate
-from replacer.generation_args import GenerationArgs, HiresFixArgs
+from replacer.generation_args import GenerationArgs, HiresFixArgs, AnimateDiffArgs
 from replacer.tools import generateSeed
 from replacer.ui.tools_ui import IS_WEBUI_1_9, prepareExpectedUIBehavior
 from replacer.extensions import replacer_extensions
@@ -148,6 +148,7 @@ def replacer_api(_, app: FastAPI):
             save_before_hires_fix=False,
             previous_frame_into_controlnet=[],
             do_not_use_mask=False,
+            animatediff_args=AnimateDiffArgs(),
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

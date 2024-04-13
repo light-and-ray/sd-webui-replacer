@@ -41,6 +41,13 @@ class AppropriateData:
 
 
 @dataclass
+class AnimateDiffArgs:
+    needApplyAnimateDiff: bool = False
+    video_path: str = None
+    mask_path: str = None
+
+
+@dataclass
 class GenerationArgs:
     positvePrompt: str
     negativePrompt: str
@@ -82,6 +89,7 @@ class GenerationArgs:
     save_before_hires_fix: bool
     previous_frame_into_controlnet: list
     do_not_use_mask: bool
+    animatediff_args: AnimateDiffArgs
 
     hires_fix_args: HiresFixArgs
     cn_args: list

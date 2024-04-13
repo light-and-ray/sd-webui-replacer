@@ -31,7 +31,9 @@ def inpaint(
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
-    mask = gArgs.mask.resize(image.size).convert('L')
+    mask = gArgs.mask
+    if mask:
+        mask = mask.resize(image.size).convert('L')
     schedulerKWargs = {"scheduler": gArgs.scheduler} if IS_WEBUI_1_9 else {}
 
     p = StableDiffusionProcessingImg2Img(
@@ -80,7 +82,7 @@ def inpaint(
     except Exception as e:
         errors.report(f"Error {e}", exc_info=True)
 
-    replacer_extensions.applyScripts(p, gArgs.cn_args, gArgs.soft_inpaint_args)
+    replacer_extensions.applyScripts(p, gArgs)
 
 
 

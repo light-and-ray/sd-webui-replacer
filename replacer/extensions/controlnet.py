@@ -85,6 +85,8 @@ def convertIntoCNImageFromat(image):
 
 
 def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
+    if gArgs.animatediff_args.needApplyAnimateDiff:
+        return
     print('Restoring images resolution after ControlNet Inpainting')
     origMask = gArgs.mask.convert('RGBA')
     if gArgs.inpainting_mask_invert:
@@ -102,7 +104,7 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
         processed.images[i] = imageOrg
 
 
-def enableInpaintModeForCN(gArgs, p, previousFrame):
+def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     if IS_SD_WEBUI_FORGE: return
     global external_code
     gArgs.cn_args = list(gArgs.cn_args)
@@ -135,15 +137,19 @@ def enableInpaintModeForCN(gArgs, p, previousFrame):
 
             print('Use cn inpaint instead of sd inpaint')
             image = limitImageByOneDemention(p.init_images[0], max(p.width, p.height))
-            gArgs.cn_args[i].image = {
-                "image": convertIntoCNImageFromat(image),
-                "mask": convertIntoCNImageFromat(mask.resize(image.size)),
-            }
+            if not gArgs.animatediff_args.needApplyAnimateDiff:
+                gArgs.cn_args[i].image = {
+                    "image": convertIntoCNImageFromat(image),
+                    "mask": convertIntoCNImageFromat(mask.resize(image.size)),
+                }
+                p.width, p.height = image.size
+            else:
+                from scripts.enums import InputMode
+                gArgs.cn_args[i].input_mode = InputMode.BATCH
             p.image_mask = None
             p.inpaint_full_res = False
-            p.width, p.height = image.size
             gArgs.cn_args[i].inpaint_crop_input_image = False
-            gArgs.cn_args[i].resize_mode = external_code.ResizeMode.RESIZE
+            gArgs.cn_args[i].resize_mode = external_code.ResizeMode.OUTER_FIT
             p.needRestoreAfterCN = True
 
 

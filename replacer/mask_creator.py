@@ -1,5 +1,8 @@
 from PIL import Image, ImageOps
+from dataclasses import dataclass
 from modules import devices
+from replacer.extensions import replacer_extensions
+from replacer.generation_args import GenerationArgs
 from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
 from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate
 sam_predict = None
@@ -157,5 +160,46 @@ class MasksCreator:
                 whiteFilling = Image.new('L', self.masks[i].size, 255)
                 self.masks[i].paste(whiteFilling, self.custom_mask.resize(self.masks[i].size))
 
-        if needAutoUnloadModels():
-            clear_cache()
+
+
+@dataclass
+class MaskResult:
+    mask: Image
+    maskPreview: Image
+    maskCutted: Image
+    maskBox: Image
+
+
+def createMask(image: Image, gArgs: GenerationArgs) -> MaskResult:
+    maskPreview = None
+    maskCutted = None
+    maskBox = None
+
+    if gArgs.do_not_use_mask:
+        mask = Image.new('L', image.size, 255)
+    elif gArgs.use_inpaint_diff:
+        mask = replacer_extensions.inpaint_difference.Globals.generated_mask.convert('L')
+
+    elif gArgs.only_custom_mask and gArgs.custom_mask is not None:
+        mask = gArgs.custom_mask
+
+    else:
+        masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
+            gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
+            gArgs.avoidance_mask, gArgs.custom_mask)
+
+        if masksCreator.previews != []:
+            if gArgs.mask_num == 'Random':
+                maskNum = gArgs.seed % len(masksCreator.previews)
+            else:
+                maskNum = int(gArgs.mask_num) - 1
+            mask = masksCreator.masks[maskNum]
+            gArgs.mask_num_for_metadata = maskNum + 1
+
+            maskPreview = masksCreator.previews[maskNum]
+            maskCutted = masksCreator.cutted[maskNum]
+            maskBox = masksCreator.boxes[maskNum]
+        else:
+            mask = gArgs.custom_mask
+    
+    return MaskResult(mask, maskPreview, maskCutted, maskBox)

@@ -4,6 +4,7 @@ import os
 import modules.shared as shared
 from PIL import Image
 from shutil import rmtree
+from replacer.generation_args import GenerationArgs
 try:
     from imageio_ffmpeg import get_ffmpeg_exe
     FFMPEG = get_ffmpeg_exe()
@@ -11,12 +12,21 @@ except Exception as e:
     FFMPEG = 'ffmpeg'
 
 
-def separate_video_into_frames(video_path, fps_out, temp_folder):
+def runFFMPEG(*ffmpeg_cmd):
+    ffmpeg_cmd = [FFMPEG] + list(ffmpeg_cmd)
+    print(' '.join(f"'{str(v)}'" if ' ' in str(v) else str(v) for v in ffmpeg_cmd))
+    rc = subprocess.run(ffmpeg_cmd).returncode
+    if rc != 0:
+        raise Exception(f'ffmpeg exited with code {rc}. See console for details')
+
+
+
+def separate_video_into_frames(video_path, fps_out, out_path):
     assert video_path, 'video not selected'
-    assert temp_folder, 'temp folder not specified'
+    assert out_path, 'out path not specified'
 
     # Create the temporary folder if it doesn't exist
-    os.makedirs(temp_folder, exist_ok=True)
+    os.makedirs(out_path, exist_ok=True)
 
     # Open the video file
     video = cv2.VideoCapture(video_path)
@@ -26,17 +36,12 @@ def separate_video_into_frames(video_path, fps_out, temp_folder):
     print('fps_in:', fps_in, 'fps_out:', fps_out)
     video.release()
 
-    ffmpeg_cmd = [
-        FFMPEG,
+    runFFMPEG(
         '-i', video_path,
         '-vf', f'fps={fps_out}',
         '-y',
-        os.path.join(temp_folder, 'frame_%05d.png'),
-    ]
-    print(' '.join(f"'{str(v)}'" if ' ' in str(v) else str(v) for v in ffmpeg_cmd))
-    rc = subprocess.run(ffmpeg_cmd).returncode
-    if rc != 0:
-        raise Exception(f'ffmpeg exited with code {rc}. See console for details')
+        os.path.join(out_path, 'frame_%05d.png'),
+    )
 
     return fps_in, fps_out
 
@@ -64,8 +69,7 @@ def getVideoFrames(video_path, fps):
 
 
 def save_video(frames_dir, fps, org_video, output_path, seed):
-    ffmpeg_cmd = [
-        FFMPEG,
+    runFFMPEG(
         '-framerate', str(fps),
         '-i', os.path.join(frames_dir, f'%5d-{seed}.{shared.opts.samples_format}'),
         '-r', str(fps),
@@ -80,8 +84,11 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
         '-shortest',
         '-y',
         output_path
-    ]
-    print(' '.join(f"'{str(v)}'" if ' ' in str(v) else str(v) for v in ffmpeg_cmd))
-    rc = subprocess.run(ffmpeg_cmd).returncode
-    if rc != 0:
-        raise Exception(f'ffmpeg exited with code {rc}. See console for details')
+    )
+
+
+def pepareGenerationArgsForVideo(gArgs: GenerationArgs):
+    gArgs.batch_count = 1
+    gArgs.batch_size = 1
+    gArgs.extra_includes = []
+    gArgs.save_before_hires_fix = False

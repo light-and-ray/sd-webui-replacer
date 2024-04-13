@@ -2,13 +2,14 @@ import os, datetime
 from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
-from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData
-from replacer.video_tools import getVideoFrames, save_video
+from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData, AnimateDiffArgs
+from replacer.video_tools import getVideoFrames, save_video, pepareGenerationArgsForVideo
 from replacer.options import getSaveDir
 from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask, generateSeed
 from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.generate import generate
+from replacer.video_animatediff import animatediffGenerate
 
 
 lastGenerationArgs: GenerationArgs = None
@@ -76,6 +77,7 @@ def generate_ui(
     save_before_hires_fix,
     previous_frame_into_controlnet,
     do_not_use_mask,
+    selected_video_mode: str,
 
     hf_upscaler,
     hf_steps,
@@ -150,11 +152,8 @@ def generate_ui(
                 if file.endswith(f'.{shared.opts.samples_format}'):
                     os.remove(os.path.join(video_output_dir, file))
         images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
+        resultFrames = os.path.join(video_output_dir, 'resultFrames')
 
-        batch_count = 1
-        batch_size = 1
-        extra_includes = []
-        save_before_hires_fix = False
 
     images = list(images)
 
@@ -229,29 +228,39 @@ def generate_ui(
         save_before_hires_fix=save_before_hires_fix,
         previous_frame_into_controlnet=previous_frame_into_controlnet if selected_input_mode == "tab_batch_video" else [],
         do_not_use_mask=do_not_use_mask,
+        animatediff_args=AnimateDiffArgs(),
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,
         soft_inpaint_args=soft_inpaint_args,
         )
     prepareExpectedUIBehavior(gArgs)
+    if selected_input_mode == "tab_batch_video":
+        pepareGenerationArgsForVideo(gArgs)
 
-    saveDir = getSaveDir()
-    saveToSubdirs = True
-    if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
-        saveDir = output_batch_dir
-        saveToSubdirs = False
-    elif selected_input_mode == "tab_batch_video":
-        saveDir = video_output_dir
-        saveToSubdirs = False
+    if selected_input_mode == "tab_batch_video" and selected_video_mode == "video_mode_animatediff":
+        processed = None
+        animatediffGenerate(gArgs, video_output_dir)
+    else:
+        saveDir = getSaveDir()
+        saveToSubdirs = True
+        if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
+            saveDir = output_batch_dir
+            saveToSubdirs = False
+        elif selected_input_mode == "tab_batch_video":
+            saveDir = resultFrames
+            saveToSubdirs = False
 
-    useSaveFormatForVideo = selected_input_mode == "tab_batch_video"
+        useSaveFormatForVideo = selected_input_mode == "tab_batch_video"
 
+        processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, useSaveFormatForVideo, extra_includes)
+        if processed is None:
+            return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
-
-    processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, useSaveFormatForVideo, extra_includes)
-    if processed is None:
-        return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
+        global lastGenerationArgs
+        gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
+        lastGenerationArgs = gArgs
+        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
 
 
@@ -261,12 +270,8 @@ def generate_ui(
         save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}_{timestamp}.mp4')
         if len(save_video_path) > 260:
             save_video_path = os.path.join(video_output_dir, f'output_{seed}_{timestamp}.mp4')
-        save_video(video_output_dir, fps_out, input_video, save_video_path, seed)
+        save_video(resultFrames, fps_out, input_video, save_video_path, seed)
 
-    global lastGenerationArgs
-    gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
-    lastGenerationArgs = gArgs
-    lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
     if selected_input_mode == "tab_batch_video":
         return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
