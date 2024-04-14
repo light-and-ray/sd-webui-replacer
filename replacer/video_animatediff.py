@@ -6,7 +6,7 @@ from replacer.mask_creator import createMask, NothingDetectedError
 from replacer.inpaint import inpaint
 from replacer.generate import generateSingle
 from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageByOneDemention,
-    Pause,
+    Pause, extraMaskExpand,
 )
 
 
@@ -71,8 +71,11 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 errors.report('***', exc_info=True)
             else:
                 print(e)
-            whiteFilling = Image.new('L', frame.size, 255)
-            mask = whiteFilling
+            if mask is None:
+                blackFilling = Image.new('L', frame.size, 0)
+                mask = blackFilling
+            else:
+                mask = extraMaskExpand(mask, 50)
         mask = limitImageByOneDemention(mask, max(gArgs.width, gArgs.height))
         mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
         mask = mask.resize(frame.size)
@@ -131,7 +134,11 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     for fragmentPath in fragmentPaths:
         images = list(readImages(os.path.join(fragmentPath, 'out')))
-        if not images: break
+        if len(images) == 1:
+            theLastImage = images[0]
+            break
+        elif len(images) == 0:
+            break
         if theLastImage:
             images[0] = Image.blend(images[0], theLastImage, 0.5)
         theLastImage = images[-1]
