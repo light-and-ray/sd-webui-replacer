@@ -60,7 +60,7 @@ def applyScripts(p, gArgs: GenerationArgs):
         avaliableScripts.append(soft_inpainting.SCRIPT)
     if lama_cleaner.SCRIPT is not None:
         avaliableScripts.append(lama_cleaner.SCRIPT)
-    if gArgs.animatediff_args.needApplyAnimateDiff:
+    if animatediff.SCRIPT is not None:
         avaliableScripts.append(animatediff.SCRIPT)
 
     if len(avaliableScripts) == 0:
@@ -68,7 +68,7 @@ def applyScripts(p, gArgs: GenerationArgs):
 
     allArgsLen = max(x.args_to for x in avaliableScripts)
 
-    p.scripts = copy.copy(scripts.scripts_img2img)
+    p.scripts = scripts.scripts_img2img
     p.scripts.alwayson_scripts = avaliableScripts
     p.script_args = [None] * allArgsLen
 
@@ -80,7 +80,7 @@ def applyScripts(p, gArgs: GenerationArgs):
         for i in range(len(gArgs.soft_inpaint_args)):
             p.script_args[soft_inpainting.SCRIPT.args_from + i] = gArgs.soft_inpaint_args[i]
     
-    if gArgs.animatediff_args.needApplyAnimateDiff:
+    if animatediff.SCRIPT is not None:
         animatediff.apply(p, gArgs.animatediff_args)
 
 

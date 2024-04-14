@@ -66,20 +66,6 @@ Note: hires fix is designed for single-user server
 ![](/docs/images/hiresfix_options_advanced.jpg)
 - _"Unload detection models before hires fix"_: I recommend you to disable it if you have a lot of vram. It will give significant negative impact on batches + `pass into hires fix automatically`
 
-## Video inpainting
-
-You can use Replacer to inpaint video with a regular stable diffusion inpaint method. It is very inconsistent, but in a few cases it can produce good enough results
-
-![](/docs/images/replacer_video.jpg)
-
-To increase consistency, it's better to inpaint clear objects on video with good quality and enough. Your prompts need to produce consistent results.
-
-To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
-
-You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
-
-Also a good can be to use `Pass the previous frame into ControlNet` with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_
-
 
 ## Dedicated page
 Dedicated page (replacer tab only) is available on url `/replacer-dedicated`

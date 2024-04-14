@@ -6,7 +6,7 @@ from replacer.options import (EXT_NAME_LOWER, doNotShowUnloadButton, getAvoidanc
     getAvoidancePromptExamplesNumber, getMaskColorStr
 )
 from replacer.extensions import replacer_extensions
-from replacer.ui.tools_ui import IS_WEBUI_1_9, AttrDict, IS_WEBUI_1_5, setCustomScriptSourceForComponents
+from replacer.ui.tools_ui import IS_WEBUI_1_9, AttrDict, IS_WEBUI_1_5, OverrideCustomScriptSource
 
 
 
@@ -179,24 +179,24 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         elem_id="replacer_mask_mode")
 
                 comp.soft_inpaint_inputs = []
-                setCustomScriptSourceForComponents("soft_inpainting")
-                if replacer_extensions.soft_inpainting.SCRIPT:
-                    try:
-                        with gr.Row():
-                            replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = True
-                            comp.soft_inpaint_inputs = list(replacer_extensions.soft_inpainting.SCRIPT.ui(True))
-                            replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = False
-                            from modules.ui_components import InputAccordion
-                            new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
-                            new_soft_inpaint_accordion.accordion.children = comp.soft_inpaint_inputs[0].accordion.children
-                            for child in new_soft_inpaint_accordion.accordion.children:
-                                child.parent = new_soft_inpaint_accordion.accordion
-                            comp.soft_inpaint_inputs[0].accordion.visible = False
-                            comp.soft_inpaint_inputs[0] = new_soft_inpaint_accordion
-                    except Exception as e:
-                        errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
-                        replacer_extensions.soft_inpainting.SCRIPT = None
-                setCustomScriptSourceForComponents(None)
+
+                with OverrideCustomScriptSource("soft_inpainting"):
+                    if replacer_extensions.soft_inpainting.SCRIPT:
+                        try:
+                            with gr.Row():
+                                replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = True
+                                comp.soft_inpaint_inputs = list(replacer_extensions.soft_inpainting.SCRIPT.ui(True))
+                                replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = False
+                                from modules.ui_components import InputAccordion
+                                new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
+                                new_soft_inpaint_accordion.accordion.children = comp.soft_inpaint_inputs[0].accordion.children
+                                for child in new_soft_inpaint_accordion.accordion.children:
+                                    child.parent = new_soft_inpaint_accordion.accordion
+                                comp.soft_inpaint_inputs[0].accordion.visible = False
+                                comp.soft_inpaint_inputs[0] = new_soft_inpaint_accordion
+                        except Exception as e:
+                            errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
+                            replacer_extensions.soft_inpainting.SCRIPT = None
 
 
             with gr.Tab('Avoidance'):
@@ -269,38 +269,37 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         comp.custom_mask_brush_color.visible = False
                     comp.do_not_use_mask = gr.Checkbox(value=False, label="Do not use mask", info="Ignore any masks, equivalent of img2img")
 
-            setCustomScriptSourceForComponents("inpaint_diff")
-            with (gr.Tab('Inpaint Diff') if replacer_extensions.inpaint_difference.Globals
-                    else gr.Group()) as comp.inpaint_diff_tab:
-                with gr.Row():
-                    comp.inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
-                    comp.use_inpaint_diff = gr.Checkbox(label='Use inpaint difference',
-                        value=True, elem_id="replacer_use_inpaint_diff")
-                with gr.Row():
-                    comp.non_altered_image_for_inpaint_diff = gr.Image(
-                        label="Non altered image",
-                        show_label=True,
-                        elem_id="replacer_non_altered_image_for_inpaint_diff",
-                        source="upload",
-                        type="pil",
-                        image_mode="RGBA",
-                    )
-                    comp.inpaint_diff_mask_view = gr.Image(label="Difference mask",
-                        interactive=True, type="pil",
-                        elem_id="replacer_inpaint_diff_mask_view")
-                with gr.Row():
-                    comp.inpaint_diff_threshold = gr.Slider(label='Difference threshold',
-                        maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
-                    comp.inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
-                        value=5, elem_id="replacer_inpaint_diff_mask_expand",
-                        minimum=0, maximum=100, step=1)
-                    comp.inpaint_diff_mask_erosion = gr.Slider(label='Mask erosion',
-                        maximum=100, step=1, value=0, elem_id='inpaint_difference_mask_erosion')
-                with gr.Row():
-                    comp.inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
-                        value=False, elem_id='inpaint_difference_contours_only')
-            if not replacer_extensions.inpaint_difference.Globals:
-                comp.inpaint_diff_tab.visible = False
-                comp.inpaint_diff_tab.render = False
-            setCustomScriptSourceForComponents(None)
+            with OverrideCustomScriptSource("inpaint_diff"):
+                with (gr.Tab('Inpaint Diff') if replacer_extensions.inpaint_difference.Globals
+                        else gr.Group()) as comp.inpaint_diff_tab:
+                    with gr.Row():
+                        comp.inpaint_diff_create = gr.Button('Create', elem_id='replacer_inpaint_diff_create')
+                        comp.use_inpaint_diff = gr.Checkbox(label='Use inpaint difference',
+                            value=True, elem_id="replacer_use_inpaint_diff")
+                    with gr.Row():
+                        comp.non_altered_image_for_inpaint_diff = gr.Image(
+                            label="Non altered image",
+                            show_label=True,
+                            elem_id="replacer_non_altered_image_for_inpaint_diff",
+                            source="upload",
+                            type="pil",
+                            image_mode="RGBA",
+                        )
+                        comp.inpaint_diff_mask_view = gr.Image(label="Difference mask",
+                            interactive=True, type="pil",
+                            elem_id="replacer_inpaint_diff_mask_view")
+                    with gr.Row():
+                        comp.inpaint_diff_threshold = gr.Slider(label='Difference threshold',
+                            maximum=1, step=0.01, value=1, elem_id='inpaint_difference_difference_threshold')
+                        comp.inpaint_diff_mask_expand = gr.Slider(label='Mask dilation',
+                            value=5, elem_id="replacer_inpaint_diff_mask_expand",
+                            minimum=0, maximum=100, step=1)
+                        comp.inpaint_diff_mask_erosion = gr.Slider(label='Mask erosion',
+                            maximum=100, step=1, value=0, elem_id='inpaint_difference_mask_erosion')
+                    with gr.Row():
+                        comp.inpaint_diff_contours_only = gr.Checkbox(label='Contours only',
+                            value=False, elem_id='inpaint_difference_contours_only')
+                if not replacer_extensions.inpaint_difference.Globals:
+                    comp.inpaint_diff_tab.visible = False
+                    comp.inpaint_diff_tab.render = False
 

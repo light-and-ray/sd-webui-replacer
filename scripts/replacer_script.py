@@ -4,7 +4,7 @@ from modules import scripts, scripts_postprocessing, errors, ui_settings
 from modules.processing import Processed, StableDiffusionProcessingTxt2Img
 from replacer.options import EXT_NAME, needHideReplacerScript
 from replacer.ui import replacer_tab_ui
-from replacer.generation_args import GenerationArgs, HiresFixArgs, AnimateDiffArgs
+from replacer.generation_args import GenerationArgs, HiresFixArgs, DUMMY_ANIMATEDIFF_ARGS
 from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask
 from replacer.generate import generate
@@ -290,7 +290,7 @@ class ReplacerScript(scripts.Script):
             save_before_hires_fix=save_before_hires_fix,
             previous_frame_into_controlnet=[],
             do_not_use_mask=do_not_use_mask,
-            animatediff_args=AnimateDiffArgs(),
+            animatediff_args=DUMMY_ANIMATEDIFF_ARGS,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

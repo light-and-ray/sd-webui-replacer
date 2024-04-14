@@ -87,8 +87,3 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
     )
 
 
-def pepareGenerationArgsForVideo(gArgs: GenerationArgs):
-    gArgs.batch_count = 1
-    gArgs.batch_size = 1
-    gArgs.extra_includes = []
-    gArgs.save_before_hires_fix = False

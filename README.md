@@ -1,9 +1,11 @@
 # Replacer
 
-Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion and controlnet
+Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion, animatediff and controlnet
 
 
 ![](/docs/images/main_screenshot.jpg)
+
+> **Note: AnimateDiff temporary requites this patch, untill it will be merged https://github.com/continue-revolution/sd-webui-animatediff/pull/499**
 
 You also can draw your mask instead of or in addition to detection, and take advantage of convenient HiresFix option, and ControlNet inpainting with preserving original image resolution and aspect ratio
 
@@ -46,11 +48,13 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 1. [Lama cleaner as masked content](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
-2. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
+1. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
 
-3. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
+1. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
 
-4. [ControlNet](https://github.com/Mikubill/sd-webui-controlnet)
+1. [ControlNet](https://github.com/Mikubill/sd-webui-controlnet)
+
+1. [AnimateDiff](https://github.com/continue-revolution/sd-webui-animatediff)
 
 </blockquote>
 
@@ -65,6 +69,7 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 # Docs:
 ## - [Usage of Replacer](/docs/usage.md)
 ## - [Replacer Options](/docs/options.md)
+## - [Video](/docs/video.md)
 ## - [Information about Replacer API](/docs/api.md)
 ## - [Useful tips: how to change defaults, maximal value of sliders, and how to get inpainting model](/docs/tips.md)
 
@@ -84,6 +89,7 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 - tiled vae
 - ☑️ "hide segment anything extention" option
 - ☑️ txt2img script
+- more video input types
 - allow multiply instances
 
 ### small todo:

@@ -1,8 +1,9 @@
-import cv2, random, git, torch, os, time
+import cv2, random, git, torch, os, time, urllib.parse, copy
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
 import gradio as gr
+from modules.images import resize_image
 from modules import errors, shared
 from modules.ui import versions_html
 from replacer.generation_args import GenerationArgs
@@ -47,7 +48,7 @@ def areImagesTheSame(image_one, image_two):
         return True
 
 
-def limiSizeByOneDemention(size: tuple, limit: int):
+def limiSizeByOneDemention(size: tuple, limit: int) -> tuple:
     w, h = size
     if h > w:
         if h > limit:
@@ -61,7 +62,7 @@ def limiSizeByOneDemention(size: tuple, limit: int):
     return (int(w), int(h))
 
 
-def limitImageByOneDemention(image: Image, limit: int):
+def limitImageByOneDemention(image: Image, limit: int) -> Image:
     if image is None:
         return None
     return image.resize(limiSizeByOneDemention(image.size, limit))
@@ -155,13 +156,27 @@ def prepareMask(mask_mode, mask_raw):
 
 def applyMaskBlur(image_mask, mask_blur):
     originalMode = image_mask.mode
-    image_mask = image_mask.convert('L')
     if mask_blur > 0:
         np_mask = np.array(image_mask).astype(np.uint8)
         kernel_size = 2 * int(2.5 * mask_blur + 0.5) + 1
         np_mask = cv2.GaussianBlur(np_mask, (kernel_size, kernel_size), mask_blur)
         image_mask = Image.fromarray(np_mask).convert(originalMode)
     return image_mask
+
+
+def applyMask(res, orig, mask, gArgs):
+    upscaler = gArgs.upscalerForImg2Img
+    if upscaler == "":
+        upscaler = None
+
+    w, h = orig.size
+    imageProc = resize_image(1, res.convert('RGB'), w, h, upscaler).convert('RGBA') # 1 - resize and crop
+    if gArgs.inpainting_mask_invert:
+        mask = ImageChops.invert(mask)
+    mask = mask.resize(orig.size).convert('L')
+    new = copy.copy(orig)
+    new.paste(imageProc, mask)
+    return new
 
 
 def generateSeed():
@@ -227,3 +242,21 @@ class Pause:
 
         print(f"    [{EXT_NAME}] resumed")
         shared.state.textinfo = "resumed"
+
+
+def convertIntoPath(string: str) -> str:
+    schemes = ['file', 'fish']
+    prefixes = [f'{x}://' for x in schemes]
+    isURL = any(string.startswith(x) for x in prefixes)
+
+    if not isURL:
+        return string
+    else:
+        for prefix in prefixes:
+            if string.startswith(prefix):
+                string = urllib.parse.unquote(string.removeprefix(prefix))
+                string = string.removeprefix(string.split('/')[-1]) # removes user:password@host:port if exists
+                return string
+
+        errors.report("Can't be here")
+        return string

@@ -4,8 +4,9 @@ import gradio as gr
 from PIL import ImageChops
 from modules import scripts, errors
 from modules.images import resize_image
-from replacer.tools import limitImageByOneDemention, applyMaskBlur
+from replacer.tools import limitImageByOneDemention, applyMaskBlur, applyMask
 from replacer.generation_args import GenerationArgs
+from replacer.extensions.animatediff import restoreAfterCN_animatediff
 
 
 
@@ -85,23 +86,22 @@ def convertIntoCNImageFromat(image):
 
 
 def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
-    if gArgs.animatediff_args.needApplyAnimateDiff:
-        return
     print('Restoring images resolution after ControlNet Inpainting')
-    origMask = gArgs.mask.convert('RGBA')
-    if gArgs.inpainting_mask_invert:
-        origMask = ImageChops.invert(gArgs.mask)
-    origMask = applyMaskBlur(origMask, gArgs.mask_blur)
-    upscaler = gArgs.upscalerForImg2Img
-    if upscaler == "":
-        upscaler = None
 
-    for i in range(len(processed.images)):
-        imageOrg = copy.copy(origImage)
-        w, h = imageOrg.size
-        imageProc = resize_image(0, processed.images[i].convert('RGB'), w, h, upscaler).convert('RGBA')
-        imageOrg.paste(imageProc, origMask.resize(imageOrg.size))
-        processed.images[i] = imageOrg
+    if gArgs.animatediff_args.needApplyAnimateDiff:
+        restoreAfterCN_animatediff(gArgs, processed)
+    else:
+        origMask = gArgs.mask.convert('RGBA')
+        if gArgs.inpainting_mask_invert:
+            origMask = ImageChops.invert(gArgs.mask)
+        origMask = applyMaskBlur(origMask, gArgs.mask_blur)
+        upscaler = gArgs.upscalerForImg2Img
+        if upscaler == "":
+            upscaler = None
+
+        for i in range(len(processed.images)):
+            imageOrg = applyMask(processed.images[i], origImage, origMask, gArgs)
+            processed.images[i] = imageOrg
 
 
 def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
@@ -111,7 +111,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     mask = None
 
     for i in range(len(gArgs.cn_args)):
-        gArgs.cn_args[i] = external_code.to_processing_unit(gArgs.cn_args[i])
+        gArgs.cn_args[i] = copy.copy(external_code.to_processing_unit(gArgs.cn_args[i]))
 
         if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
             if previousFrame:
@@ -124,6 +124,12 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 print(f'Disabling CN unit {i} for the first frame')
                 gArgs.cn_args[i].enabled = False
                 continue
+
+        if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
+            gArgs.cn_args[i].enabled = True
+            gArgs.cn_args[i].module = 'inpaint_only'
+            gArgs.cn_args[i].model = gArgs.animatediff_args.cn_inpainting_model
+            gArgs.cn_args[i].weight = gArgs.animatediff_args.control_weight
 
         if not gArgs.cn_args[i].enabled:
             continue
@@ -142,7 +148,6 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                     "image": convertIntoCNImageFromat(image),
                     "mask": convertIntoCNImageFromat(mask.resize(image.size)),
                 }
-                p.width, p.height = image.size
             else:
                 from scripts.enums import InputMode
                 gArgs.cn_args[i].input_mode = InputMode.BATCH
@@ -172,4 +177,19 @@ def watchControlNetUI(component, **kwargs):
 
     if 'img2img' in elem_id:
         component.elem_id = elem_id.replace('img2img', 'replacer')
+
+
+def getInpaintModels() -> list:
+    global external_code
+    if external_code is None:
+        return ["None"]
+
+    models: str = external_code.get_models()
+    result = []
+    for model in models:
+        if "inpaint" in model.lower():
+            result.append(model)
+    if result == []:
+        return ["None"]
+    return result
 

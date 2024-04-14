@@ -1,12 +1,11 @@
-import os, copy
+import os, copy, math
 from PIL import Image
 from modules import shared
 from replacer.generation_args import GenerationArgs
 from replacer.mask_creator import createMask, MaskResult
 from replacer.inpaint import inpaint
 from replacer.generate import generateSingle
-from replacer.tools import interrupted, applyMaskBlur, clearCache
-from replacer.options import needAutoUnloadModels
+from replacer.tools import interrupted, applyMaskBlur, clearCache, limitImageByOneDemention
 
 
 
@@ -26,8 +25,8 @@ def processFragment(fragmentPath: str, initImage, gArgs: GenerationArgs):
 
 
 
-def getFragments(gArgs: GenerationArgs, video_output_dir: str):
-    fragmentSize = 16
+def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: int):
+    fragmentSize = gArgs.animatediff_args.fragment_length
 
     frames = gArgs.images
     fragmentNum = 0
@@ -42,12 +41,12 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str):
     for frameIdx in range(len(frames)):
         if frameInFragmentIdx == fragmentSize:
             if fragmentPath is not None:
-                shared.state.textinfo = f"inpainting fragment {fragmentNum}"
+                shared.state.textinfo = f"inpainting fragment {fragmentNum} / {totalFragments}"
                 yield fragmentPath
             frameInFragmentIdx = 0
             fragmentNum += 1
             fragmentPath = os.path.join(video_output_dir, f"fragment_{fragmentNum}")
-            shared.state.textinfo = f"generating masks for fragment {fragmentNum}"
+            shared.state.textinfo = f"generating masks for fragment {fragmentNum} / {totalFragments}"
 
             framesDir = os.path.join(fragmentPath, 'frames'); os.makedirs(framesDir, exist_ok=True)
             masksDir = os.path.join(fragmentPath, 'masks'); os.makedirs(masksDir, exist_ok=True)
@@ -63,20 +62,68 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str):
         frame = frames[frameIdx]
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
         maskResult: MaskResult = createMask(frame, gArgs)
-        mask = maskResult.mask.resize(frame.size)
-        mask = applyMaskBlur(mask, gArgs.mask_blur)
+        mask = limitImageByOneDemention(maskResult.mask, max(gArgs.width, gArgs.height))
+        mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
+        mask = mask.resize(frame.size)
         mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
         frameInFragmentIdx += 1
 
 
-def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str):
-    shared.state.textinfo = "processing init frame"
+
+def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir, video_fps: float):
+    if gArgs.animatediff_args.force_override_sd_model:
+        gArgs.override_sd_model = True
+        gArgs.sd_model_checkpoint = gArgs.animatediff_args.force_sd_model_checkpoint
+    if gArgs.animatediff_args.internal_fps <= 0:
+        gArgs.animatediff_args.internal_fps = video_fps
+    if gArgs.animatediff_args.fragment_length <= 0:
+        gArgs.animatediff_args.fragment_length = len(gArgs.images)
+    gArgs.animatediff_args.needApplyCNForAnimateDiff = True
+
+    totalFragments = math.ceil((len(gArgs.images) - 1) / gArgs.animatediff_args.fragment_length)
+    if gArgs.animatediff_args.generate_only_first_fragment:
+        totalFragments = 1
+    shared.state.job_count = 1 + totalFragments
+
+    shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
     processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)
     initImage: Image = processedFirstImg.images[0]
+    fragmentPaths = []
 
-    for fragmentPath in getFragments(gArgs, video_output_dir):
-        # if needAutoUnloadModels():
-        clearCache()
+
+    for fragmentPath in getFragments(gArgs, video_output_dir, totalFragments):
+        if not shared.cmd_opts.lowram: # do not confuse with lowvram. lowram is for really crazy people
+            clearCache()
         processed = processFragment(fragmentPath, initImage, gArgs)
+        if interrupted():
+            break
+        fragmentPaths.append(fragmentPath)
         initImage = processed.images[-1]
-        break
+        if gArgs.animatediff_args.generate_only_first_fragment:
+            break
+    
+
+    shared.state.textinfo = "merging fragments"
+    def readImages(input_dir):
+        image_list = shared.listfiles(input_dir)
+        for filename in image_list:
+            image = Image.open(filename).convert('RGBA')
+            yield image
+    def saveImage(image):
+        image.save(os.path.join(result_dir, f"{frameNum:05d}-{gArgs.seed}.{shared.opts.samples_format}"))
+    os.makedirs(result_dir, exist_ok=True)
+    theLastImage = None
+    frameNum = 0
+
+    for fragmentPath in fragmentPaths:
+        images = list(readImages(os.path.join(fragmentPath, 'out')))
+        if theLastImage:
+            images[0] = Image.blend(images[0], theLastImage, 0.5)
+        theLastImage = images[-1]
+        images = images[:-1]
+        
+        for image in images:
+            saveImage(image)
+            frameNum += 1
+    saveImage(theLastImage)
+

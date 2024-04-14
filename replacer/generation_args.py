@@ -42,10 +42,27 @@ class AppropriateData:
 
 @dataclass
 class AnimateDiffArgs:
+    fragment_length: int
+    internal_fps: float
+    batch_size: int
+    stride: int
+    overlap: int
+    latent_power: float
+    latent_scale: float
+    generate_only_first_fragment: bool
+
+    cn_inpainting_model: str
+    control_weight: float
+    force_override_sd_model: bool
+    force_sd_model_checkpoint: str
+    moution_model: str
+
     needApplyAnimateDiff: bool = False
+    needApplyCNForAnimateDiff: bool = False
     video_path: str = None
     mask_path: str = None
 
+DUMMY_ANIMATEDIFF_ARGS = AnimateDiffArgs(0, 0, 0, 0, 0, 0, 0, False, "", 0, False, "", "")
 
 @dataclass
 class GenerationArgs:

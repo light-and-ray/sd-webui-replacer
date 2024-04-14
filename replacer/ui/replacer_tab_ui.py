@@ -15,7 +15,7 @@ from replacer.ui.make_hiresfix_options import makeHiresFixOptions
 from replacer.ui.video_ui import makeVideoUI
 from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, unloadModels, AttrDict,
     getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow,
-    setCustomScriptSourceForComponents,
+    OverrideCustomScriptSource,
 )
 from replacer.tools import Pause
 
@@ -152,24 +152,24 @@ class ReplacerMainUI:
                             makeVideoUI(comp)
 
                     comp.cn_inputs = []
-                    setCustomScriptSourceForComponents("controlnet")
-                    if replacer_extensions.controlnet.SCRIPT:
-                        try:
-                            with gr.Row():
-                                replacer_extensions.controlnet.needWatchControlNetUI = True
-                                comp.cn_inputs = list(replacer_extensions.controlnet.SCRIPT.ui(True))
-                                replacer_extensions.controlnet.needWatchControlNetUI = False
+                    
+                    with OverrideCustomScriptSource("controlnet"):
+                        if replacer_extensions.controlnet.SCRIPT:
+                            try:
+                                with gr.Row():
+                                    replacer_extensions.controlnet.needWatchControlNetUI = True
+                                    comp.cn_inputs = list(replacer_extensions.controlnet.SCRIPT.ui(True))
+                                    replacer_extensions.controlnet.needWatchControlNetUI = False
 
-                                if not replacer_extensions.controlnet.controlNetAccordion:
-                                    errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
-                                else:
-                                    with replacer_extensions.controlnet.controlNetAccordion:
-                                        with gr.Row():
-                                            gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
-                        except Exception as e:
-                            errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
-                            replacer_extensions.controlnet.SCRIPT = None
-                    setCustomScriptSourceForComponents(None)
+                                    if not replacer_extensions.controlnet.controlNetAccordion:
+                                        errors.report(f"[{EXT_NAME}] controlnet accordion wasn't found", exc_info=True)
+                                    else:
+                                        with replacer_extensions.controlnet.controlNetAccordion:
+                                            with gr.Row():
+                                                gr.Markdown('_If you select Inpaint -> inpaint_only, cn inpaint model will be used instead of sd inpainting_')
+                            except Exception as e:
+                                errors.report(f"Cannot add controlnet accordion {e}", exc_info=True)
+                                replacer_extensions.controlnet.SCRIPT = None
 
 
                 with gr.Column(scale=15):
@@ -330,6 +330,20 @@ class ReplacerMainUI:
                     comp.previous_frame_into_controlnet,
                     comp.do_not_use_mask,
                     comp.selected_video_mode,
+
+                    comp.ad_fragment_length,
+                    comp.ad_internal_fps,
+                    comp.ad_batch_size,
+                    comp.ad_stride,
+                    comp.ad_overlap,
+                    comp.ad_latent_power,
+                    comp.ad_latent_scale,
+                    comp.ad_generate_only_first_fragment,
+                    comp.ad_cn_inpainting_model,
+                    comp.ad_control_weight,
+                    comp.ad_force_override_sd_model,
+                    comp.ad_force_sd_model_checkpoint,
+                    comp.ad_moution_model,
 
                     comp.hf_upscaler,
                     comp.hf_steps,

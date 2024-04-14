@@ -141,9 +141,20 @@ def prepareExpectedUIBehavior(gArgs: GenerationArgs):
 
 custom_script_source = None
 
-def setCustomScriptSourceForComponents(text: str):
+def _setCustomScriptSourceForComponents(text: str):
     global custom_script_source
     custom_script_source = text
+
+
+class OverrideCustomScriptSource:
+    def __init__(self, text):
+        self.text = text
+    
+    def __enter__(self):
+        _setCustomScriptSourceForComponents(self.text)
+    
+    def __exit__(self, *args):
+        _setCustomScriptSourceForComponents(None)
 
 
 def watchSetCustomScriptSourceForComponents(component, **kwargs):

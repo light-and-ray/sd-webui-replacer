@@ -1,12 +1,12 @@
-import os, datetime
+import os, datetime, copy
 from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
 from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData, AnimateDiffArgs
-from replacer.video_tools import getVideoFrames, save_video, pepareGenerationArgsForVideo
+from replacer.video_tools import getVideoFrames, save_video
 from replacer.options import getSaveDir
 from replacer.extensions import replacer_extensions
-from replacer.tools import prepareMask, generateSeed
+from replacer.tools import prepareMask, generateSeed, convertIntoPath
 from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.generate import generate
 from replacer.video_animatediff import animatediffGenerate
@@ -32,12 +32,12 @@ def generate_ui(
     image_single,
     image_batch,
     keep_original_filenames,
-    input_batch_dir,
-    output_batch_dir,
+    input_batch_dir: str,
+    output_batch_dir: str,
     keep_original_filenames_from_dir,
     show_batch_dir_results,
-    input_video,
-    video_output_dir,
+    input_video: str,
+    video_output_dir: str,
     target_video_fps,
     upscalerForImg2Img,
     seed,
@@ -79,6 +79,20 @@ def generate_ui(
     do_not_use_mask,
     selected_video_mode: str,
 
+    ad_fragment_length,
+    ad_internal_fps,
+    ad_batch_size,
+    ad_stride,
+    ad_overlap,
+    ad_latent_power,
+    ad_latent_scale,
+    ad_generate_only_first_fragment,
+    ad_cn_inpainting_model,
+    ad_control_weight,
+    ad_force_override_sd_model,
+    ad_force_sd_model_checkpoint,
+    ad_moution_model,
+
     hf_upscaler,
     hf_steps,
     hf_sampler,
@@ -106,6 +120,11 @@ def generate_ui(
 
     output_batch_dir = output_batch_dir.strip()
     video_output_dir = video_output_dir.strip()
+
+    input_batch_dir = convertIntoPath(input_batch_dir)
+    output_batch_dir = convertIntoPath(output_batch_dir)
+    input_video = convertIntoPath(input_video)
+    video_output_dir = convertIntoPath(video_output_dir)
 
     images = []
 
@@ -151,6 +170,11 @@ def generate_ui(
             for file in os.listdir(video_output_dir):
                 if file.endswith(f'.{shared.opts.samples_format}'):
                     os.remove(os.path.join(video_output_dir, file))
+        batch_count = 1
+        batch_size = 1
+        extra_includes = []
+        save_before_hires_fix = False
+
         images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
         resultFrames = os.path.join(video_output_dir, 'resultFrames')
 
@@ -182,6 +206,22 @@ def generate_ui(
         extra_mask_blur = hf_extra_mask_blur,
         randomize_seed = hf_randomize_seed,
         soft_inpaint = hf_soft_inpaint,
+    )
+
+    animatediff_args = AnimateDiffArgs(
+        ad_fragment_length,
+        ad_internal_fps,
+        ad_batch_size,
+        ad_stride,
+        ad_overlap,
+        ad_latent_power,
+        ad_latent_scale,
+        ad_generate_only_first_fragment,
+        ad_cn_inpainting_model,
+        ad_control_weight,
+        ad_force_override_sd_model,
+        ad_force_sd_model_checkpoint,
+        ad_moution_model,
     )
 
     gArgs = GenerationArgs(
@@ -226,21 +266,25 @@ def generate_ui(
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,
-        previous_frame_into_controlnet=previous_frame_into_controlnet if selected_input_mode == "tab_batch_video" else [],
+        previous_frame_into_controlnet=previous_frame_into_controlnet if selected_input_mode == "tab_batch_video" \
+                and selected_video_mode == "video_mode_frame_by_frame" else [],
         do_not_use_mask=do_not_use_mask,
-        animatediff_args=AnimateDiffArgs(),
+        animatediff_args=animatediff_args,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,
         soft_inpaint_args=soft_inpaint_args,
         )
     prepareExpectedUIBehavior(gArgs)
-    if selected_input_mode == "tab_batch_video":
-        pepareGenerationArgsForVideo(gArgs)
+
+
+
 
     if selected_input_mode == "tab_batch_video" and selected_video_mode == "video_mode_animatediff":
         processed = None
-        animatediffGenerate(gArgs, video_output_dir)
+        if replacer_extensions.animatediff.SCRIPT is None or replacer_extensions.controlnet.SCRIPT is None:
+            return [], "", plaintext_to_html("controlnet or animatediff extensions are not installed"), ""
+        animatediffGenerate(gArgs, video_output_dir, resultFrames, fps_out)
     else:
         saveDir = getSaveDir()
         saveToSubdirs = True
