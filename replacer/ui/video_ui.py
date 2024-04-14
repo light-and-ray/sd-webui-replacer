@@ -38,6 +38,7 @@ def makeVideoUI(comp: AttrDict):
                     )
                     comp.ad_internal_fps = gr.Number(
                         value=0, precision=0, info="Set 0 to use the same with input video",
+                        minimum=0,
                         label="Internal AD FPS", 
                         elem_id="replacer_ad_internal_fps"
                     )
@@ -118,7 +119,8 @@ def makeVideoUI(comp: AttrDict):
 
                 with gr.Accordion("Help", open=False):
                     gr.Markdown(
-                        "Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting\n\n"
+                        "Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting. "
+                        "Lama cleaner in masked content enables CN inpaint_only+lama module instead of inpaint_only\n\n"
                         \
                         "Due to high AnimateDiff's consistency in comparison with *\"Frame by frame\"* mode "
                         "you can use high `mask blur` and `mask expand`.\n\n"
@@ -131,7 +133,7 @@ def makeVideoUI(comp: AttrDict):
                         "`Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`\n\n"
                         \
                         "`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional "
-                        "ControlNet units. If you get OutOfMemort error, decrease them\n\n"
+                        "ControlNet unit. If you get OutOfMemort error, decrease them\n\n"
                         \
                         "Read [here](https://github.com/light-and-ray/sd-webui-replacer/blob/master/docs/video.md#animatediff-options) "
                         "about AnimateDiff options\n\n"

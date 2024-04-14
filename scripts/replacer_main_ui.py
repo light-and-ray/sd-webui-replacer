@@ -2,7 +2,7 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath, on_ui_settings,
+    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, 
 )
 from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_tab_ui
@@ -58,9 +58,21 @@ def hideSegmentAnythingAccordions(component, **kwargs):
         getattr(component, 'label', "") == "Segment Anything":
 
         component.visible = False
+        print(f"[{EXT_NAME}] Segment Anything accordion has been hidden")
 
 if needHideSegmentAnythingAccordions():
     script_callbacks.on_after_component(hideSegmentAnythingAccordions)
+
+
+def hideAnimateDiffAccordions(component, **kwargs):
+    if type(component) is gr.Accordion and\
+        getattr(component, 'label', "") == "AnimateDiff":
+
+        component.visible = False
+        print(f"[{EXT_NAME}] AnimateDiff accordion has been hidden")
+
+if needHideAnimateDiffAccordions():
+    script_callbacks.on_after_component(hideAnimateDiffAccordions)
 
 
 script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)

@@ -1,11 +1,11 @@
 # Replacer
 
+> **Note: AnimateDiff temporary requites this patch, untill it will be merged https://github.com/continue-revolution/sd-webui-animatediff/pull/499**
+
 Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with stable diffusion, animatediff and controlnet
 
 
 ![](/docs/images/main_screenshot.jpg)
-
-> **Note: AnimateDiff temporary requites this patch, untill it will be merged https://github.com/continue-revolution/sd-webui-animatediff/pull/499**
 
 You also can draw your mask instead of or in addition to detection, and take advantage of convenient HiresFix option, and ControlNet inpainting with preserving original image resolution and aspect ratio
 

@@ -9,7 +9,7 @@ You need to provide a path to your video file, or url in `file://` format. On Wi
 ![](/docs/images/replacer_video_animate_diff.jpg)
 
 ### General advice
-Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting
+Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting. Lama cleaner in masked content enables CN inpaint_only+lama module instead of inpaint_only
 
 Due to high AnimateDiff's consistency in comparison with *"Frame by frame"* mode you can use high `mask blur` and `mask expand`.
 
@@ -17,7 +17,7 @@ Hires fix doesn't work here, and as I think, it basically can't, because it will
 
 To increase consistency between fragments, you can use ControlNet, or try to use `Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`
 
-`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional ControlNet units. If you get OutOfMemort error, decrease them
+`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemort error, decrease them
 
 If you know any other good advice, please send them into github issues, I can place them here
 

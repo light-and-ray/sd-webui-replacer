@@ -152,6 +152,10 @@ def needHideSegmentAnythingAccordions():
     res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_segment_anything_accordions", False)
     return res
 
+def needHideAnimateDiffAccordions():
+    res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_animatediff_accordions", False)
+    return res
+
 def needHideReplacerScript():
     res : bool = shared.opts.data.get(EXT_NAME_LOWER + "_hide_replacer_script", False)
     return res
@@ -222,6 +226,16 @@ def on_ui_settings():
         shared.OptionInfo(
             False,
             f"Hide Segment Anything accordions in txt2img and img2img tabs. Useful if you installed it only for {EXT_NAME}",
+            gr.Checkbox,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_hide_animatediff_accordions",
+        shared.OptionInfo(
+            False,
+            f"Hide AnimateDiff accordions in txt2img and img2img tabs. Useful if you installed it only for {EXT_NAME}",
             gr.Checkbox,
             section=section,
         ).needs_reload_ui()

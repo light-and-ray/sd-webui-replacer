@@ -128,13 +128,15 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
         if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
             gArgs.cn_args[i].enabled = True
             gArgs.cn_args[i].module = 'inpaint_only'
+            if gArgs.inpainting_fill == 4: # lama cleaner
+                gArgs.cn_args[i].module += "+lama"
             gArgs.cn_args[i].model = gArgs.animatediff_args.cn_inpainting_model
             gArgs.cn_args[i].weight = gArgs.animatediff_args.control_weight
 
         if not gArgs.cn_args[i].enabled:
             continue
 
-        if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module == 'inpaint_only':
+        if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module.startswith('inpaint_only'):
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:

@@ -67,9 +67,12 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
         try:
             mask = createMask(frame, gArgs).mask
+            mask = limitImageByOneDemention(mask, max(gArgs.width, gArgs.height))
+            mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
+            mask = mask.resize(frame.size)
         except Exception as e:
             if type(e) is not NothingDetectedError:
-                errors.report('***', exc_info=True)
+                errors.report(f'{e} ***', exc_info=True)
             else:
                 print(e)
             if mask is None:
@@ -77,9 +80,6 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask = blackFilling
             else:
                 mask = extraMaskExpand(mask, 50)
-        mask = limitImageByOneDemention(mask, max(gArgs.width, gArgs.height))
-        mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
-        mask = mask.resize(frame.size)
         mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
         frameInFragmentIdx += 1
     yield fragmentPath
@@ -96,7 +96,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
         gArgs.animatediff_args.fragment_length = len(gArgs.images)
     gArgs.animatediff_args.needApplyCNForAnimateDiff = True
 
-    totalFragments = math.ceil((len(gArgs.images) - 1) / gArgs.animatediff_args.fragment_length)
+    totalFragments = math.ceil((len(gArgs.images) - 1) / (gArgs.animatediff_args.fragment_length - 1))
     if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
     shared.state.job_count = 1 + totalFragments
