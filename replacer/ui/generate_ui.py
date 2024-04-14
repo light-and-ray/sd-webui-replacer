@@ -209,19 +209,19 @@ def generate_ui(
     )
 
     animatediff_args = AnimateDiffArgs(
-        ad_fragment_length,
-        ad_internal_fps,
-        ad_batch_size,
-        ad_stride,
-        ad_overlap,
-        ad_latent_power,
-        ad_latent_scale,
-        ad_generate_only_first_fragment,
-        ad_cn_inpainting_model,
-        ad_control_weight,
-        ad_force_override_sd_model,
-        ad_force_sd_model_checkpoint,
-        ad_moution_model,
+        fragment_length=ad_fragment_length,
+        internal_fps=ad_internal_fps,
+        batch_size=ad_batch_size,
+        stride=ad_stride,
+        overlap=ad_overlap,
+        latent_power=ad_latent_power,
+        latent_scale=ad_latent_scale,
+        generate_only_first_fragment=ad_generate_only_first_fragment,
+        cn_inpainting_model=ad_cn_inpainting_model,
+        control_weight=ad_control_weight,
+        force_override_sd_model=ad_force_override_sd_model,
+        force_sd_model_checkpoint=ad_force_sd_model_checkpoint,
+        moution_model=ad_moution_model,
     )
 
     gArgs = GenerationArgs(

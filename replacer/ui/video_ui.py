@@ -118,17 +118,25 @@ def makeVideoUI(comp: AttrDict):
 
                 with gr.Accordion("Help", open=False):
                     gr.Markdown(
-                        "Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting\n"
-                        "Due to high AnimateDiff's consistency in comparison with \"Frame by frame\" mode "
-                        "you can use high mask blur and mask expansion.\n"
+                        "Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting\n\n"
+                        \
+                        "Due to high AnimateDiff's consistency in comparison with *\"Frame by frame\"* mode "
+                        "you can use high `mask blur` and `mask expand`.\n\n"
+                        \
                         "Hires fix doesn't work here, and as I think, it basically can't, because it will "
-                        "decrease the consistency. But you can use the \"upscaler for img2img\" option - these "
-                        "upscalers work and consistent enough.\n"
+                        "decrease the consistency. But you can use the `upscaler for img2img` option - these "
+                        "upscalers work and consistent enough.\n\n"
+                        \
                         "To increase consistency between fragments, you can use ControlNet, or try to use "
-                        "\"Fragment length\" = 0 and set up \"Context batch size\", \"Stride\", \"Overlap\"\n"
-                        "\"Latent scale\", \"Fragment length\" and \"Context batch size\" are set up for 12GB VRAM with one additional "
-                        "ControlNet units. If you get OutOfMemort error, decrease them\n"
-                        "If you know any other good advice, please send them into github issues, I can place them here\n"
+                        "`Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`\n\n"
+                        \
+                        "`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional "
+                        "ControlNet units. If you get OutOfMemort error, decrease them\n\n"
+                        \
+                        "Read [here](https://github.com/light-and-ray/sd-webui-replacer/blob/master/docs/video.md#animatediff-options) "
+                        "about AnimateDiff options\n\n"
+                        \
+                        "If you know any other good advice, please send them into github issues, I can place them here"
                     )
 
 
@@ -139,7 +147,7 @@ def makeVideoUI(comp: AttrDict):
                 else:
                     comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], visible=False)
 
-                with gr.Accordion("Help", open=False):
+                with gr.Accordion("Help", open=True):
                     gr.Markdown(
                         "To increase consistency it's better to inpaint clear "\
                         "objects on video with good quality and enough context. "\

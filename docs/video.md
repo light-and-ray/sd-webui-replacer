@@ -11,17 +11,17 @@ You need to provide a path to your video file, or url in `file://` format. On Wi
 ### General advice
 Almost all advanced options work here. Inpaint padding doesn't, because it's ControlNet inpainting
 
-Due to high AnimateDiff's consistency in comparison with "Frame by frame" mode you can use high mask blur and mask expansion.
+Due to high AnimateDiff's consistency in comparison with *"Frame by frame"* mode you can use high `mask blur` and `mask expand`.
 
 Hires fix doesn't work here, and as I think, it basically can't, because it will decrease the consistency. But you can use the "upscaler for img2img" option - these upscalers work and consistent enough.
 
-To increase consistency between fragments, you can use ControlNet, or try to use "Fragment length" = 0 and set up "Context batch size", "Stride", "Overlap"
+To increase consistency between fragments, you can use ControlNet, or try to use `Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`
 
-"Latent scale", "Fragment length" and "Context batch size" are set up for 12GB VRAM with one additional ControlNet units. If you get OutOfMemort error, decrease them
+`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional ControlNet units. If you get OutOfMemort error, decrease them
 
 If you know any other good advice, please send them into github issues, I can place them here
 
-### AnimateDiff advice
+### AnimateDiff options
 1. **Number of frames** (*Fragment length, frames* inside Replacer) — Choose whatever number you like. 
 
     If you enter something smaller than your `Context batch size` other than 0: you will get the first `Number of frames` frames as your output fragment from your whole generation. 
@@ -31,7 +31,7 @@ If you know any other good advice, please send them into github issues, I can pl
 1. **Stride** — Max motion stride as a power of 2 (default: 1).
     1. Due to the limitation of the infinite context generator, this parameter is effective only when `Number of frames` > `Context batch size`, including when ControlNet is enabled and the source video frame number > `Context batch size` and `Number of frames` is 0.
     1. "Absolutely no closed loop" is only possible when `Stride` is 1.
-    1. For each 1 <= $2^i$ <= `Stride`, the infinite context generator will try to make frames $2^i$ apart temporal consistent. For example, if `Stride` is 4 and `Number of frames` is 8, it will make the following frames temporal consistent:
+    1. For each `1 <= 2^i <= Stride`, the infinite context generator will try to make frames `2^i` apart temporal consistent. For example, if `Stride` is 4 and `Number of frames` is 8, it will make the following frames temporal consistent:
         - `Stride` == 1: [0, 1, 2, 3, 4, 5, 6, 7]
         - `Stride` == 2: [0, 2, 4, 6], [1, 3, 5, 7]
         - `Stride` == 4: [0, 4], [1, 5], [2, 6], [3, 7]

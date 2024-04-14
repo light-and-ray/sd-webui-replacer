@@ -69,7 +69,7 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 # Docs:
 ## - [Usage of Replacer](/docs/usage.md)
 ## - [Replacer Options](/docs/options.md)
-## - [Video](/docs/video.md)
+## - [Video: AnimateDiff and Frame by frame](/docs/video.md)
 ## - [Information about Replacer API](/docs/api.md)
 ## - [Useful tips: how to change defaults, maximal value of sliders, and how to get inpainting model](/docs/tips.md)
 

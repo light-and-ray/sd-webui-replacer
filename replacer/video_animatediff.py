@@ -48,8 +48,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
             frameInFragmentIdx = 0
             fragmentNum += 1
             fragmentPath = os.path.join(video_output_dir, f"fragment_{fragmentNum}")
-            shared.state.textinfo = f"generating masks for fragment {fragmentNum} / {totalFragments}"
-
+            
             framesDir = os.path.join(fragmentPath, 'frames'); os.makedirs(framesDir, exist_ok=True)
             masksDir = os.path.join(fragmentPath, 'masks'); os.makedirs(masksDir, exist_ok=True)
             outDir = os.path.join(fragmentPath, 'out'); os.makedirs(outDir, exist_ok=True)
@@ -62,6 +61,8 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
 
         Pause.wait()
         if interrupted(): return
+        shared.state.textinfo = f"generating masks for fragment {fragmentNum} / {totalFragments}"
+
         frame = frames[frameIdx]
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
         try:
@@ -99,6 +100,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
     if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
     shared.state.job_count = 1 + totalFragments
+    Pause.paused = False
 
     shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
     processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)

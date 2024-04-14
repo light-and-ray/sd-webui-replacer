@@ -1,6 +1,6 @@
 import copy, os
 from PIL import Image
-from modules import scripts, shared, paths_internal
+from modules import scripts, shared, paths_internal, errors
 from replacer.generation_args import AnimateDiffArgs, GenerationArgs
 from replacer.tools import applyMask
 
@@ -12,7 +12,7 @@ AnimateDiffProcess = None
 
 
 def initAnimateDiffScript():
-    global SCRIPT, AnimateDiffProcess, motion_module
+    global SCRIPT, AnimateDiffProcess
     index = None
     for idx, script in enumerate(scripts.scripts_img2img.alwayson_scripts):
         if script.title().lower() == "animatediff":
@@ -95,8 +95,8 @@ def getModels() -> list:
             model_dir = default_model_dir
         models = shared.listfiles(model_dir)
     except Exception as e:
-        print(e)
-        raise
+        # errors.report(e)
+        pass
     if models == []:
         return ["None"]
     models = [os.path.basename(x) for x in models]

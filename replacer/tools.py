@@ -255,7 +255,7 @@ def convertIntoPath(string: str) -> str:
         for prefix in prefixes:
             if string.startswith(prefix):
                 string = urllib.parse.unquote(string.removeprefix(prefix))
-                string = string.removeprefix(string.split('/')[-1]) # removes user:password@host:port if exists
+                string = string.removeprefix(string.split('/')[0]) # removes user:password@host:port if exists
                 return string
 
         errors.report("Can't be here")
