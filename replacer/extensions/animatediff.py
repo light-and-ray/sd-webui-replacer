@@ -53,6 +53,12 @@ def apply(p, animatediff_args: AnimateDiffArgs):
 
         params.video_path = animatediff_args.video_path
         params.mask_path = animatediff_args.mask_path
+
+        framesNum = len(shared.listfiles(animatediff_args.video_path))
+        if framesNum < params.batch_size:
+            params.batch_size = framesNum
+        if framesNum < params.video_length:
+            params.video_length = framesNum
         
         p.script_args[SCRIPT.args_from] = params
 

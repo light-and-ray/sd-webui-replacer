@@ -1,11 +1,13 @@
 import os, copy, math
 from PIL import Image
-from modules import shared
+from modules import shared, errors
 from replacer.generation_args import GenerationArgs
-from replacer.mask_creator import createMask, MaskResult
+from replacer.mask_creator import createMask, NothingDetectedError
 from replacer.inpaint import inpaint
 from replacer.generate import generateSingle
-from replacer.tools import interrupted, applyMaskBlur, clearCache, limitImageByOneDemention
+from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageByOneDemention,
+    Pause,
+)
 
 
 
@@ -58,15 +60,25 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
                 frameInFragmentIdx = 1
 
+        Pause.wait()
         if interrupted(): return
         frame = frames[frameIdx]
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
-        maskResult: MaskResult = createMask(frame, gArgs)
-        mask = limitImageByOneDemention(maskResult.mask, max(gArgs.width, gArgs.height))
+        try:
+            mask = createMask(frame, gArgs).mask
+        except Exception as e:
+            if type(e) is not NothingDetectedError:
+                errors.report('***', exc_info=True)
+            else:
+                print(e)
+            whiteFilling = Image.new('L', frame.size, 255)
+            mask = whiteFilling
+        mask = limitImageByOneDemention(mask, max(gArgs.width, gArgs.height))
         mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
         mask = mask.resize(frame.size)
         mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
         frameInFragmentIdx += 1
+    yield fragmentPath
 
 
 
@@ -102,14 +114,16 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
         if gArgs.animatediff_args.generate_only_first_fragment:
             break
     
-
-    shared.state.textinfo = "merging fragments"
+    text = "merging fragments"
+    shared.state.textinfo = text
+    print(text)
     def readImages(input_dir):
         image_list = shared.listfiles(input_dir)
         for filename in image_list:
             image = Image.open(filename).convert('RGBA')
             yield image
     def saveImage(image):
+        if not image: return
         image.save(os.path.join(result_dir, f"{frameNum:05d}-{gArgs.seed}.{shared.opts.samples_format}"))
     os.makedirs(result_dir, exist_ok=True)
     theLastImage = None
@@ -117,6 +131,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     for fragmentPath in fragmentPaths:
         images = list(readImages(os.path.join(fragmentPath, 'out')))
+        if not images: break
         if theLastImage:
             images[0] = Image.blend(images[0], theLastImage, 0.5)
         theLastImage = images[-1]
