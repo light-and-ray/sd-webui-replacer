@@ -138,10 +138,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     for fragmentPath in tqdm(fragmentPaths):
         images = list(readImages(os.path.join(fragmentPath, 'out')))
-        if len(images) == 1:
-            theLastImage = images[0]
-            break
-        elif len(images) == 0:
+        if len(images) <= 1:
             break
         if theLastImage:
             images[0] = Image.blend(images[0], theLastImage, 0.5)
