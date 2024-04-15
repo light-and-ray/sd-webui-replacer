@@ -174,6 +174,7 @@ def generate_ui(
         batch_size = 1
         extra_includes = []
         save_before_hires_fix = False
+        hf_randomize_seed = False
 
         images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
         resultFrames = os.path.join(video_output_dir, 'resultFrames')
