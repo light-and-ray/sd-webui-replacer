@@ -32,7 +32,7 @@ def makeVideoUI(comp: AttrDict):
 
                 with gr.Row():
                     comp.ad_fragment_length = gr.Number(
-                        minimum=0, value=12, precision=0,
+                        minimum=0, value=36, precision=0,
                         label="Fragment length, frames", info="Set 0 to consider the full video as 1 fragment",
                         elem_id="replacer_ad_fragment_length",
                     )
