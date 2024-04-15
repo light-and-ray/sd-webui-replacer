@@ -1,5 +1,6 @@
 import os, copy, math
 from PIL import Image
+from tqdm import tqdm
 from modules import shared, errors
 from replacer.generation_args import GenerationArgs
 from replacer.mask_creator import createMask, NothingDetectedError
@@ -100,6 +101,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
     if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
     shared.state.job_count = 1 + totalFragments
+    shared.total_tqdm.clear()
     Pause.paused = False
 
     shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
@@ -134,7 +136,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
     theLastImage = None
     frameNum = 0
 
-    for fragmentPath in fragmentPaths:
+    for fragmentPath in tqdm(fragmentPaths):
         images = list(readImages(os.path.join(fragmentPath, 'out')))
         if len(images) == 1:
             theLastImage = images[0]
