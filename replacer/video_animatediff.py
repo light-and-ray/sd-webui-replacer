@@ -63,6 +63,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         Pause.wait()
         if interrupted(): return
         shared.state.textinfo = f"generating masks for fragment {fragmentNum} / {totalFragments}"
+        print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
