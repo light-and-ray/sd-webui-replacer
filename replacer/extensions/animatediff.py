@@ -1,6 +1,6 @@
 import copy, os
 from PIL import Image
-from modules import scripts, shared, paths_internal, errors
+from modules import scripts, shared, paths_internal, errors, extensions
 from replacer.generation_args import AnimateDiffArgs, GenerationArgs
 from replacer.tools import applyMask
 
@@ -88,13 +88,18 @@ def getModels() -> list:
         return ["None"]
     models = []
     try:
-        default_model_dir = os.path.join(paths_internal.extensions_dir, "sd-webui-animatediff", "model")
+        try:
+            adExtension = next(x for x in extensions.extensions if "animatediff" in x.name.lower())
+            default_model_dir = os.path.join(adExtension.path, "model")
+        except Exception as e:
+            errors.report(e)
+            default_model_dir = os.path.join(paths_internal.extensions_dir, "sd-webui-animatediff", "model")
         model_dir = shared.opts.data.get("animatediff_model_path", default_model_dir)
         if not model_dir:
             model_dir = default_model_dir
         models = shared.listfiles(model_dir)
     except Exception as e:
-        # errors.report(e)
+        errors.report(e)
         pass
     if models == []:
         return ["None"]
