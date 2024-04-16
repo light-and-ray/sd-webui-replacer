@@ -83,7 +83,8 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask = extraMaskExpand(mask, 50)
         mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
         frameInFragmentIdx += 1
-    yield fragmentPath
+    if frameInFragmentIdx > 1:
+        yield fragmentPath
 
 
 

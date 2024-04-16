@@ -65,14 +65,19 @@ def restoreAfterCN_animatediff(gArgs: GenerationArgs, processed):
             yield image
 
     newImages = []
+    i = 0
+    total = len(processed.images)
 
     for res, orig, mask in \
         zip(processed.images,
             readImages(gArgs.animatediff_args.video_path),
             readImages(gArgs.animatediff_args.mask_path)
             ):
+        if gArgs.upscalerForImg2Img not in [None, "None", "Lanczos", "Nearest"]:
+            print(f"{i+1} / {total}")
         orig = applyMask(res, orig, mask, gArgs)
         newImages.append(orig)
+        i+=1
 
     processed.images = newImages
 
