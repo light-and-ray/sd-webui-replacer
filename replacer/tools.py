@@ -245,6 +245,11 @@ class Pause:
 
 
 def convertIntoPath(string: str) -> str:
+    string = string.strip()
+    if not string: return string
+    if len(string) > 3 and string[0] == string[-1] and string[0] in ('"', "'"):
+        string = string[1:-1]
+
     schemes = ['file', 'fish']
     prefixes = [f'{x}://' for x in schemes]
     isURL = any(string.startswith(x) for x in prefixes)

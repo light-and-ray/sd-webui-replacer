@@ -118,9 +118,6 @@ def generate_ui(
     if (seed == -1):
         seed = generateSeed()
 
-    output_batch_dir = output_batch_dir.strip()
-    video_output_dir = video_output_dir.strip()
-
     input_batch_dir = convertIntoPath(input_batch_dir)
     output_batch_dir = convertIntoPath(output_batch_dir)
     input_video = convertIntoPath(input_video)

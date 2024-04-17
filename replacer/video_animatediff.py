@@ -69,7 +69,6 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
         try:
             mask = createMask(frame, gArgs).mask
-            mask = limitImageByOneDemention(mask, max(gArgs.width, gArgs.height))
             mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
             mask = mask.resize(frame.size)
         except Exception as e:
