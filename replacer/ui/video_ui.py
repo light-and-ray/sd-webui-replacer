@@ -130,10 +130,11 @@ def makeVideoUI(comp: AttrDict):
                         "upscalers work and consistent enough.\n\n"
                         \
                         "To increase consistency between fragments, you can use ControlNet, or try to use "
-                        "`Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`\n\n"
+                        "`Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`. I recomment make "
+                        "`Fragment length` few times more then `Context batch size`\n\n"
                         \
-                        "`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional "
-                        "ControlNet unit. If you get OutOfMemort error, decrease them\n\n"
+                        "`Context batch size` is set up for 12GB VRAM with one additional "
+                        "ControlNet unit. If you get OutOfMemort error, decrease it\n\n"
                         \
                         "Read [here](https://github.com/light-and-ray/sd-webui-replacer/blob/master/docs/video.md#animatediff-options) "
                         "about AnimateDiff options\n\n"

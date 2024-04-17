@@ -15,9 +15,9 @@ Due to high AnimateDiff's consistency in comparison with *"Frame by frame"* mode
 
 Hires fix doesn't work here, and as I think, it basically can't, because it will decrease the consistency. But you can use the "upscaler for img2img" option - these upscalers work and consistent enough.
 
-To increase consistency between fragments, you can use ControlNet, or try to use `Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`
+To increase consistency between fragments, you can use ControlNet, or try to use `Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`. I recomment make `Fragment length` few times more then `Context batch size`
 
-`Latent scale`, `Fragment length` and `Context batch size` are set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemort error, decrease them
+`Context batch size` is set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemort error, decrease it
 
 If you know any other good advice, please send them into github issues, I can place them here
 
