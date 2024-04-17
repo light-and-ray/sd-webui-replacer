@@ -94,7 +94,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
         gArgs.sd_model_checkpoint = gArgs.animatediff_args.force_sd_model_checkpoint
     if gArgs.animatediff_args.internal_fps <= 0:
         gArgs.animatediff_args.internal_fps = video_fps
-    if gArgs.animatediff_args.fragment_length <= 0:
+    if gArgs.animatediff_args.fragment_length <= 0 or len(gArgs.images) < gArgs.animatediff_args.fragment_length:
         gArgs.animatediff_args.fragment_length = len(gArgs.images)
     gArgs.animatediff_args.needApplyCNForAnimateDiff = True
 

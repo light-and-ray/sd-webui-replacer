@@ -48,7 +48,7 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 1. [Lama cleaner as masked content](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
-1. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference)
+1. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference) (discontinued)
 
 1. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
 
@@ -68,8 +68,8 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 
 # Docs:
 ## - [Usage of Replacer](/docs/usage.md)
-## - [Replacer Options](/docs/options.md)
 ## - [Video: AnimateDiff and Frame by frame](/docs/video.md)
+## - [Replacer Options](/docs/options.md)
 ## - [Information about Replacer API](/docs/api.md)
 ## - [Useful tips: how to change defaults, maximal value of sliders, and how to get inpainting model](/docs/tips.md)
 
