@@ -72,7 +72,7 @@ Dedicated page (replacer tab only) is available on url `/replacer-dedicated`
 
 ## ControlNet
 ![](/docs/images/controlnet.jpg)
-[ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) is also avaliavle here. (Forge is discontinued)
+[ControlNet extension](https://github.com/Mikubill/sd-webui-controlnet) is also avaliavle here. (Forge is discontinued. Revert to the last compatible version: `git checkout 3321b2cec451d`)
 
 ## Replacer script in txt2img/img2img tabs
 ![](/docs/images/replacer_script.jpg)

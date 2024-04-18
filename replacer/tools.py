@@ -171,9 +171,10 @@ def applyMask(res, orig, mask, gArgs):
 
     w, h = orig.size
     imageProc = resize_image(1, res.convert('RGB'), w, h, upscaler).convert('RGBA') # 1 - resize and crop
+    mask = mask.convert('L')
     if gArgs.inpainting_mask_invert:
         mask = ImageChops.invert(mask)
-    mask = mask.resize(orig.size).convert('L')
+    mask = mask.resize(orig.size)
     new = copy.copy(orig)
     new.paste(imageProc, mask)
     return new

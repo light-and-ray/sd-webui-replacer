@@ -1,5 +1,5 @@
 import os, copy, math
-from PIL import Image
+from PIL import Image, ImageChops
 from tqdm import tqdm
 from modules import shared, errors
 from replacer.generation_args import GenerationArgs
@@ -14,6 +14,7 @@ from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageB
 
 def processFragment(fragmentPath: str, initImage, gArgs: GenerationArgs):
     gArgs = copy.copy(gArgs)
+    gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
     gArgs.animatediff_args.needApplyAnimateDiff = True
     gArgs.animatediff_args.video_path = os.path.join(fragmentPath, 'frames')
@@ -69,6 +70,8 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
         try:
             mask = createMask(frame, gArgs).mask
+            if gArgs.inpainting_mask_invert:
+                mask = ImageChops.invert(mask.convert('L'))
             mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
             mask = mask.resize(frame.size)
         except Exception as e:

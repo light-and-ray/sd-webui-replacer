@@ -92,8 +92,6 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
         restoreAfterCN_animatediff(gArgs, processed)
     else:
         origMask = gArgs.mask.convert('RGBA')
-        if gArgs.inpainting_mask_invert:
-            origMask = ImageChops.invert(gArgs.mask)
         origMask = applyMaskBlur(origMask, gArgs.mask_blur)
         upscaler = gArgs.upscalerForImg2Img
         if upscaler == "":
@@ -186,11 +184,14 @@ def getInpaintModels() -> list:
     if external_code is None:
         return ["None"]
 
-    models: str = external_code.get_models()
     result = []
-    for model in models:
-        if "inpaint" in model.lower():
-            result.append(model)
+    try:
+        models = external_code.get_models()
+        for model in models:
+            if "inpaint" in model.lower():
+                result.append(model)
+    except Exception as e:
+        errors.report(f"{e} ***", exc_info=True)
     if result == []:
         return ["None"]
     return result
