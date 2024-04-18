@@ -33,6 +33,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
     fragmentSize = gArgs.animatediff_args.fragment_length
 
     frames = gArgs.images
+    blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
     fragmentNum = 0
     frameInFragmentIdx = fragmentSize
     fragmentPath = None
@@ -79,8 +80,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 errors.report(f'{e} ***', exc_info=True)
             else:
                 print(e)
-            if mask is None:
-                blackFilling = Image.new('L', frame.size, 0)
+            if mask is None or mask is blackFilling:
                 mask = blackFilling
             else:
                 mask = extraMaskExpand(mask, 50)
