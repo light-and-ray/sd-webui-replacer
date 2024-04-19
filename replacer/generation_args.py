@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Any, List
 from PIL import Image
 
 
@@ -29,14 +28,14 @@ class HiresFixArgs:
 @dataclass
 class HiresFixCacheData:
     upscaler: str
-    generatedImage: Image
+    generatedImage: Image.Image
     galleryIdx: int
 
 
 @dataclass
 class AppropriateData:
     inputImageIdx: int
-    mask: Image
+    mask: Image.Image
     seed: int
 
 
@@ -91,20 +90,20 @@ class GenerationArgs:
     inpaint_full_res_padding: int
     img2img_fix_steps: bool
     inpainting_mask_invert : int
-    images: Any
+    images: list[Image.Image]
     override_sd_model: bool
     sd_model_checkpoint: str
     mask_num: int
-    avoidance_mask: Image
+    avoidance_mask: Image.Image
     only_custom_mask: bool
-    custom_mask: Image
+    custom_mask: Image.Image
     use_inpaint_diff: bool
     lama_cleaner_upscaler: str
     clip_skip: int
 
     pass_into_hires_fix_automatically: bool
     save_before_hires_fix: bool
-    previous_frame_into_controlnet: list
+    previous_frame_into_controlnet: list[str]
     do_not_use_mask: bool
     animatediff_args: AnimateDiffArgs
 
@@ -112,10 +111,10 @@ class GenerationArgs:
     cn_args: list
     soft_inpaint_args: list
 
-    mask: Image = None
+    mask: Image.Image = None
     mask_num_for_metadata: int = None
     hiresFixCacheData: HiresFixCacheData = None
     addHiresFixIntoMetadata: bool = False
-    appropriateInputImageDataList: List[AppropriateData] = None
+    appropriateInputImageDataList: list[AppropriateData] = None
 
 

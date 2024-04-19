@@ -164,13 +164,13 @@ class MasksCreator:
 
 @dataclass
 class MaskResult:
-    mask: Image
-    maskPreview: Image
-    maskCutted: Image
-    maskBox: Image
+    mask: Image.Image
+    maskPreview: Image.Image
+    maskCutted: Image.Image
+    maskBox: Image.Image
 
 
-def createMask(image: Image, gArgs: GenerationArgs) -> MaskResult:
+def createMask(image: Image.Image, gArgs: GenerationArgs) -> MaskResult:
     maskPreview = None
     maskCutted = None
     maskBox = None

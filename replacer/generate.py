@@ -19,7 +19,7 @@ class InterrupredDetection(Exception):
 
 
 def generateSingle(
-    image : Image,
+    image : Image.Image,
     gArgs : GenerationArgs,
     savePath : str,
     saveSuffix : str,

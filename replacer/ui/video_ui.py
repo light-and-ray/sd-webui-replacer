@@ -23,7 +23,10 @@ def makeVideoUI(comp: AttrDict):
 
         comp.selected_video_mode = gr.Textbox(value="video_mode_animatediff", visible=False)
 
+
         with gr.Tabs(elem_id="replacer_video_modes"):
+
+
             with gr.Tab("AnimateDiff mode", elem_id="replacer_video_mode_animatediff") as comp.video_mode_animatediff:
                 if replacer_extensions.controlnet.SCRIPT is None:
                     gr.Markdown("[sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) is not installed")
@@ -107,7 +110,7 @@ def makeVideoUI(comp: AttrDict):
                     with gr.Row():
                         moutionModels = replacer_extensions.animatediff.getModels()
                         default = "mm_sd15_v3.safetensors"
-                        if not default in moutionModels:
+                        if default not in moutionModels:
                             default = moutionModels[0]
                         comp.ad_moution_model = gr.Dropdown(
                             choices=moutionModels,

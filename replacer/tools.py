@@ -62,7 +62,7 @@ def limiSizeByOneDemention(size: tuple, limit: int) -> tuple:
     return (int(w), int(h))
 
 
-def limitImageByOneDemention(image: Image, limit: int) -> Image:
+def limitImageByOneDemention(image: Image.Image, limit: int) -> Image.Image:
     if image is None:
         return None
     return image.resize(limiSizeByOneDemention(image.size, limit))
@@ -109,15 +109,15 @@ def fastMaskDilate(mask, _, dilation_amount, imageResized):
 
 @dataclass
 class CachedExtraMaskExpand:
-    mask: Image
+    mask: Image.Image
     expand: int
-    result: Image
+    result: Image.Image
 
 cachedExtraMaskExpand: CachedExtraMaskExpand = None
 update_mask = None
 
 
-def extraMaskExpand(mask: Image, expand: int):
+def extraMaskExpand(mask: Image.Image, expand: int):
     global cachedExtraMaskExpand, update_mask
 
     if cachedExtraMaskExpand is not None and\

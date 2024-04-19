@@ -12,7 +12,7 @@ from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageB
 
 
 
-def processFragment(fragmentPath: str, initImage, gArgs: GenerationArgs):
+def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
     gArgs = copy.copy(gArgs)
     gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
@@ -36,12 +36,12 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
     blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
     fragmentNum = 0
     frameInFragmentIdx = fragmentSize
-    fragmentPath = None
-    framesDir = None
-    masksDir = None
-    outDir = None
-    frame = None
-    mask = None
+    fragmentPath: str = None
+    framesDir: str = None
+    masksDir: str = None
+    outDir: str = None
+    frame: Image.Image = None
+    mask: Image.Image = None
 
     for frameIdx in range(len(frames)):
         if frameInFragmentIdx == fragmentSize:
@@ -86,12 +86,13 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask = extraMaskExpand(mask, 50)
         mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
         frameInFragmentIdx += 1
+
     if frameInFragmentIdx > 1:
         yield fragmentPath
 
 
 
-def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir, video_fps: float):
+def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir: str, video_fps: float):
     if gArgs.animatediff_args.force_override_sd_model:
         gArgs.override_sd_model = True
         gArgs.sd_model_checkpoint = gArgs.animatediff_args.force_sd_model_checkpoint
@@ -110,7 +111,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
     processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)
-    initImage: Image = processedFirstImg.images[0]
+    initImage: Image.Image = processedFirstImg.images[0]
     fragmentPaths = []
 
 
@@ -128,12 +129,12 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
     text = "merging fragments"
     shared.state.textinfo = text
     print(text)
-    def readImages(input_dir):
+    def readImages(input_dir: str):
         image_list = shared.listfiles(input_dir)
         for filename in image_list:
             image = Image.open(filename).convert('RGBA')
             yield image
-    def saveImage(image):
+    def saveImage(image: Image.Image):
         if not image: return
         image.save(os.path.join(result_dir, f"{frameNum:05d}-{gArgs.seed}.{shared.opts.samples_format}"))
     os.makedirs(result_dir, exist_ok=True)

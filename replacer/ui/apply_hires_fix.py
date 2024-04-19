@@ -89,11 +89,8 @@ def applyHiresFix(
     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
 
     try:
-        shared.state.job_count = 2
         shared.total_tqdm.clear()
-        shared.total_tqdm.updateTotal(gArgs.steps + hrGArgs.steps)
 
-        shared.state.textinfo = "inpainting with upscaler"
         if generate_ui.lastGenerationArgs.hiresFixCacheData is not None and\
                 generate_ui.lastGenerationArgs.hiresFixCacheData.upscaler == hf_upscaler and\
                 generate_ui.lastGenerationArgs.hiresFixCacheData.galleryIdx == gallery_idx:
@@ -102,6 +99,10 @@ def applyHiresFix(
             shared.state.job_count = 1
             shared.total_tqdm.updateTotal(hrGArgs.steps)
         else:
+            shared.state.job_count = 2
+            shared.total_tqdm.updateTotal(gArgs.steps + hrGArgs.steps)
+            shared.state.textinfo = "inpainting with upscaler"
+
             processed, scriptImages = inpaint(image, gArgs)
             generatedImage = processed.images[0]
             if not interrupted() and not shared.state.skipped:

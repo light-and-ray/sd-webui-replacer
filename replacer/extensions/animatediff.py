@@ -98,11 +98,11 @@ def getModels() -> list:
         if not model_dir:
             model_dir = default_model_dir
         models = shared.listfiles(model_dir)
+        models = [os.path.basename(x) for x in models]
     except Exception as e:
         errors.report(e)
-        pass
+
     if models == []:
         return ["None"]
-    models = [os.path.basename(x) for x in models]
     return models
 

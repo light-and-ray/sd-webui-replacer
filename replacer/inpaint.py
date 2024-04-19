@@ -14,7 +14,7 @@ from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
 def inpaint(
-    image : Image,
+    image : Image.Image,
     gArgs : GenerationArgs,
     savePath : str = "",
     saveSuffix : str = "",
