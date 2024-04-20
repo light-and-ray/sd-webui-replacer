@@ -42,6 +42,8 @@ If you know any other good advice, please send them into github issues, I can pl
 ### Sparsectrl
 Sparsectrl is a special ControlNet models for AnimateDiff. Set up it in a ControlNet unit to use it. Produces much better correspondence of the first result frame of the fragment and the initial image
 
+![](/docs/images/replacer_video_sparsectrl.jpg)
+
 You can download them here: https://huggingface.co/conrevo/AnimateDiff-A1111/tree/main/control RGB is for "none" preprocessor, scribble is for scribbles
 
 ## Frame by frame mode
