@@ -39,6 +39,11 @@ If you know any other good advice, please send them into github issues, I can pl
     1. Due to the limitation of the infinite context generator, this parameter is effective only when `Number of frames` > `Context batch size`, including when ControlNet is enabled and the source video frame number > `Context batch size` and `Number of frames` is 0.
 1. **Latent power** and **Latent scale** — Initial latent for each AnimateDiff's frame is calculated using `init_alpha` made with this formula: `init_alpha = 1 - frame_number ^ latent_power / latent_scale`. You can see these factors in console log `AnimateDiff - INFO - Randomizing init_latent according to [ ... ]`. It describes the straight of initial image of the frames. Inside Replacer initial image is the last image of the previous fragment, or inpainted the first frame in the first fragment
 
+### Sparsectrl
+Sparsectrl is a special ControlNet models for AnimateDiff. Set up it in a ControlNet unit to use it. Produces much better correspondence of the first result frame of the fragment and the initial image
+
+You can download them here: https://huggingface.co/conrevo/AnimateDiff-A1111/tree/main/control RGB is for "none" preprocessor, scribble is for scribbles
+
 ## Frame by frame mode
 You can use Replacer to inpaint video with an old frame by frame method with regular stable diffusion inpaint method. It is very inconsistent, but in a few cases it can produce good enough results
 

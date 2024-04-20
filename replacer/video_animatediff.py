@@ -13,6 +13,7 @@ from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageB
 
 
 def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
+    initImage.save(os.path.join(fragmentPath, 'frames', 'frame_0.png'))
     gArgs = copy.copy(gArgs)
     gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)

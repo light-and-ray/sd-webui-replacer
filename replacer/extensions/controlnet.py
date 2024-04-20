@@ -122,6 +122,12 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 print(f'Disabling CN unit {i} for the first frame')
                 gArgs.cn_args[i].enabled = False
                 continue
+        
+        if not gArgs.animatediff_args.needApplyAnimateDiff and \
+                'sparsectrl' in gArgs.cn_args[i].model.lower():
+            print(f'Sparsectrl was disabled in unit {i} because of non-animeediff generation')
+            gArgs.cn_args[i].enabled = False
+            continue
 
         if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
             gArgs.cn_args[i].enabled = True
