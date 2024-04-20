@@ -87,8 +87,9 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 - tiled vae
 - ☑️ "hide segment anything extention" option
 - ☑️ txt2img script
-- more video input types
-- allow multiply instances
+- more video and mask input types
+- RIFE frames inperpolation
+- allow multiply instances (presets)
 
 ### small todo:
 - add hires fix args into metadata
