@@ -132,8 +132,8 @@ def makeVideoUI(comp: AttrDict):
                         "decrease the consistency. But you can use the `upscaler for img2img` option - these "
                         "upscalers work and consistent enough.\n\n"
                         \
-                        "To increase consistency between fragments, you can use ControlNet, or try to use "
-                        "`Fragment length` = 0 and set up `Context batch size`, `Stride`, `Overlap`. I recomment make "
+                        "To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use "
+                        "`Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recomment make "
                         "`Fragment length` few times more then `Context batch size`\n\n"
                         \
                         "`Context batch size` is set up for 12GB VRAM with one additional "
