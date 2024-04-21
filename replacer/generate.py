@@ -76,8 +76,9 @@ def generate(
         totalSteps = shared.state.job_count * min(math.ceil(gArgs.steps * (1 if gArgs.img2img_fix_steps else gArgs.denoising_strength) + 1), gArgs.steps)
 
         if gArgs.pass_into_hires_fix_automatically:
-            totalSteps += shared.state.job_count * gArgs.hires_fix_args.steps
-            shared.state.job_count *= 2
+            hiresCount = shared.state.job_count * gArgs.batch_size
+            totalSteps += hiresCount * gArgs.hires_fix_args.steps
+            shared.state.job_count += hiresCount
         shared.total_tqdm.updateTotal(totalSteps)
 
         if not gArgs.override_sd_model or gArgs.sd_model_checkpoint is None or gArgs.sd_model_checkpoint == "":
