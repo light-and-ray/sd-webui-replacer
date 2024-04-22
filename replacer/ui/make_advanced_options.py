@@ -208,13 +208,14 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                                         placeholder=None,
                                         elem_id="replacer_avoidancePrompt")
 
-                    gr.Examples(
-                        examples=getAvoidancePromptExamples(),
-                        inputs=comp.avoidancePrompt,
-                        label="",
-                        elem_id="replacer_avoidancePrompt_examples",
-                        examples_per_page=getAvoidancePromptExamplesNumber(),
-                    )
+                    if getAvoidancePromptExamplesNumber() > 0:
+                        gr.Examples(
+                            examples=getAvoidancePromptExamples(),
+                            inputs=comp.avoidancePrompt,
+                            label="",
+                            elem_id="replacer_avoidancePrompt_examples",
+                            examples_per_page=getAvoidancePromptExamplesNumber(),
+                        )
 
                 with gr.Row():
                     comp.avoid_mask_create_canvas = gr.Button('Create canvas', elem_id='replacer_avoid_mask_create_canvas')

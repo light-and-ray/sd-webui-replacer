@@ -379,7 +379,7 @@ def on_ui_settings():
             "Override number of examples per pages for detection prompt",
             gr.Number,
             section=section,
-        ).needs_reload_ui()
+        ).needs_reload_ui().info('Set 0 to hide')
     )
 
     shared.opts.add_option(
@@ -389,7 +389,7 @@ def on_ui_settings():
             "Override number of examples per pages for avoidance prompt",
             gr.Number,
             section=section,
-        ).needs_reload_ui()
+        ).needs_reload_ui().info('Set 0 to hide')
     )
 
     shared.opts.add_option(
@@ -399,7 +399,7 @@ def on_ui_settings():
             "Override number of examples per pages for positive prompt",
             gr.Number,
             section=section,
-        ).needs_reload_ui()
+        ).needs_reload_ui().info('Set 0 to hide')
     )
 
     shared.opts.add_option(
@@ -409,7 +409,7 @@ def on_ui_settings():
             "Override number of examples per pages for negative prompt",
             gr.Number,
             section=section,
-        ).needs_reload_ui()
+        ).needs_reload_ui().info('Set 0 to hide')
     )
 
 

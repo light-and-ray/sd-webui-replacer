@@ -60,13 +60,14 @@ class ReplacerMainUI:
                                             placeholder=placeholder,
                                             elem_id="replacer_detectionPrompt")
 
-                        gr.Examples(
-                            examples=getDetectionPromptExamples(),
-                            inputs=comp.detectionPrompt,
-                            label="",
-                            elem_id="replacer_detectionPrompt_examples",
-                            examples_per_page=getDetectionPromptExamplesNumber(),
-                        )
+                        if getDetectionPromptExamplesNumber() > 0:
+                            gr.Examples(
+                                examples=getDetectionPromptExamples(),
+                                inputs=comp.detectionPrompt,
+                                label="",
+                                elem_id="replacer_detectionPrompt_examples",
+                                examples_per_page=getDetectionPromptExamplesNumber(),
+                            )
 
                     with gr.Row():
                         placeholder = None
@@ -80,13 +81,14 @@ class ReplacerMainUI:
                                             placeholder=placeholder,
                                             elem_id="replacer_positvePrompt")
 
-                        gr.Examples(
-                            examples=getPositivePromptExamples(),
-                            inputs=comp.positvePrompt,
-                            label="",
-                            elem_id="replacer_positvePrompt_examples",
-                            examples_per_page=getPositivePromptExamplesNumber(),
-                        )
+                        if getPositivePromptExamplesNumber() > 0:
+                            gr.Examples(
+                                examples=getPositivePromptExamples(),
+                                inputs=comp.positvePrompt,
+                                label="",
+                                elem_id="replacer_positvePrompt_examples",
+                                examples_per_page=getPositivePromptExamplesNumber(),
+                            )
 
                     with gr.Row():
                         placeholder = None
@@ -100,14 +102,14 @@ class ReplacerMainUI:
                                             placeholder=placeholder,
                                             elem_id="replacer_negativePrompt")
 
-
-                        gr.Examples(
-                            examples=getNegativePromptExamples(),
-                            inputs=comp.negativePrompt,
-                            label="",
-                            elem_id="replacer_negativePrompt_examples",
-                            examples_per_page=getNegativePromptExamplesNumber(),
-                        )
+                        if getNegativePromptExamplesNumber() > 0:
+                            gr.Examples(
+                                examples=getNegativePromptExamples(),
+                                inputs=comp.negativePrompt,
+                                label="",
+                                elem_id="replacer_negativePrompt_examples",
+                                examples_per_page=getNegativePromptExamplesNumber(),
+                            )
 
                     if ui_toprow:
                         toprow = ui_toprow.Toprow(is_compact=True, is_img2img=False, id_part='replacer')
