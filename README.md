@@ -19,9 +19,9 @@ You also can draw your mask instead of or in addition to detection, and take adv
 If you don't want to use Video feature, that's all for you. Further steps are for Video:
 
 1. Install [sd-webui-animatediff](https://github.com/continue-revolution/sd-webui-animatediff) and [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) extensions. You should also use `Extension` -> `Available` tab and find them there
-2. Download [mm_sd15_v3.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/motion_module/mm_sd15_v3.safetensors) animatediff's moution model, and put it into `extensions/sd-webui-animatediff/model/` directory
-3. Download [control_v11p_sd15_inpaint_fp16.safetensors](https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_inpaint_fp16.safetensors) controlnet's model and put it into `models/ControlNet/` directory
-4. I strongly recommend you to download [mm_sd15_v3_sparsectrl_rgb.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_rgb.safetensors) and [mm_sd15_v3_sparsectrl_scribble.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_scribble.safetensors) controlnet models. Put them also into `models/ControlNet/` directory. Then you can select SparseCtrl module in ControlNet extension. The rgb one requires "none" preprocessor
+2. Download [mm_sd15_v3.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/motion_module/mm_sd15_v3.safetensors) animatediff's moution model, and put it into `extensions/sd-webui-animatediff/model` directory
+3. Download [control_v11p_sd15_inpaint_fp16.safetensors](https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_inpaint_fp16.safetensors) controlnet's model and put it into `models/ControlNet` directory
+4. I strongly recommend you to download [mm_sd15_v3_sparsectrl_rgb.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_rgb.safetensors) and [mm_sd15_v3_sparsectrl_scribble.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_scribble.safetensors) controlnet's models. Put them also into `models/ControlNet` directory. Then you can select SparseCtrl module in ControlNet extension. The rgb one requires "none" preprocessor
 
 
 ### SAM models list:
