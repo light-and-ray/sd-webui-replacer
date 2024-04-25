@@ -68,7 +68,7 @@ def applyScripts(p, gArgs: GenerationArgs):
 
     allArgsLen = max(x.args_to for x in avaliableScripts)
 
-    p.scripts = scripts.scripts_img2img
+    p.scripts = copy.copy(scripts.scripts_img2img)
     p.scripts.alwayson_scripts = avaliableScripts
     p.script_args = [None] * allArgsLen
 
