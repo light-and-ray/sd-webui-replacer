@@ -22,7 +22,7 @@ def initAllScripts():
 def restoreTemporartChangedThigs():
     controlnet.restoreCNContext()
 
-def reinitAllScreiptsAfterUICreated(*args): # for args_to and args_from
+def reinitAllScriptsAfterUICreated(*args): # for args_to and args_from
     controlnet.reinitCNScript()
     soft_inpainting.reinitSoftInpaintScript()
     lama_cleaner.initLamaCleanerAsMaskedContent()

@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import shared, ui_settings, errors
+from modules import shared, ui_settings, errors, infotext_utils
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, update_generation_info
 from replacer.ui.generate_ui import generate_ui, getLastUsedSeed
@@ -521,11 +521,22 @@ class ReplacerMainUI:
 replacerMainUI: ReplacerMainUI = None
 replacerMainUI_dedicated: ReplacerMainUI = None
 
+registered_param_bindings_main_ui = []
+
 def initMainUI(*args):
-    global replacerMainUI, replacerMainUI_dedicated
+    global replacerMainUI, replacerMainUI_dedicated, registered_param_bindings_main_ui
+    lenBefore = len(infotext_utils.registered_param_bindings)
     try:
         replacer_extensions.initAllScripts()
         replacerMainUI = ReplacerMainUI(isDedicatedPage=False)
         replacerMainUI_dedicated = ReplacerMainUI(isDedicatedPage=True)
     finally:
         replacer_extensions.restoreTemporartChangedThigs()
+    
+    registered_param_bindings_main_ui = infotext_utils.registered_param_bindings[lenBefore:]
+
+
+def reinitMainUIAfterUICreated():
+    replacer_extensions.reinitAllScriptsAfterUICreated()
+    infotext_utils.registered_param_bindings += registered_param_bindings_main_ui
+

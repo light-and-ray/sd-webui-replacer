@@ -13,7 +13,7 @@ from replacer.extensions import replacer_extensions
 
 
 def on_ui_tabs():
-    replacer_extensions.reinitAllScreiptsAfterUICreated()
+    replacer_tab_ui.reinitMainUIAfterUICreated()
     tab = replacer_tab_ui.replacerMainUI.getReplacerTabUI()
     return [(tab, EXT_NAME, EXT_NAME)]
 
