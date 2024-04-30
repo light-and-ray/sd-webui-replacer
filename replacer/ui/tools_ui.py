@@ -48,8 +48,8 @@ def get_current_image(image, isAvoid, needLimit, maxResolutionOnDetection):
 def unloadModels():
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
     memBefore = mem_stats['reserved']
-    from scripts.sam import clear_cache
-    clear_cache()
+    from lib_segment_anything import sam
+    sam.clear_cache()
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
     memAfter = mem_stats['reserved']
     

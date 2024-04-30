@@ -130,8 +130,8 @@ def extraMaskExpand(mask: Image.Image, expand: int):
             if useFastDilation():
                 update_mask = fastMaskDilate
             else:
-                from scripts.sam import update_mask as update_mask_
-                update_mask = update_mask_
+                from lib_segment_anything import sam
+                update_mask = sam.update_mask_
         expandedMask = update_mask(mask, 0, expand, mask.convert('RGBA'))[1]
         cachedExtraMaskExpand = CachedExtraMaskExpand(mask, expand, expandedMask)
         print('extraMaskExpand cached')
@@ -208,8 +208,8 @@ g_clear_cache = None
 def clearCache():
     global g_clear_cache
     if g_clear_cache is None:
-        from scripts.sam import clear_cache
-        g_clear_cache = clear_cache
+        from lib_segment_anything import sam
+        g_clear_cache = sam.clear_cache
     g_clear_cache()
 
 

@@ -15,7 +15,8 @@ from replacer.extensions import replacer_extensions
 
 
 def replacer_api(_, app: FastAPI):
-    from scripts.sam import sam_model_list
+    from lib_segment_anything import sam
+    sam_model_list = sam.get_sam_model_list()
     from scripts.dino import dino_model_list
     try:
         from lama_cleaner_masked_content.inpaint import lamaInpaint

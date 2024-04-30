@@ -126,13 +126,13 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     )
 
                 with gr.Row():
-                    from scripts.sam import sam_model_list, refresh_sam_models
+                    from lib_segment_anything import sam
                     from scripts.dino import dino_model_list
-
+                    sam_model_list = sam.get_sam_model_list()
                     comp.sam_model_name = gr.Dropdown(label="SAM Model", choices=sam_model_list,
                         value=sam_model_list[0] if len(sam_model_list) > 0 else None)
                     comp.sam_refresh_models = ToolButton(value=refresh_symbol)
-                    comp.sam_refresh_models.click(refresh_sam_models, comp.sam_model_name, comp.sam_model_name)
+                    comp.sam_refresh_models.click(sam.refresh_sam_models, comp.sam_model_name, comp.sam_model_name)
 
                     comp.dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
                 

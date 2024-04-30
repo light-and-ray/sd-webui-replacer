@@ -15,7 +15,7 @@ from replacer.extensions import replacer_extensions
 def on_ui_tabs():
     replacer_tab_ui.reinitMainUIAfterUICreated()
     tab = replacer_tab_ui.replacerMainUI.getReplacerTabUI()
-    return [(tab, EXT_NAME, EXT_NAME)]
+    return [(tab, EXT_NAME, EXT_NAME_LOWER)]
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
 
@@ -43,7 +43,7 @@ def mountDedicatedPage(demo, app):
 
         loadsave = copy.copy(demo.ui_loadsave)  
         loadsave.finalized_ui = False
-        loadsave.add_block(replacerUi, EXT_NAME)
+        loadsave.add_block(replacerUi, EXT_NAME_LOWER)
         loadsave.dump_defaults()
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)

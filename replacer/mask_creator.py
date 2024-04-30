@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from modules import devices
 from replacer.extensions import replacer_extensions
 from replacer.generation_args import GenerationArgs
-from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
+from replacer.options import EXT_NAME, useCpuForDetection, useFastDilation
 from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate
 sam_predict = None
 update_mask = None
@@ -12,15 +12,15 @@ clear_cache = None
 def initSamDependencies():
     global sam_predict, update_mask, clear_cache
     if not sam_predict or not update_mask or not clear_cache:
-        import scripts.sam
-        sam_predict = scripts.sam.sam_predict
+        from lib_segment_anything import sam
+        sam_predict = sam.sam_predict
         if useFastDilation():
             update_mask = fastMaskDilate
         else:
-            update_mask = scripts.sam.update_mask
-        clear_cache = scripts.sam.clear_cache
+            update_mask = sam.update_mask
+        clear_cache = sam.clear_cache
         if useCpuForDetection():
-            scripts.sam.sam_device = 'cpu'
+            sam.sam_device = 'cpu'
             print('Use CPU for SAM')
 
 
