@@ -52,6 +52,7 @@ def replacer_api(_, app: FastAPI):
         sd_model_checkpoint : str = ""
         lama_cleaner_upscaler: str = ""
         clip_skip: int = 1
+        rotation_fix: str = '-'
         extra_include: list = ["mask", "box", "cutted", "preview", "script"]
 
         use_hires_fix: bool = False
@@ -149,6 +150,7 @@ def replacer_api(_, app: FastAPI):
             previous_frame_into_controlnet=[],
             do_not_use_mask=False,
             animatediff_args=DUMMY_ANIMATEDIFF_ARGS,
+            rotation_fix=data.rotation_fix,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

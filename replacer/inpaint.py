@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer.extensions import replacer_extensions
-from replacer.tools import addReplacerMetadata, limiSizeByOneDemention
+from replacer.tools import addReplacerMetadata, limiSizeByOneDemention, applyRotationFix, removeRotationFix
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
@@ -35,6 +35,9 @@ def inpaint(
     if mask:
         mask = mask.resize(image.size).convert('L')
     schedulerKWargs = {"scheduler": gArgs.scheduler} if IS_WEBUI_1_9 else {}
+
+    image = applyRotationFix(image, gArgs.rotation_fix)
+    mask = applyRotationFix(mask, gArgs.rotation_fix)
 
     p = StableDiffusionProcessingImg2Img(
         sd_model=shared.sd_model,
@@ -90,6 +93,9 @@ def inpaint(
 
     with closing(p):
         processed = process_images(p)
+
+    for i in range(len(processed.images)):
+        processed.images[i] = removeRotationFix(processed.images[i], gArgs.rotation_fix)
 
     scriptImages = processed.images[len(processed.all_seeds):]
     processed.images = processed.images[:len(processed.all_seeds)]

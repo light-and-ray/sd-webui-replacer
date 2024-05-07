@@ -98,6 +98,7 @@ class ReplacerScript(scripts.Script):
             comp.pass_into_hires_fix_automatically,
             comp.save_before_hires_fix,
             comp.do_not_use_mask,
+            comp.rotation_fix,
 
             comp.hf_upscaler,
             comp.hf_steps,
@@ -183,6 +184,7 @@ class ReplacerScript(scripts.Script):
         pass_into_hires_fix_automatically,
         save_before_hires_fix,
         do_not_use_mask,
+        rotation_fix,
 
         hf_upscaler,
         hf_steps,
@@ -291,6 +293,7 @@ class ReplacerScript(scripts.Script):
             previous_frame_into_controlnet=[],
             do_not_use_mask=do_not_use_mask,
             animatediff_args=DUMMY_ANIMATEDIFF_ARGS,
+            rotation_fix=rotation_fix,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

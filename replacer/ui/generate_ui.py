@@ -78,6 +78,7 @@ def generate_ui(
     previous_frame_into_controlnet,
     do_not_use_mask,
     selected_video_mode: str,
+    rotation_fix: str,
 
     ad_fragment_length,
     ad_internal_fps,
@@ -268,6 +269,7 @@ def generate_ui(
                 and selected_video_mode == "video_mode_frame_by_frame" else [],
         do_not_use_mask=do_not_use_mask,
         animatediff_args=animatediff_args,
+        rotation_fix=rotation_fix,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,

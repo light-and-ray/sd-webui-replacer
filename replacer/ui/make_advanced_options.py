@@ -93,6 +93,10 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     )
                 
                 with gr.Row():
+                    comp.rotation_fix = gr.Radio(label='Rotation fix',
+                        choices=['-', '⟲', '⟳', '🗘'],
+                        value='-', type="value", elem_id="replacer_rotation_fix")
+                with gr.Row():
                     if not isDedicatedPage:
                         comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
                         comp.override_sd_model = gr.Checkbox(label='Override stable diffusion model',

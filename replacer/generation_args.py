@@ -106,6 +106,7 @@ class GenerationArgs:
     previous_frame_into_controlnet: list[str]
     do_not_use_mask: bool
     animatediff_args: AnimateDiffArgs
+    rotation_fix: str
 
     hires_fix_args: HiresFixArgs
     cn_args: list

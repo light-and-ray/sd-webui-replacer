@@ -266,3 +266,28 @@ def convertIntoPath(string: str) -> str:
 
         errors.report("Can't be here")
         return string
+
+
+def applyRotationFix(image: Image.Image, fix: str) -> Image.Image:
+    if image is None:
+        return None
+    if fix == '-':
+        return image
+    if fix == '⟲':
+        return image.transpose(Image.ROTATE_90)
+    if fix == '🗘':
+        return image.transpose(Image.ROTATE_180)
+    if fix == '⟳':
+        return image.transpose(Image.ROTATE_270)
+
+def removeRotationFix(image: Image.Image, fix: str) -> Image.Image:
+    if image is None:
+        return None
+    if fix == '-':
+        return image
+    if fix == '⟲':
+        return image.transpose(Image.ROTATE_270)
+    if fix == '🗘':
+        return image.transpose(Image.ROTATE_180)
+    if fix == '⟳':
+        return image.transpose(Image.ROTATE_90)

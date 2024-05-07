@@ -337,6 +337,7 @@ class ReplacerMainUI:
                     comp.previous_frame_into_controlnet,
                     comp.do_not_use_mask,
                     comp.selected_video_mode,
+                    comp.rotation_fix,
 
                     comp.ad_fragment_length,
                     comp.ad_internal_fps,

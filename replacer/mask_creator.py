@@ -4,7 +4,7 @@ from modules import devices
 from replacer.extensions import replacer_extensions
 from replacer.generation_args import GenerationArgs
 from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
-from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate
+from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate, applyRotationFix, removeRotationFix
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -35,7 +35,7 @@ masksCreatorCached = None
 
 class MasksCreator:
     def __init__(self, detectionPrompt, avoidancePrompt, image, samModel, grdinoModel, boxThreshold,
-            maskExpand, maxResolutionOnDetection, avoidance_mask, custom_mask):
+            maskExpand, maxResolutionOnDetection, avoidance_mask, custom_mask, rotation_fix):
         self.detectionPrompt = detectionPrompt
         self.avoidancePrompt = avoidancePrompt
         self.image = image
@@ -46,6 +46,7 @@ class MasksCreator:
         self.maxResolutionOnDetection = maxResolutionOnDetection
         self.avoidance_mask = avoidance_mask
         self.custom_mask = custom_mask
+        self.rotation_fix = rotation_fix
 
         global masksCreatorCached
 
@@ -57,6 +58,7 @@ class MasksCreator:
                 self.boxThreshold == masksCreatorCached.boxThreshold and\
                 self.maskExpand == masksCreatorCached.maskExpand and\
                 self.maxResolutionOnDetection == masksCreatorCached.maxResolutionOnDetection and\
+                self.rotation_fix == masksCreatorCached.rotation_fix and\
                 areImagesTheSame(self.image, masksCreatorCached.image) and\
                 areImagesTheSame(self.avoidance_mask, masksCreatorCached.avoidance_mask) and\
                 areImagesTheSame(self.custom_mask, masksCreatorCached.custom_mask):
@@ -91,10 +93,12 @@ class MasksCreator:
         self.boxes = []
 
         imageResized = limitImageByOneDemention(self.image, self.maxResolutionOnDetection)
+        imageResized = applyRotationFix(imageResized, self.rotation_fix)
         if self.avoidance_mask is None:
             customAvoidanceMaskResized = None
         else:
             customAvoidanceMaskResized = self.avoidance_mask.resize(imageResized.size)
+            customAvoidanceMaskResized = applyRotationFix(customAvoidanceMaskResized, self.rotation_fix)
         masks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
             self.grdinoModel, self.detectionPrompt, self.boxThreshold, False, [])
         print(samLog)
@@ -156,9 +160,19 @@ class MasksCreator:
                 self.cutted[i].paste(transparent, avoidanceMasks[i])
 
         if self.custom_mask is not None:
+            self.custom_mask = applyRotationFix(self.custom_mask, self.rotation_fix)
             for i in range(len(self.masks)):
                 whiteFilling = Image.new('L', self.masks[i].size, 255)
                 self.masks[i].paste(whiteFilling, self.custom_mask.resize(self.masks[i].size))
+        
+        for i in range(len(self.masks)):
+            self.masks[i] = removeRotationFix(self.masks[i], self.rotation_fix)
+        for i in range(len(self.previews)):
+            self.previews[i] = removeRotationFix(self.previews[i], self.rotation_fix)
+        for i in range(len(self.cutted)):
+            self.cutted[i] = removeRotationFix(self.cutted[i], self.rotation_fix)
+        for i in range(len(self.boxes)):
+            self.boxes[i] = removeRotationFix(self.boxes[i], self.rotation_fix)
 
 
 
@@ -186,7 +200,7 @@ def createMask(image: Image.Image, gArgs: GenerationArgs) -> MaskResult:
     else:
         masksCreator = MasksCreator(gArgs.detectionPrompt, gArgs.avoidancePrompt, image, gArgs.samModel,
             gArgs.grdinoModel, gArgs.boxThreshold, gArgs.maskExpand, gArgs.maxResolutionOnDetection,
-            gArgs.avoidance_mask, gArgs.custom_mask)
+            gArgs.avoidance_mask, gArgs.custom_mask, gArgs.rotation_fix)
 
         if masksCreator.previews != []:
             if gArgs.mask_num == 'Random':
