@@ -18,6 +18,7 @@ You can detect few objects, just using comma `,`
 - _"Do exactly the number of steps the slider specifies"_: actual steps num is steps from slider * denoising straight
 - _"width"_, _"height"_: internal resolution on generation. 512 for sd1, 1024 for sdxl. If you increase, it will produce mutations for high denoising straight
 - _"Upscaler for img2Img"_: which method will be used to fix the generated image inside the original image. It can be used instead hires fix. DAT upscalers are good. For example this is a good one: https://openmodeldb.info/models/4x-FaceUpDAT
+- _"Rotation fix"_: fixes, if your photo is rotated by 90, 180 or 270 degree and it causes artifacts in detection and generation
 
 ### Detection
 ![](/docs/images/advanced_options_detection.jpg)
@@ -45,6 +46,8 @@ You can detect few objects, just using comma `,`
 - Or it can be appended to generated mask if `Do not use detection prompt if use custom mask` is disabled. Opposite of avoidance mask
 
 ### Inpaing Diff
+*discontinued, maybe temporary*
+
 ![](/docs/images/advanced_options_inpaint_diff.jpg)
 
 [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference) extension.

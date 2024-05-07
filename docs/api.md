@@ -32,6 +32,7 @@ API is avaliable on `/replacer/replace`
     sd_model_checkpoint : str = ""
     lama_cleaner_upscaler: str = ""
     clip_skip: int = 1
+    rotation_fix: str = '-' # choices: '-', '⟲', '⟳', '🗘'
     extra_include: list = ["mask", "box", "cutted", "preview", "script"]
 
     use_hires_fix: bool = False
