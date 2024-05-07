@@ -157,6 +157,7 @@ class ReplacerMainUI:
                     
                     with OverrideCustomScriptSource("controlnet"):
                         if replacer_extensions.controlnet.SCRIPT:
+                            replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_submit_button = comp.run_button
                             try:
                                 with gr.Row():
                                     replacer_extensions.controlnet.needWatchControlNetUI = True
