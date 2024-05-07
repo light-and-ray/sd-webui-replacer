@@ -105,7 +105,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                 with gr.Row():
                     comp.box_threshold = gr.Slider(label='Box Threshold',
                         value=0.3, elem_id="replacer_box_threshold",
-                        minimum=0.0, maximum=1.0, step=0.05)
+                        minimum=0.0, maximum=1.0, step=0.01)
                     comp.mask_expand = gr.Slider(label='Mask Expand',
                         value=35, elem_id="replacer_mask_expand",
                         minimum=-50, maximum=100, step=1)

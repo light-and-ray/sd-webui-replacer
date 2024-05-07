@@ -214,7 +214,7 @@ class ReplacerMainUI:
                         makeHiresFixOptions(comp)
 
                     comp.pause_button = gr.Button(
-                        'pause/resume batch generation',
+                        '-',
                         elem_id='replacer_pause',
                         visible=False,
                         elem_classes=["pause-button"],
@@ -262,15 +262,19 @@ class ReplacerMainUI:
                     replacer_extensions.controlnet.SCRIPT = None
 
 
-            def tabSelected(tab, showPause):
+            def tabSelected(tab, showPause, isVideo):
                 def func():
-                    return tab, gr.update(visible=showPause)
+                    if not isVideo:
+                        text = 'batch'
+                    else:
+                        text = 'video'
+                    return tab, gr.update(value=f'pause/resume {text} generation', visible=showPause)
                 return func
 
-            comp.tab_single.select(fn=tabSelected("tab_single", False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
-            comp.tab_batch.select(fn=tabSelected("tab_batch", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
-            comp.tab_batch_dir.select(fn=tabSelected("tab_batch_dir", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
-            comp.tab_batch_video.select(fn=tabSelected("tab_batch_video", True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_single.select(fn=tabSelected("tab_single", False, False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch.select(fn=tabSelected("tab_batch", True, False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch_dir.select(fn=tabSelected("tab_batch_dir", True, False), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
+            comp.tab_batch_video.select(fn=tabSelected("tab_batch_video", True, True), inputs=[], outputs=[comp.selected_input_mode, comp.pause_button])
 
 
             comp.run_button.click(

@@ -9,11 +9,12 @@ from replacer.generate import generateSingle
 from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageByOneDemention,
     Pause, extraMaskExpand,
 )
+from replacer.video_tools import fastFrameSave
 
 
 
 def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
-    initImage.save(os.path.join(fragmentPath, 'frames', 'frame_0.png'))
+    fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0.jpg'))
     gArgs = copy.copy(gArgs)
     gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
@@ -24,7 +25,7 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
 
     outDir = os.path.join(fragmentPath, 'out')
     for idx in range(len(processed.images)):
-        processed.images[idx].save(os.path.join(outDir, f'frame_{idx}.png'))
+        fastFrameSave(processed.images[idx], os.path.join(outDir, f'frame_{idx}.jpg'))
 
     return processed
 
@@ -59,8 +60,8 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
 
             # last frame goes first in the next fragment
             if mask is not None:
-                frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
-                mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
+                fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
+                fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}.jpg'))
                 frameInFragmentIdx = 1
 
         Pause.wait()
@@ -69,7 +70,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
-        frame.save(os.path.join(framesDir, f'frame_{frameInFragmentIdx}.png'))
+        fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
         try:
             mask = createMask(frame, gArgs).mask
             if gArgs.inpainting_mask_invert:
@@ -85,7 +86,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask = blackFilling
             else:
                 mask = extraMaskExpand(mask, 50)
-        mask.save(os.path.join(masksDir, f'frame_{frameInFragmentIdx}.png'))
+        fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}.jpg'))
         frameInFragmentIdx += 1
 
     if frameInFragmentIdx > 1:

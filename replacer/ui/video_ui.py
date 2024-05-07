@@ -17,7 +17,7 @@ def makeVideoUI(comp: AttrDict):
             info='(default is the same directory with input video. Rusult is in "out_seed_timestamp" subdirectory)',
             elem_id="replacer_video_output_dir")
         comp.target_video_fps = gr.Slider(
-            label='FPS', value=12.0, step=0.1, minimum=0.0, maximum=100.0, 
+            label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0, 
             info="(0 = fps from input video)",
             elem_id="replacer_video_fps")
 

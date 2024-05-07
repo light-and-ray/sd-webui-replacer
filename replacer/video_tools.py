@@ -87,3 +87,6 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
     )
 
 
+def fastFrameSave(image: Image.Image, path: str):
+    image.convert('RGB').save(path, subsampling=0, quality=93)
+
