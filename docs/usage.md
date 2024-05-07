@@ -83,14 +83,14 @@ You can use it to pass generated images into replacer immediately
 ## Extention name
 Replacer" name of this extension, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
-Or you can override it using the environment variable `SD_WEBUI_REPLACER_EXTENTION_NAME`
+Or you can override it using the environment variable `SD_WEBUI_REPLACER_EXTENSION_NAME`
 
 For exaple: Linux
 ```sh
-export SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
+export SD_WEBUI_REPLACER_EXTENSION_NAME="Fast Inpaint"
 ```
 
 Or Windows in your `.bat` file:
 ```bat
-set SD_WEBUI_REPLACER_EXTENTION_NAME="Fast Inpaint"
+set SD_WEBUI_REPLACER_EXTENSION_NAME="Fast Inpaint"
 ```
