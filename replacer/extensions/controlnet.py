@@ -102,6 +102,14 @@ def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
             processed.images[i] = imageOrg
 
 
+class UnitIsReserved(Exception):
+    def __init__(self, unitNum: int):
+        super().__init__(
+            f"You have enabled ControlNet Unit {unitNum}, while it's reserved for "
+            "AnimateDiff video inpainting. Plaese disable it. If you need more units, "
+            "increase maximal number of them in Settings -> ControlNet")
+
+
 def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     if IS_SD_WEBUI_FORGE: return
     global external_code
@@ -130,6 +138,8 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
             continue
 
         if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
+            if gArgs.cn_args[i].enabled and gArgs.cn_args[i].module != 'inpaint_only':
+                raise UnitIsReserved(i)
             gArgs.cn_args[i].enabled = True
             gArgs.cn_args[i].module = 'inpaint_only'
             if gArgs.inpainting_fill == 4: # lama cleaner

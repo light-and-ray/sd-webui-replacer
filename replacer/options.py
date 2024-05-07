@@ -14,7 +14,7 @@ except :
     EXT_NAME = None
 
 if EXT_NAME is None or EXT_NAME == "":
-    EXT_NAME = os.environ.get("SD_WEBUI_REPLACER_EXTENTION_NAME", "Replacer").strip()
+    EXT_NAME = os.environ.get("SD_WEBUI_REPLACER_EXTENSION_NAME", "Replacer").strip()
 
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 

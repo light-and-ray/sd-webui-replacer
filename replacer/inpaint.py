@@ -80,6 +80,8 @@ def inpaint(
                 previousFrame = batch_processed.images[-1]
             replacer_extensions.controlnet.enableInpaintModeForCN(gArgs, p, previousFrame)
     except Exception as e:
+        if isinstance(e, replacer_extensions.controlnet.UnitIsReserved):
+            raise
         errors.report(f"Error {e}", exc_info=True)
 
     replacer_extensions.applyScripts(p, gArgs)
