@@ -16,7 +16,7 @@ from replacer.extensions import replacer_extensions
 
 def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
     initImage = applyRotationFix(initImage, gArgs.rotation_fix)
-    fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0.jpg'))
+    fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0'))
     gArgs = copy.copy(gArgs)
     gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
@@ -27,7 +27,7 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
 
     outDir = os.path.join(fragmentPath, 'out')
     for idx in range(len(processed.images)):
-        fastFrameSave(processed.images[idx], os.path.join(outDir, f'frame_{idx}.jpg'))
+        fastFrameSave(processed.images[idx], os.path.join(outDir, f'frame_{idx}'))
 
     return processed
 
@@ -62,8 +62,8 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
 
             # last frame goes first in the next fragment
             if mask is not None:
-                fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
-                fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}.jpg'))
+                fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}'))
+                fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}'))
                 frameInFragmentIdx = 1
 
         Pause.wait()
@@ -87,9 +87,9 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
                 mask = extraMaskExpand(mask, 50)
 
         frame = applyRotationFix(frame, gArgs.rotation_fix)
-        fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
+        fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}'))
         mask = applyRotationFix(mask, gArgs.rotation_fix)
-        fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}.jpg'))
+        fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}'))
         frameInFragmentIdx += 1
 
     if frameInFragmentIdx > 1:
@@ -122,6 +122,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
         print(e)
         initImage: Image.Image = copy.copy(gArgs.images[0])
         shared.state.nextjob()
+        shared.total_tqdm.clear()
 
     fragmentPaths = []
 

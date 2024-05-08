@@ -113,6 +113,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     if IS_SD_WEBUI_FORGE: return
     global external_code
     gArgs.cn_args = list(gArgs.cn_args)
+    hasInpainting = False
     mask = None
 
     for i in range(len(gArgs.cn_args)):
@@ -130,7 +131,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 print(f'Disabling CN unit {i} for the first frame')
                 gArgs.cn_args[i].enabled = False
                 continue
-        
+
         if not gArgs.animatediff_args.needApplyAnimateDiff and \
                 'sparsectrl' in gArgs.cn_args[i].model.lower():
             print(f'Sparsectrl was disabled in unit {i} because of non-animeediff generation')
@@ -151,6 +152,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
             continue
 
         if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module.startswith('inpaint_only'):
+            hasInpainting = True
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:
@@ -169,9 +171,13 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 gArgs.cn_args[i].input_mode = InputMode.BATCH
             p.image_mask = None
             p.inpaint_full_res = False
+            p.needRestoreAfterCN = True
+
+
+    if hasInpainting:
+        for i in range(len(gArgs.cn_args)):
             gArgs.cn_args[i].inpaint_crop_input_image = False
             gArgs.cn_args[i].resize_mode = external_code.ResizeMode.OUTER_FIT
-            p.needRestoreAfterCN = True
 
 
 
