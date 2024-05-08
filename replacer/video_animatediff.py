@@ -6,7 +6,7 @@ from replacer.generation_args import GenerationArgs
 from replacer.mask_creator import createMask, NothingDetectedError
 from replacer.inpaint import inpaint
 from replacer.generate import generateSingle
-from replacer.tools import ( interrupted, applyMaskBlur, clearCache, limitImageByOneDemention,
+from replacer.tools import ( interrupted, applyMaskBlur, clearCache, applyRotationFix, removeRotationFix,
     Pause, extraMaskExpand,
 )
 from replacer.video_tools import fastFrameSave
@@ -21,6 +21,7 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
     gArgs.animatediff_args.needApplyAnimateDiff = True
     gArgs.animatediff_args.video_path = os.path.join(fragmentPath, 'frames')
     gArgs.animatediff_args.mask_path = os.path.join(fragmentPath, 'masks')
+    initImage = removeRotationFix(initImage, gArgs.rotation_fix)
     processed, _ = inpaint(initImage, gArgs)
 
     outDir = os.path.join(fragmentPath, 'out')
@@ -36,6 +37,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
 
     frames = gArgs.images
     blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
+    blackFilling = applyRotationFix(blackFilling, gArgs.rotation_fix)
     fragmentNum = 0
     frameInFragmentIdx = fragmentSize
     fragmentPath: str = None
@@ -70,9 +72,11 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
+        frame = applyRotationFix(frame, gArgs.rotation_fix)
         fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
         try:
             mask = createMask(frame, gArgs).mask
+            mask = applyRotationFix(mask, gArgs.rotation_fix)
             if gArgs.inpainting_mask_invert:
                 mask = ImageChops.invert(mask.convert('L'))
             mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)

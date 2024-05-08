@@ -3,8 +3,7 @@ import numpy as np
 import gradio as gr
 from PIL import ImageChops
 from modules import scripts, errors
-from modules.images import resize_image
-from replacer.tools import limitImageByOneDemention, applyMaskBlur, applyMask
+from replacer.tools import limitImageByOneDemention, applyMaskBlur, applyMask, applyRotationFix
 from replacer.generation_args import GenerationArgs
 from replacer.extensions.animatediff import restoreAfterCN_animatediff
 
@@ -122,6 +121,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
         if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
             if previousFrame:
                 print(f'Passing the previous frame into CN unit {i}')
+                previousFrame = applyRotationFix(previousFrame, gArgs.rotation_fix)
                 gArgs.cn_args[i].image = {
                     "image": convertIntoCNImageFromat(previousFrame),
                 }
