@@ -66,10 +66,10 @@ def restoreAfterCN_animatediff(gArgs: GenerationArgs, processed):
 
     newImages = []
     i = 0
-    total = len(processed.images)
+    total = len(processed.all_seeds)
 
     for res, orig, mask in \
-        zip(processed.images,
+        zip(processed.images[:total],
             readImages(gArgs.animatediff_args.video_path),
             readImages(gArgs.animatediff_args.mask_path)
             ):

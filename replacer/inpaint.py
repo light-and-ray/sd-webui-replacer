@@ -94,6 +94,10 @@ def inpaint(
     with closing(p):
         processed = process_images(p)
 
+    needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
+    if needRestoreAfterCN:
+        replacer_extensions.controlnet.restoreAfterCN(image, mask, gArgs, processed)
+
     for i in range(len(processed.images)):
         processed.images[i] = removeRotationFix(processed.images[i], gArgs.rotation_fix)
 
@@ -101,9 +105,7 @@ def inpaint(
     processed.images = processed.images[:len(processed.all_seeds)]
     scriptImages.extend(getattr(processed, 'extra_images', []))
 
-    needRestoreAfterCN = getattr(p, 'needRestoreAfterCN', False)
-    if needRestoreAfterCN:
-        replacer_extensions.controlnet.restoreAfterCN(image, gArgs, processed)
+
 
 
     if savePath:

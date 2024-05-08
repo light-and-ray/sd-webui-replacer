@@ -10,10 +10,12 @@ from replacer.tools import ( interrupted, applyMaskBlur, clearCache, applyRotati
     Pause, extraMaskExpand,
 )
 from replacer.video_tools import fastFrameSave
+from replacer.extensions import replacer_extensions
 
 
 
 def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
+    initImage = applyRotationFix(initImage, gArgs.rotation_fix)
     fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0.jpg'))
     gArgs = copy.copy(gArgs)
     gArgs.inpainting_mask_invert = False
@@ -21,7 +23,6 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
     gArgs.animatediff_args.needApplyAnimateDiff = True
     gArgs.animatediff_args.video_path = os.path.join(fragmentPath, 'frames')
     gArgs.animatediff_args.mask_path = os.path.join(fragmentPath, 'masks')
-    initImage = removeRotationFix(initImage, gArgs.rotation_fix)
     processed, _ = inpaint(initImage, gArgs)
 
     outDir = os.path.join(fragmentPath, 'out')
@@ -37,7 +38,6 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
 
     frames = gArgs.images
     blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
-    blackFilling = applyRotationFix(blackFilling, gArgs.rotation_fix)
     fragmentNum = 0
     frameInFragmentIdx = fragmentSize
     fragmentPath: str = None
@@ -72,24 +72,23 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
-        frame = applyRotationFix(frame, gArgs.rotation_fix)
-        fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
         try:
             mask = createMask(frame, gArgs).mask
-            mask = applyRotationFix(mask, gArgs.rotation_fix)
             if gArgs.inpainting_mask_invert:
                 mask = ImageChops.invert(mask.convert('L'))
             mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
             mask = mask.resize(frame.size)
-        except Exception as e:
-            if type(e) is not NothingDetectedError:
-                errors.report(f'{e} ***', exc_info=True)
-            else:
-                print(e)
+        except NothingDetectedError as e:
+            print(e)
             if mask is None or mask is blackFilling:
                 mask = blackFilling
             else:
+                mask = removeRotationFix(mask, gArgs.rotation_fix)
                 mask = extraMaskExpand(mask, 50)
+
+        frame = applyRotationFix(frame, gArgs.rotation_fix)
+        fastFrameSave(frame, os.path.join(framesDir, f'frame_{frameInFragmentIdx}.jpg'))
+        mask = applyRotationFix(mask, gArgs.rotation_fix)
         fastFrameSave(mask, os.path.join(masksDir, f'frame_{frameInFragmentIdx}.jpg'))
         frameInFragmentIdx += 1
 
@@ -115,23 +114,35 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
     shared.total_tqdm.clear()
     Pause.paused = False
 
-    shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
-    processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)
-    initImage: Image.Image = processedFirstImg.images[0]
+    try:
+        shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
+        processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)
+        initImage: Image.Image = processedFirstImg.images[0]
+    except NothingDetectedError as e:
+        print(e)
+        initImage: Image.Image = copy.copy(gArgs.images[0])
+        shared.state.nextjob()
+
     fragmentPaths = []
 
 
-    for fragmentPath in getFragments(gArgs, video_output_dir, totalFragments):
-        if not shared.cmd_opts.lowram: # do not confuse with lowvram. lowram is for really crazy people
-            clearCache()
-        processed = processFragment(fragmentPath, initImage, gArgs)
-        if interrupted():
-            break
-        fragmentPaths.append(fragmentPath)
-        initImage = processed.images[-1]
-        if gArgs.animatediff_args.generate_only_first_fragment:
-            break
-    
+    try:
+        for fragmentPath in getFragments(gArgs, video_output_dir, totalFragments):
+            if not shared.cmd_opts.lowram: # do not confuse with lowvram. lowram is for really crazy people
+                clearCache()
+            processed = processFragment(fragmentPath, initImage, gArgs)
+            fragmentPaths.append(fragmentPath)
+            initImage = processed.images[-1]
+            if gArgs.animatediff_args.generate_only_first_fragment:
+                break
+            if interrupted():
+                break
+    except Exception as e:
+        if type(e) is replacer_extensions.controlnet.UnitIsReserved:
+            raise
+        errors.report(f'{e} ***', exc_info=True)
+
+
     text = "merging fragments"
     shared.state.textinfo = text
     print(text)

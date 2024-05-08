@@ -84,21 +84,21 @@ def convertIntoCNImageFromat(image):
     return color
 
 
-def restoreAfterCN(origImage, gArgs: GenerationArgs, processed):
+def restoreAfterCN(origImage, mask, gArgs: GenerationArgs, processed):
     print('Restoring images resolution after ControlNet Inpainting')
 
     if gArgs.animatediff_args.needApplyAnimateDiff:
         restoreAfterCN_animatediff(gArgs, processed)
     else:
-        origMask = gArgs.mask.convert('RGBA')
+        origMask = mask.convert('RGBA')
         origMask = applyMaskBlur(origMask, gArgs.mask_blur)
         upscaler = gArgs.upscalerForImg2Img
         if upscaler == "":
             upscaler = None
 
-        for i in range(len(processed.images)):
-            imageOrg = applyMask(processed.images[i], origImage, origMask, gArgs)
-            processed.images[i] = imageOrg
+        for i in range(len(processed.all_seeds)):
+            image = applyMask(processed.images[i], origImage, origMask, gArgs)
+            processed.images[i] = image
 
 
 class UnitIsReserved(Exception):
