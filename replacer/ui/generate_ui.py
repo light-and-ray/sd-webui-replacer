@@ -3,7 +3,7 @@ from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
 from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData, AnimateDiffArgs
-from replacer.video_tools import getVideoFrames, save_video
+from replacer.video_tools import getVideoFrames, save_video, overriveSettingsForVideo
 from replacer.options import getSaveDir
 from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask, generateSeed, convertIntoPath
@@ -22,7 +22,7 @@ def getLastUsedSeed():
 
 
 
-def generate_ui(
+def generate_ui_(
     id_task,
     selected_input_mode: str,
     detectionPrompt: str,
@@ -327,4 +327,15 @@ def generate_ui(
     processed.infotexts += [processed.info] * len(allExtraImages)
 
     return processed.images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+
+
+def generate_ui(*args, **kwargs):
+    restoreList = []
+    try:
+        restoreList.append(overriveSettingsForVideo())
+        return generate_ui_(*args, **kwargs)
+    finally:
+        for f in restoreList:
+            f()
+
 

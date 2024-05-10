@@ -87,7 +87,21 @@ def save_video(frames_dir, fps, org_video, output_path, seed):
     )
 
 
-def fastFrameSave(image: Image.Image, path: str):
-    image.convert('RGB').save(path + '.jpg', subsampling=0, quality=93)
-    # image.convert('RGB').save(path + '.png')
+def fastFrameSave(image: Image.Image, path: str, idx):
+    savePath = os.path.join(path, f'frame_{idx}.{shared.opts.samples_format}')
+    image.convert('RGB').save(savePath, subsampling=0, quality=93)
+
+
+def overriveSettingsForVideo():
+    old_samples_filename_pattern = shared.opts.samples_filename_pattern
+    old_save_images_add_number = shared.opts.save_images_add_number
+    old_controlnet_ignore_noninpaint_mask = shared.opts.data.get("controlnet_ignore_noninpaint_mask", False)
+    def restoreOpts():
+        shared.opts.samples_filename_pattern = old_samples_filename_pattern
+        shared.opts.save_images_add_number = old_save_images_add_number
+        shared.opts.data["controlnet_ignore_noninpaint_mask"] = old_controlnet_ignore_noninpaint_mask
+    shared.opts.samples_filename_pattern = "[seed]"
+    shared.opts.save_images_add_number = True
+    shared.opts.data["controlnet_ignore_noninpaint_mask"] = True
+    return restoreOpts
 

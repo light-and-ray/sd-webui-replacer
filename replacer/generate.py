@@ -92,16 +92,6 @@ def generate(
             opts.sd_model_checkpoint = gArgs.sd_model_checkpoint
             sd_models.reload_model_weights()
 
-        if useSaveFormatForVideo:
-            old_samples_filename_pattern = opts.samples_filename_pattern
-            old_save_images_add_number = opts.save_images_add_number
-            def restoreOpts():
-                opts.samples_filename_pattern = old_samples_filename_pattern
-                opts.save_images_add_number = old_save_images_add_number
-            restoreList.append(restoreOpts)
-            opts.samples_filename_pattern = "[seed]"
-            opts.save_images_add_number = True
-
 
         if gArgs.pass_into_hires_fix_automatically:
             prepareGenerationArgsBeforeHiresFixPass(gArgs)
