@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from PIL import Image
 
@@ -119,3 +120,21 @@ class GenerationArgs:
     appropriateInputImageDataList: list[AppropriateData] = None
 
 
+    def copy(self):
+        gArgs = copy.copy(self)
+        gArgs.cn_args = copy.copy(list(gArgs.cn_args))
+        for i in range(len(gArgs.cn_args)):
+            gArgs.cn_args[i] = gArgs.cn_args[i].copy()
+        gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
+        gArgs.soft_inpaint_args = copy.copy(gArgs.soft_inpaint_args)
+        gArgs.hires_fix_args = copy.copy(gArgs.hires_fix_args)
+        gArgs.images = copy.copy(gArgs.images)
+        for i in range(len(gArgs.images)):
+            gArgs.images[i] = gArgs.images[i].copy()
+        gArgs.mask = copy.copy(gArgs.mask)
+        gArgs.hiresFixCacheData = copy.copy(gArgs.hiresFixCacheData)
+        if gArgs.appropriateInputImageDataList is not None:
+            gArgs.appropriateInputImageDataList = copy.copy(gArgs.appropriateInputImageDataList)
+            for i in range(len(gArgs.appropriateInputImageDataList)):
+                gArgs.appropriateInputImageDataList[i] = gArgs.appropriateInputImageDataList[i].copy()
+        return gArgs

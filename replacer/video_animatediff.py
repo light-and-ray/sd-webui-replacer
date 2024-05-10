@@ -17,12 +17,8 @@ from replacer.extensions import replacer_extensions
 def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: GenerationArgs):
     initImage = applyRotationFix(initImage, gArgs.rotation_fix)
     fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0'))
-    gArgs = copy.copy(gArgs)
-    gArgs.cn_args = copy.copy(list(gArgs.cn_args))
-    for i in range(len(gArgs.cn_args)):
-        gArgs.cn_args[i] = gArgs.cn_args[i].copy()
+    gArgs = gArgs.copy()
     gArgs.inpainting_mask_invert = False
-    gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
     gArgs.animatediff_args.needApplyAnimateDiff = True
     gArgs.animatediff_args.video_path = os.path.join(fragmentPath, 'frames')
     gArgs.animatediff_args.mask_path = os.path.join(fragmentPath, 'masks')
@@ -119,7 +115,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     try:
         shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
-        processedFirstImg, _ = generateSingle(gArgs.images[0], copy.copy(gArgs), "", "", False, [], None)
+        processedFirstImg, _ = generateSingle(gArgs.images[0], gArgs.copy(), "", "", False, [], None)
         initImage: Image.Image = processedFirstImg.images[0]
     except NothingDetectedError as e:
         print(e)

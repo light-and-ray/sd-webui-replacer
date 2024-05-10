@@ -133,7 +133,8 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 continue
 
         if not gArgs.animatediff_args.needApplyAnimateDiff and \
-                'sparsectrl' in gArgs.cn_args[i].model.lower():
+                'sparsectrl' in gArgs.cn_args[i].model.lower() and \
+                gArgs.cn_args[i].enabled:
             print(f'Sparsectrl was disabled in unit {i} because of non-animeediff generation')
             gArgs.cn_args[i].enabled = False
             continue
