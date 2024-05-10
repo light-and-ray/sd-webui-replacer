@@ -18,6 +18,9 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
     initImage = applyRotationFix(initImage, gArgs.rotation_fix)
     fastFrameSave(initImage, os.path.join(fragmentPath, 'frames', 'frame_0'))
     gArgs = copy.copy(gArgs)
+    gArgs.cn_args = copy.copy(list(gArgs.cn_args))
+    for i in range(len(gArgs.cn_args)):
+        gArgs.cn_args[i] = gArgs.cn_args[i].copy()
     gArgs.inpainting_mask_invert = False
     gArgs.animatediff_args = copy.copy(gArgs.animatediff_args)
     gArgs.animatediff_args.needApplyAnimateDiff = True
