@@ -137,6 +137,9 @@ def prepareExpectedUIBehavior(gArgs: GenerationArgs):
 
     gArgs.detectionPrompt = gArgs.detectionPrompt.strip()
     gArgs.avoidancePrompt = gArgs.avoidancePrompt.strip()
+    if gArgs.inpainting_mask_invert:
+        gArgs.maskExpand = -gArgs.maskExpand
+        gArgs.hires_fix_args.extra_mask_expand = -gArgs.hires_fix_args.extra_mask_expand
 
 
 custom_script_source = None
