@@ -147,7 +147,11 @@ def generate_ui_(
     if selected_input_mode == "tab_batch_dir":
         assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
         def readImages(input_dir):
-            image_list = shared.listfiles(input_dir)
+            if hasattr(shared, 'walk_image_files'): # webui 1.10
+                image_list = shared.walk_image_files(input_dir)
+            else:
+                image_list = shared.listfiles(input_dir)
+
             for filename in image_list:
                 try:
                     image = Image.open(filename).convert('RGBA')
