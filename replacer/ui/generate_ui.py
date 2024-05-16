@@ -145,6 +145,7 @@ def generate_ui_(
             images = getImages(image_batch)
 
     if selected_input_mode == "tab_batch_dir":
+        assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
         def readImages(input_dir):
             image_list = shared.listfiles(input_dir)
             for filename in image_list:
@@ -159,6 +160,7 @@ def generate_ui_(
 
     timestamp = int(datetime.datetime.now().timestamp())
     if selected_input_mode == "tab_batch_video":
+        assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
         shared.state.textinfo = 'video preparing'
         if video_output_dir == "":
             video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}_{timestamp}')

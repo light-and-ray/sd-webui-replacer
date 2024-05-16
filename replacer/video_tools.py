@@ -47,9 +47,7 @@ def separate_video_into_frames(video_path, fps_out, out_path):
 
 
 def readImages(input_dir):
-    assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
     assert input_dir, 'input directory not selected'
-
     image_list = shared.listfiles(input_dir)
     for filename in image_list:
         try:

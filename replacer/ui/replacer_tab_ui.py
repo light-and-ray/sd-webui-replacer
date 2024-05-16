@@ -138,11 +138,11 @@ class ReplacerMainUI:
 
                         with gr.TabItem('Batch from Directory', id="batch_from_directory", elem_id="replacer_batch_directory_tab") as comp.tab_batch_dir:
                             comp.input_batch_dir = gr.Textbox(
-                                label="Input directory", **shared.hide_dirs,
+                                label="Input directory",
                                 placeholder="A directory on the same machine where the server is running.",
                                 elem_id="replacer_input_batch_dir")
                             comp.output_batch_dir = gr.Textbox(
-                                label="Output directory", **shared.hide_dirs,
+                                label="Output directory",
                                 placeholder="Leave blank to save images to the default path.",
                                 elem_id="replacer_output_batch_dir")
                             comp.keep_original_filenames_from_dir = gr.Checkbox(
