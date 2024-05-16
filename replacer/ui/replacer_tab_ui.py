@@ -132,7 +132,7 @@ class ReplacerMainUI:
                             comp.image = gr.Image(label="Source", source="upload", interactive=True, type="pil", elem_id="replacer_image", image_mode="RGBA")
 
                         with gr.TabItem('Batch Process', id="batch_process", elem_id="replacer_batch_process_tab") as comp.tab_batch:
-                            comp.image_batch = gr.Files(label="Batch Process", interactive=True, elem_id="replacer_image_batch")
+                            comp.image_batch = gr.Files(label="Files", interactive=True, elem_id="replacer_image_batch")
                             comp.keep_original_filenames = gr.Checkbox(
                                 label='Keep original filenames', value=True, elem_id="replacer_keep_original_filenames")
 
