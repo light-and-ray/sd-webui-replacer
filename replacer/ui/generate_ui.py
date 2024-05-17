@@ -291,6 +291,8 @@ def generate_ui_(
         if replacer_extensions.animatediff.SCRIPT is None or replacer_extensions.controlnet.SCRIPT is None:
             return [], "", plaintext_to_html("controlnet or animatediff extensions are not installed"), ""
         animatediffGenerate(gArgs, video_output_dir, resultFrames, fps_out)
+        if not os.path.exists(resultFrames) or len(os.listdir(resultFrames)) == 0:
+            return [], "", plaintext_to_html(f"No one frame was processed. See console logs for errors"), ""
     else:
         saveDir = getSaveDir()
         saveToSubdirs = True
@@ -321,9 +323,6 @@ def generate_ui_(
         if len(save_video_path) > 260:
             save_video_path = os.path.join(video_output_dir, f'output_{seed}_{timestamp}.mp4')
         save_video(resultFrames, fps_out, input_video, save_video_path, seed)
-
-
-    if selected_input_mode == "tab_batch_video":
         return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
 
     if selected_input_mode == "tab_batch_dir" and not show_batch_dir_results:
