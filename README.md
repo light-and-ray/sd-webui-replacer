@@ -53,13 +53,13 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 1. [Lama cleaner as masked content](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content)
 
-1. [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference) (discontinued)
-
 1. [Image Comparison](https://github.com/Haoming02/sd-webui-image-comparison)
 
 1. [ControlNet](https://github.com/Mikubill/sd-webui-controlnet)
 
 1. [AnimateDiff](https://github.com/continue-revolution/sd-webui-animatediff)
+
+1. Other extension scripts which doesn't have control arguments, e.g. [Hardware Info in metadata](https://github.com/light-and-ray/sd-webui-hardware-info-in-metadata), [NudeNet NSFW Censor](https://github.com/w-e-w/sd-webui-nudenet-nsfw-censor), built-in **Hypertile**
 
 </blockquote>
 

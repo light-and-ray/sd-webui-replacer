@@ -27,7 +27,7 @@ def inpaint(
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
-    if replacer_extensions.lama_cleaner.SCRIPT:
+    if replacer_extensions.background_extensions.lamaCleanerAvaliable():
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 

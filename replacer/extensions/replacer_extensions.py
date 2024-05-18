@@ -5,7 +5,7 @@ from replacer.generation_args import GenerationArgs
 from replacer.extensions import controlnet
 from replacer.extensions import inpaint_difference
 from replacer.extensions import soft_inpainting
-from replacer.extensions import lama_cleaner
+from replacer.extensions import background_extensions
 from replacer.extensions import image_comparison
 from replacer.extensions import animatediff
 
@@ -16,7 +16,7 @@ def initAllScripts():
     controlnet.initCNScript()
     inpaint_difference.initInpaintDiffirence()
     soft_inpainting.initSoftInpaintScript()
-    lama_cleaner.initLamaCleanerAsMaskedContent()
+    background_extensions.initAllBackgroundExtensions()
     animatediff.initAnimateDiffScript()
 
 def restoreTemporartChangedThigs():
@@ -25,7 +25,7 @@ def restoreTemporartChangedThigs():
 def reinitAllScriptsAfterUICreated(*args): # for args_to and args_from
     controlnet.reinitCNScript()
     soft_inpainting.reinitSoftInpaintScript()
-    lama_cleaner.initLamaCleanerAsMaskedContent()
+    background_extensions.initAllBackgroundExtensions()
     animatediff.initAnimateDiffScript()
 
 def prepareScriptsArgs(scripts_args):
@@ -58,8 +58,6 @@ def applyScripts(p, gArgs: GenerationArgs):
         avaliableScripts.append(controlnet.SCRIPT)
     if needSoftInpaint :
         avaliableScripts.append(soft_inpainting.SCRIPT)
-    if lama_cleaner.SCRIPT is not None:
-        avaliableScripts.append(lama_cleaner.SCRIPT)
     if animatediff.SCRIPT is not None:
         avaliableScripts.append(animatediff.SCRIPT)
 
@@ -70,6 +68,7 @@ def applyScripts(p, gArgs: GenerationArgs):
 
     p.scripts = copy.copy(scripts.scripts_img2img)
     p.scripts.alwayson_scripts = avaliableScripts
+    p.scripts.alwayson_scripts.extend(background_extensions.SCRIPTS)
     p.script_args = [None] * allArgsLen
 
     if needControlNet:

@@ -169,7 +169,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    if replacer_extensions.lama_cleaner.SCRIPT:
+                    if replacer_extensions.background_extensions.lamaCleanerAvaliable():
                         comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
                     else:
                         comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
