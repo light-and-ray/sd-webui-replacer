@@ -24,7 +24,7 @@ If you don't want to use Video feature, that's all for you. Further steps are fo
 4. I strongly recommend you to download [mm_sd15_v3_sparsectrl_rgb.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_rgb.safetensors) and [mm_sd15_v3_sparsectrl_scribble.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_scribble.safetensors) controlnet's models. Put them also into `models/ControlNet` directory. Then you can select SparseCtrl module in ControlNet extension. The rgb one requires "none" preprocessor
 
 
-### SAM models list:
+##### SAM models list:
 
 SAM-HQ are the best for me. Choose it depending on your vram. Sum this model size with dino model size (694MB-938MB)
 
@@ -47,7 +47,17 @@ SAM-HQ are the best for me. Choose it depending on your vram. Sum this model siz
 
 _FastSAM_ and _Matting-Anything_ aren't currently supported
 
-### Supported extensons:
+
+
+## How does it work?
+
+First, grounding dino models detect objects you provided in the detection prompt. Then segment anything model generates contours of them. And then extension chooses randomly 1 of 3 generated masks, and inpaints it with regular inpainting method in a1111 webui
+
+When you press the "Apply hires fix" button, the extension regenerates the image with exactly the same settings, excluding upscaler_for_img2img. Then it applies inpainting with "Original" masked content mode and lower denoising but higher resolution.
+
+
+
+## Supported extensons:
 
 <blockquote>
 
@@ -65,18 +75,12 @@ _FastSAM_ and _Matting-Anything_ aren't currently supported
 
 
 
-## How does it work?
-
-First, grounding dino models detect objects you provided in the detection prompt. Then segment anything model generates contours of them. And then extension chooses randomly 1 of 3 generated masks, and inpaints it with regular inpainting method in a1111 webui
-
-When you press the "Apply hires fix" button, the extension regenerates the image with exactly the same settings, excluding upscaler_for_img2img. Then it applies inpainting with "Original" masked content mode and lower denoising but higher resolution.
-
-# Docs:
-## - [Usage of Replacer](/docs/usage.md)
-## - [Video: AnimateDiff and Frame by frame](/docs/video.md)
-## - [Replacer Options](/docs/options.md)
-## - [Information about Replacer API](/docs/api.md)
-## - [Useful tips: how to change defaults, maximal value of sliders, and how to get inpainting model](/docs/tips.md)
+## Docs:
+### - [Usage of Replacer](/docs/usage.md)
+### - [Video: AnimateDiff and Frame by frame](/docs/video.md)
+### - [Replacer Options](/docs/options.md)
+### - [Information about Replacer API](/docs/api.md)
+### - [Useful tips: how to change defaults, maximal value of sliders, and how to get inpainting model](/docs/tips.md)
 
 
 --------------------------------
