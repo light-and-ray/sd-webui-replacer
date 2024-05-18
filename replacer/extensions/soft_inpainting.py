@@ -30,6 +30,7 @@ def reinitSoftInpaintScript():
     if index is not None:
         SCRIPT.args_from = scripts.scripts_img2img.alwayson_scripts[index].args_from
         SCRIPT.args_to = scripts.scripts_img2img.alwayson_scripts[index].args_to
+        SCRIPT.name = scripts.scripts_img2img.alwayson_scripts[index].name
 
 
 

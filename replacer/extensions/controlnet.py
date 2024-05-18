@@ -58,6 +58,7 @@ def reinitCNScript():
     if cnet_idx is not None:
         SCRIPT.args_from =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_from
         SCRIPT.args_to =  scripts.scripts_img2img.alwayson_scripts[cnet_idx].args_to
+        SCRIPT.name = scripts.scripts_img2img.alwayson_scripts[cnet_idx].name
 
 
 oldCNContext = None
