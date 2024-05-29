@@ -157,7 +157,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
         if hasattr(image, 'original_path') and image.original_path:
             shutil.copy(image.original_path, savePath)
         else:
-            image.save(savePath)
+            image.convert('RGB').save(savePath)
     os.makedirs(result_dir, exist_ok=True)
     theLastImage = None
     frameNum = 0
