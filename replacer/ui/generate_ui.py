@@ -295,7 +295,7 @@ def generate_ui_(
             return [], "", plaintext_to_html(f"No one frame was processed. See console logs for errors"), ""
     else:
         saveDir = getSaveDir()
-        saveToSubdirs = True
+        saveToSubdirs = shared.opts.save_to_dirs
         if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
             saveDir = output_batch_dir
             saveToSubdirs = False
