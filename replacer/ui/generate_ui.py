@@ -306,7 +306,7 @@ def generate_ui_(
         useSaveFormatForVideo = selected_input_mode == "tab_batch_video"
 
         processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, useSaveFormatForVideo, extra_includes)
-        if processed is None:
+        if processed is None or not getattr(processed, 'images', None):
             return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
         global lastGenerationArgs
