@@ -17,7 +17,7 @@ class HiresFixArgs:
     unload_detection_models: bool
     disable_cn: bool
     extra_mask_expand: int
-    positve_prompt: str
+    positive_prompt: str
     negative_prompt: str
     sd_model_checkpoint: str
     extra_inpaint_padding: int
@@ -55,7 +55,7 @@ class AnimateDiffArgs:
     control_weight: float
     force_override_sd_model: bool
     force_sd_model_checkpoint: str
-    moution_model: str
+    motion_model: str
 
     needApplyAnimateDiff: bool = False
     needApplyCNForAnimateDiff: bool = False
@@ -66,7 +66,7 @@ DUMMY_ANIMATEDIFF_ARGS = AnimateDiffArgs(0, 0, 0, 0, 0, 0, 0, False, "", 0, Fals
 
 @dataclass
 class GenerationArgs:
-    positvePrompt: str
+    positivePrompt: str
     negativePrompt: str
     detectionPrompt: str
     avoidancePrompt: str

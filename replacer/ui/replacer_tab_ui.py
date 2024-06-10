@@ -14,7 +14,7 @@ from replacer.ui.make_advanced_options import makeAdvancedOptions
 from replacer.ui.make_hiresfix_options import makeHiresFixOptions
 from replacer.ui.video_ui import makeVideoUI
 from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, unloadModels, AttrDict,
-    getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OuputPanelWatcher, ui_toprow,
+    getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OutputPanelWatcher, ui_toprow,
     OverrideCustomScriptSource,
 )
 from replacer.tools import Pause
@@ -74,19 +74,19 @@ class ReplacerMainUI:
                         if (useFirstPositivePromptFromExamples()):
                             placeholder = getPositivePromptExamples()[0]
 
-                        comp.positvePrompt = gr.Textbox(label="Positive prompt",
+                        comp.positivePrompt = gr.Textbox(label="Positive prompt",
                                             show_label=True,
                                             lines=1,
-                                            elem_classes=["positvePrompt"],
+                                            elem_classes=["positivePrompt"],
                                             placeholder=placeholder,
-                                            elem_id="replacer_positvePrompt")
+                                            elem_id="replacer_positivePrompt")
 
                         if getPositivePromptExamplesNumber() > 0:
                             gr.Examples(
                                 examples=getPositivePromptExamples(),
-                                inputs=comp.positvePrompt,
+                                inputs=comp.positivePrompt,
                                 label="",
-                                elem_id="replacer_positvePrompt_examples",
+                                elem_id="replacer_positivePrompt_examples",
                                 examples_per_page=getPositivePromptExamplesNumber(),
                             )
 
@@ -154,7 +154,7 @@ class ReplacerMainUI:
                             makeVideoUI(comp)
 
                     comp.cn_inputs = []
-                    
+
                     with OverrideCustomScriptSource("controlnet"):
                         if replacer_extensions.controlnet.SCRIPT:
                             replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.img2img_submit_button = comp.run_button
@@ -194,10 +194,10 @@ class ReplacerMainUI:
                             outputs=[comp.html_info, comp.html_info],
                             show_progress=False,
                         )
-                        if isDedicatedPage and OuputPanelWatcher.send_to_img2img:
-                            OuputPanelWatcher.send_to_img2img.visible = False
-                            OuputPanelWatcher.send_to_inpaint.visible = False
-                            OuputPanelWatcher.send_to_extras.visible = False
+                        if isDedicatedPage and OutputPanelWatcher.send_to_img2img:
+                            OutputPanelWatcher.send_to_img2img.visible = False
+                            OutputPanelWatcher.send_to_inpaint.visible = False
+                            OutputPanelWatcher.send_to_extras.visible = False
 
                     with gr.Row():
                         if ui_toprow:
@@ -255,7 +255,7 @@ class ReplacerMainUI:
                             ui_group.inpaint_crop_input_image.value = True
                             ui_group.inpaint_crop_input_image.visible = True
                             ui_group.inpaint_crop_input_image.label = "Crop input image based on generated mask",
-                        # if isDedicatedPage: 
+                        # if isDedicatedPage:
                         #     replacer_extensions.controlnet.ControlNetUiGroup.a1111_context.setting_sd_model_checkpoint = sd_model_checkpoint
                         # ui_group.register_sd_version_changed()
                 except Exception as e:
@@ -286,7 +286,7 @@ class ReplacerMainUI:
                     comp.selected_input_mode,
                     comp.detectionPrompt,
                     comp.avoidancePrompt,
-                    comp.positvePrompt,
+                    comp.positivePrompt,
                     comp.negativePrompt,
                     comp.image,
                     comp.image_batch,
@@ -351,7 +351,7 @@ class ReplacerMainUI:
                     comp.ad_control_weight,
                     comp.ad_force_override_sd_model,
                     comp.ad_force_sd_model_checkpoint,
-                    comp.ad_moution_model,
+                    comp.ad_motion_model,
 
                     comp.hf_upscaler,
                     comp.hf_steps,
@@ -365,7 +365,7 @@ class ReplacerMainUI:
                     comp.hf_unload_detection_models,
                     comp.hf_disable_cn,
                     comp.hf_extra_mask_expand,
-                    comp.hf_positvePrompt,
+                    comp.hf_positivePrompt,
                     comp.hf_negativePrompt,
                     comp.hf_sd_model_checkpoint,
                     comp.hf_extra_inpaint_padding,
@@ -404,7 +404,7 @@ class ReplacerMainUI:
                     comp.hf_unload_detection_models,
                     comp.hf_disable_cn,
                     comp.hf_extra_mask_expand,
-                    comp.hf_positvePrompt,
+                    comp.hf_positivePrompt,
                     comp.hf_negativePrompt,
                     comp.hf_sd_model_checkpoint,
                     comp.hf_extra_inpaint_padding,
@@ -440,7 +440,7 @@ class ReplacerMainUI:
             )
 
 
-            OuputPanelWatcher.send_back_to_replacer.click(
+            OutputPanelWatcher.send_back_to_replacer.click(
                 fn=sendBackToReplacer,
                 _js="sendBackToReplacer",
                 inputs=[
@@ -501,7 +501,7 @@ class ReplacerMainUI:
                 fn=Pause.toggle
             )
 
-            
+
             if replacer_extensions.inpaint_difference.Globals:
                 comp.inpaint_diff_create.click(
                     fn=replacer_extensions.inpaint_difference.computeInpaintDifference,
@@ -537,8 +537,8 @@ def initMainUI(*args):
         replacerMainUI = ReplacerMainUI(isDedicatedPage=False)
         replacerMainUI_dedicated = ReplacerMainUI(isDedicatedPage=True)
     finally:
-        replacer_extensions.restoreTemporartChangedThigs()
-    
+        replacer_extensions.restoreTemporaryChangedThings()
+
     registered_param_bindings_main_ui = infotext_utils.registered_param_bindings[lenBefore:]
 
 

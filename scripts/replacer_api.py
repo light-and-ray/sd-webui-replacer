@@ -19,9 +19,9 @@ def replacer_api(_, app: FastAPI):
     from scripts.dino import dino_model_list
     try:
         from lama_cleaner_masked_content.inpaint import lamaInpaint
-        lama_cleaner_avaliable = True
+        lama_cleaner_available = True
     except Exception as e:
-        lama_cleaner_avaliable = False
+        lama_cleaner_available = False
 
     class ReplaceRequest(BaseModel):
         input_image: str = "base64 image"
@@ -53,7 +53,7 @@ def replacer_api(_, app: FastAPI):
         lama_cleaner_upscaler: str = ""
         clip_skip: int = 1
         rotation_fix: str = '-' # choices: '-', '⟲', '⟳', '🗘'
-        extra_include: list = ["mask", "box", "cutted", "preview", "script"]
+        extra_include: list = ["mask", "box", "cut", "preview", "script"]
 
         use_hires_fix: bool = False
         hf_upscaler: str = "ESRGAN_4x"
@@ -68,7 +68,7 @@ def replacer_api(_, app: FastAPI):
         hf_unload_detection_models: bool = True
         hf_disable_cn: bool = True
         hf_extra_mask_expand: int = 5
-        hf_positve_prompt: str = ""
+        hf_positive_prompt: str = ""
         hf_negative_prompt: str = ""
         hf_sd_model_checkpoint: str = "Use same checkpoint"
         hf_extra_inpaint_padding: int = 250
@@ -82,7 +82,7 @@ def replacer_api(_, app: FastAPI):
     @app.post("/replacer/replace")
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_base64_to_image(data.input_image).convert("RGBA")
-        
+
         cn_args, soft_inpaint_args = replacer_extensions.prepareScriptsArgs_api(data.scripts)
 
         hires_fix_args = HiresFixArgs(
@@ -98,7 +98,7 @@ def replacer_api(_, app: FastAPI):
             unload_detection_models = data.hf_unload_detection_models,
             disable_cn = data.hf_disable_cn,
             extra_mask_expand = data.hf_extra_mask_expand,
-            positve_prompt = data.hf_positve_prompt,
+            positive_prompt = data.hf_positive_prompt,
             negative_prompt = data.hf_negative_prompt,
             sd_model_checkpoint = data.hf_sd_model_checkpoint,
             extra_inpaint_padding = data.hf_extra_inpaint_padding,
@@ -108,7 +108,7 @@ def replacer_api(_, app: FastAPI):
         )
 
         gArgs = GenerationArgs(
-            positvePrompt=data.positive_prompt,
+            positivePrompt=data.positive_prompt,
             negativePrompt=data.negative_prompt,
             detectionPrompt=data.detection_prompt,
             avoidancePrompt=data.avoidance_prompt,
@@ -119,7 +119,7 @@ def replacer_api(_, app: FastAPI):
             boxThreshold=data.box_threshold,
             maskExpand=data.mask_expand,
             maxResolutionOnDetection=data.max_resolution_on_detection,
-            
+
             steps=data.steps,
             sampler_name=data.sampler,
             scheduler=data.scheduler,
@@ -173,14 +173,14 @@ def replacer_api(_, app: FastAPI):
         }
 
 
-    @app.post("/replacer/avaliable_options")
+    @app.post("/replacer/available_options")
     async def api_replacer_avaliable_options() -> Any:
         return {
             "sam_model_name": sam_model_list,
             "dino_model_name": dino_model_list,
             "upscalers": [""] + [x.name for x in shared.sd_upscalers],
-            "lama_cleaner_avaliable": lama_cleaner_avaliable, # inpainting_fill=4, https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
-            "avaliable_scripts": replacer_extensions.getAvaliableScripts_api(),
+            "lama_cleaner_available": lama_cleaner_available, # inpainting_fill=4, https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
+            "available_scripts": replacer_extensions.getAvailableScripts_api(),
         }
 
 

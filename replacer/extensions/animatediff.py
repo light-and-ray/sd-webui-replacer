@@ -22,7 +22,7 @@ def initAnimateDiffScript():
         SCRIPT = copy.copy(scripts.scripts_img2img.alwayson_scripts[index])
     else:
         return
-    
+
     if not AnimateDiffProcess:
         from scripts.animatediff_ui import AnimateDiffProcess
 
@@ -49,7 +49,7 @@ def apply(p, animatediff_args: AnimateDiffArgs):
         params.overlap = animatediff_args.overlap
         params.latent_power = animatediff_args.latent_power
         params.latent_scale = animatediff_args.latent_scale
-        params.model = animatediff_args.moution_model
+        params.model = animatediff_args.motion_model
 
         params.video_path = animatediff_args.video_path
         params.mask_path = animatediff_args.mask_path

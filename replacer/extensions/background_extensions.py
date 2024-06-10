@@ -18,11 +18,11 @@ def initAllBackgroundExtensions():
 
 # --- LamaCleaner as masked content ---- https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content
 
-_lamaCleanerAvaliable = None
+_lamaCleanerAvailable = None
 
-def lamaCleanerAvaliable():
-    global _lamaCleanerAvaliable
-    if _lamaCleanerAvaliable is None:
-        _lamaCleanerAvaliable = "Lama-cleaner-masked-content" in (x.title() for x in scripts.scripts_img2img.alwayson_scripts)
-    return _lamaCleanerAvaliable
+def lamaCleanerAvailable():
+    global _lamaCleanerAvailable
+    if _lamaCleanerAvailable is None:
+        _lamaCleanerAvailable = "Lama-cleaner-masked-content" in (x.title() for x in scripts.scripts_img2img.alwayson_scripts)
+    return _lamaCleanerAvailable
 

@@ -6,7 +6,7 @@ from modules import errors
 Globals = None
 computeInpaintDifference = None
 
-def initInpaintDiffirence():
+def initInpaintDifference():
     global Globals, computeInpaintDifference
     try:
         from lib_inpaint_difference.globals import DifferenceGlobals as Globals
@@ -36,8 +36,8 @@ def initInpaintDiffirence():
                 inpaint_diff_threshold,
                 inpaint_diff_contours_only,
             )
-            
+
     except Exception as e:
-        errors.report(f"Cannot init InpaintDiffirence {e}", exc_info=True)
+        errors.report(f"Cannot init InpaintDifference {e}", exc_info=True)
         Globals = None
 

@@ -90,7 +90,7 @@ def fastFrameSave(image: Image.Image, path: str, idx):
     image.convert('RGB').save(savePath, subsampling=0, quality=93)
 
 
-def overriveSettingsForVideo():
+def overrideSettingsForVideo():
     old_samples_filename_pattern = shared.opts.samples_filename_pattern
     old_save_images_add_number = shared.opts.save_images_add_number
     old_controlnet_ignore_noninpaint_mask = shared.opts.data.get("controlnet_ignore_noninpaint_mask", False)

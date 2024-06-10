@@ -3,7 +3,7 @@ import numpy as np
 import gradio as gr
 from PIL import ImageChops
 from modules import scripts, errors
-from replacer.tools import limitImageByOneDemention, applyMaskBlur, applyMask, applyRotationFix
+from replacer.tools import limitImageByOneDimension, applyMaskBlur, applyMask, applyRotationFix
 from replacer.generation_args import GenerationArgs
 from replacer.extensions.animatediff import restoreAfterCN_animatediff
 
@@ -33,7 +33,7 @@ def initCNScript():
         SCRIPT = copy.copy(scripts.scripts_img2img.alwayson_scripts[cnet_idx])
     else:
         return
-    
+
     try:
         if not IS_SD_WEBUI_FORGE:
             from scripts.controlnet_ui.controlnet_ui_group import ControlNetUiGroup
@@ -75,7 +75,7 @@ def restoreCNContext():
     ControlNetUiGroup.all_ui_groups = []
 
 g_cn_HWC3 = None
-def convertIntoCNImageFromat(image):
+def convertIntoCNImageFormat(image):
     global g_cn_HWC3
     if g_cn_HWC3 is None:
         from annotator.util import HWC3
@@ -106,7 +106,7 @@ class UnitIsReserved(Exception):
     def __init__(self, unitNum: int):
         super().__init__(
             f"You have enabled ControlNet Unit {unitNum}, while it's reserved for "
-            "AnimateDiff video inpainting. Plaese disable it. If you need more units, "
+            "AnimateDiff video inpainting. Please disable it. If you need more units, "
             "increase maximal number of them in Settings -> ControlNet")
 
 
@@ -125,7 +125,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 print(f'Passing the previous frame into CN unit {i}')
                 previousFrame = applyRotationFix(previousFrame, gArgs.rotation_fix)
                 gArgs.cn_args[i].image = {
-                    "image": convertIntoCNImageFromat(previousFrame),
+                    "image": convertIntoCNImageFormat(previousFrame),
                 }
                 gArgs.cn_args[i].enabled = True
             else:
@@ -136,7 +136,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
         if not gArgs.animatediff_args.needApplyAnimateDiff and \
                 'sparsectrl' in gArgs.cn_args[i].model.lower() and \
                 gArgs.cn_args[i].enabled:
-            print(f'Sparsectrl was disabled in unit {i} because of non-animeediff generation')
+            print(f'Sparsectrl was disabled in unit {i} because of non-animatediff generation')
             gArgs.cn_args[i].enabled = False
             continue
 
@@ -162,11 +162,11 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 mask = applyMaskBlur(mask, p.mask_blur)
 
             print('Use cn inpaint instead of sd inpaint')
-            image = limitImageByOneDemention(p.init_images[0], max(p.width, p.height))
+            image = limitImageByOneDimension(p.init_images[0], max(p.width, p.height))
             if not gArgs.animatediff_args.needApplyAnimateDiff:
                 gArgs.cn_args[i].image = {
-                    "image": convertIntoCNImageFromat(image),
-                    "mask": convertIntoCNImageFromat(mask.resize(image.size)),
+                    "image": convertIntoCNImageFormat(image),
+                    "mask": convertIntoCNImageFormat(mask.resize(image.size)),
                 }
             else:
                 from scripts.enums import InputMode

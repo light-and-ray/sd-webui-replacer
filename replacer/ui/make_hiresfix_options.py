@@ -61,7 +61,7 @@ def makeHiresFixOptions(comp: AttrDict):
                         choices=[x.name for x in shared.sd_upscalers],
                         label="Above limit upscaler",
                     )
-                
+
                 with gr.Row():
                     comp.hf_extra_mask_expand = gr.Slider(
                         label='Extra mask expand',
@@ -75,7 +75,7 @@ def makeHiresFixOptions(comp: AttrDict):
                     comp.hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
                         value=250, elem_id="replacer_hf_extra_inpaint_padding",
                         minimum=0, maximum=3000, step=1)
-                    
+
                     comp.hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
                         value=2, elem_id="replacer_hf_extra_mask_blur",
                         minimum=0, maximum=150, step=1)
@@ -145,12 +145,12 @@ def makeHiresFixOptions(comp: AttrDict):
                     )
 
                 with gr.Row():
-                    comp.hf_positvePrompt = gr.Textbox(label="Override positive prompt",
+                    comp.hf_positivePrompt = gr.Textbox(label="Override positive prompt",
                             show_label=True,
                             lines=1,
-                            elem_classes=["positvePrompt"],
+                            elem_classes=["positivePrompt"],
                             placeholder='leave empty to use the same prompt',
-                            elem_id="replacer_hf_positvePrompt")
+                            elem_id="replacer_hf_positivePrompt")
 
                     comp.hf_negativePrompt = gr.Textbox(label="Override negative prompt",
                             show_label=True,
@@ -165,7 +165,7 @@ def makeHiresFixOptions(comp: AttrDict):
                         choices=getHiresFixCheckpoints(), value="Use same checkpoint")
                     create_refresh_button(comp.hf_sd_model_checkpoint, modules.sd_models.list_models,
                         lambda: {"choices": getHiresFixCheckpoints()}, "replacer_hf_sd_model_checkpoint")
-                    
+
                     comp.hf_disable_cn = gr.Checkbox(
                         label='Disable ControlNet while hires fix',
                         value=True,
@@ -173,7 +173,7 @@ def makeHiresFixOptions(comp: AttrDict):
                     )
                     if not replacer_extensions.controlnet.SCRIPT:
                         comp.hf_disable_cn.visible = False
-                
+
                 with gr.Row():
                     comp.hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
                         choices=['Same', 'Enable', 'Disable'],

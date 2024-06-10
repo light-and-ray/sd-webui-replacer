@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from modules import devices
 from replacer.extensions import replacer_extensions
 from replacer.generation_args import GenerationArgs
-from replacer.options import needAutoUnloadModels, EXT_NAME, useCpuForDetection, useFastDilation
-from replacer.tools import areImagesTheSame, limitImageByOneDemention, fastMaskDilate, applyRotationFix, removeRotationFix
+from replacer.options import EXT_NAME, useCpuForDetection, useFastDilation
+from replacer.tools import areImagesTheSame, limitImageByOneDimension, fastMaskDilate, applyRotationFix, removeRotationFix
 sam_predict = None
 update_mask = None
 clear_cache = None
@@ -64,7 +64,7 @@ class MasksCreator:
                 areImagesTheSame(self.custom_mask, masksCreatorCached.custom_mask):
             self.previews = masksCreatorCached.previews
             self.masks = masksCreatorCached.masks
-            self.cutted = masksCreatorCached.cutted
+            self.cut = masksCreatorCached.cut
             self.boxes = masksCreatorCached.boxes
             print('MasksCreator restored from cache')
         else:
@@ -89,10 +89,10 @@ class MasksCreator:
         initSamDependencies()
         self.previews = []
         self.masks = []
-        self.cutted = []
+        self.cut = []
         self.boxes = []
 
-        imageResized = limitImageByOneDemention(self.image, self.maxResolutionOnDetection)
+        imageResized = limitImageByOneDimension(self.image, self.maxResolutionOnDetection)
         imageResized = applyRotationFix(imageResized, self.rotation_fix)
         if self.avoidance_mask is None:
             customAvoidanceMaskResized = None
@@ -125,7 +125,7 @@ class MasksCreator:
 
             self.previews.append(expanded[0])
             self.masks.append(expanded[1])
-            self.cutted.append(expanded[2])
+            self.cut.append(expanded[2])
 
         if self.avoidancePrompt != "":
             detectedAvoidanceMasks, samLog = sam_predict(self.samModel, imageResized, [], [], True,
@@ -157,20 +157,20 @@ class MasksCreator:
                 self.masks[i] = ImageOps.invert(maskTmp)
                 self.previews[i].paste(imageResized, avoidanceMasks[i])
                 transparent = Image.new('RGBA', imageResized.size, (255, 0, 0, 0))
-                self.cutted[i].paste(transparent, avoidanceMasks[i])
+                self.cut[i].paste(transparent, avoidanceMasks[i])
 
         if self.custom_mask is not None:
             self.custom_mask = applyRotationFix(self.custom_mask, self.rotation_fix)
             for i in range(len(self.masks)):
                 whiteFilling = Image.new('L', self.masks[i].size, 255)
                 self.masks[i].paste(whiteFilling, self.custom_mask.resize(self.masks[i].size))
-        
+
         for i in range(len(self.masks)):
             self.masks[i] = removeRotationFix(self.masks[i], self.rotation_fix)
         for i in range(len(self.previews)):
             self.previews[i] = removeRotationFix(self.previews[i], self.rotation_fix)
-        for i in range(len(self.cutted)):
-            self.cutted[i] = removeRotationFix(self.cutted[i], self.rotation_fix)
+        for i in range(len(self.cut)):
+            self.cut[i] = removeRotationFix(self.cut[i], self.rotation_fix)
         for i in range(len(self.boxes)):
             self.boxes[i] = removeRotationFix(self.boxes[i], self.rotation_fix)
 
@@ -180,13 +180,13 @@ class MasksCreator:
 class MaskResult:
     mask: Image.Image
     maskPreview: Image.Image
-    maskCutted: Image.Image
+    maskCut: Image.Image
     maskBox: Image.Image
 
 
 def createMask(image: Image.Image, gArgs: GenerationArgs) -> MaskResult:
     maskPreview = None
-    maskCutted = None
+    maskCut = None
     maskBox = None
 
     if gArgs.do_not_use_mask:
@@ -211,9 +211,9 @@ def createMask(image: Image.Image, gArgs: GenerationArgs) -> MaskResult:
             gArgs.mask_num_for_metadata = maskNum + 1
 
             maskPreview = masksCreator.previews[maskNum]
-            maskCutted = masksCreator.cutted[maskNum]
+            maskCut = masksCreator.cut[maskNum]
             maskBox = masksCreator.boxes[maskNum]
         else:
             mask = gArgs.custom_mask
-    
-    return MaskResult(mask, maskPreview, maskCutted, maskBox)
+
+    return MaskResult(mask, maskPreview, maskCut, maskBox)

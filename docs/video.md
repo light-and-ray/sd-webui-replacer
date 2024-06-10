@@ -3,7 +3,7 @@
 ## Common
 ![](/docs/images/replacer_video_common.jpg)
 
-You need to provide a path to your video file, or url in `file://` format. On Windows you need to make right mouse click on your file with Alt key holded, and then select "copy file as path"
+You need to provide a path to your video file, or url in `file://` format. On Windows you need to make right mouse click on your file with Alt key holden, and then select "copy file as path"
 
 ## AnimateDiff mode
 ![](/docs/images/replacer_video_animate_diff.jpg)
@@ -15,16 +15,16 @@ Due to high AnimateDiff's consistency in comparison with *"Frame by frame"* mode
 
 Hires fix doesn't work here, and as I think, it basically can't, because it will decrease the consistency. But you can use the "upscaler for img2img" option - these upscalers work and consistent enough.
 
-To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use `Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recomment make `Fragment length` few times more then `Context batch size`
+To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use `Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recommend make `Fragment length` few times more then `Context batch size`
 
-`Context batch size` is set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemort error, decrease it
+`Context batch size` is set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemory error, decrease it
 
 If you know any other good advice, please send them into github issues, I can place them here
 
 ### AnimateDiff options
-1. **Number of frames** (*Fragment length, frames* inside Replacer) — Choose whatever number you like. 
+1. **Number of frames** (*Fragment length, frames* inside Replacer) — Choose whatever number you like.
 
-    If you enter something smaller than your `Context batch size` other than 0: you will get the first `Number of frames` frames as your output fragment from your whole generation. 
+    If you enter something smaller than your `Context batch size` other than 0: you will get the first `Number of frames` frames as your output fragment from your whole generation.
 1. **FPS** (*Internal AD FPS* inside Replacer)— Frames per second, which is how many frames (images) are shown every second. If 16 frames are generated at 8 frames per second, your fragment’s duration is 2 seconds.
 
 1. **Context batch size** — How many frames will be passed into the motion module at once. The SD1.5 motion modules are trained with 16 frames, so it’ll give the best results when the number of frames is set to `16`. SDXL HotShotXL motion modules are trained with 8 frames instead. Choose [1, 24] for V1 / HotShotXL motion modules and [1, 32] for V2 / AnimateDiffXL motion modules.
@@ -55,7 +55,7 @@ To increase consistency, it's better to inpaint clear objects on video with good
 
 To suppress flickering you can generate in little fps (e.g. 10), then interpolate (x2) it with ai interpolation algorithm (e.g [RIFE](https://github.com/megvii-research/ECCV2022-RIFE) or [frame interpolation in deforum sd-webui extension](https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))
 
-You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) extensions to increase consistency, if it fits to your scenario
+You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or [lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denoising) extensions to increase consistency, if it fits to your scenario
 
 Also a good can be to use `Pass the previous frame into ControlNet` with _IP-Adapter_, _Reference_, _Shuffle_, _T2IA-Color_, _T2IA-Style_
 

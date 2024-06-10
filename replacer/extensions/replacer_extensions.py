@@ -14,12 +14,12 @@ from replacer.extensions import animatediff
 def initAllScripts():
     scripts.scripts_img2img.initialize_scripts(is_img2img=True)
     controlnet.initCNScript()
-    inpaint_difference.initInpaintDiffirence()
+    inpaint_difference.initInpaintDifference()
     soft_inpainting.initSoftInpaintScript()
     background_extensions.initAllBackgroundExtensions()
     animatediff.initAnimateDiffScript()
 
-def restoreTemporartChangedThigs():
+def restoreTemporaryChangedThings():
     controlnet.restoreCNContext()
 
 def reinitAllScriptsAfterUICreated(*args): # for args_to and args_from
@@ -45,7 +45,7 @@ def prepareScriptsArgs(scripts_args):
         lastIndex += argsLen
     else:
         result.append([])
-    
+
     return result
 
 
@@ -53,32 +53,32 @@ def applyScripts(p, gArgs: GenerationArgs):
     needControlNet = controlnet.SCRIPT is not None and gArgs.cn_args is not None and len(gArgs.cn_args) != 0
     needSoftInpaint = soft_inpainting.SCRIPT is not None and gArgs.soft_inpaint_args is not None and len(gArgs.soft_inpaint_args) != 0
 
-    avaliableScripts = []
+    availableScripts = []
     if needControlNet:
-        avaliableScripts.append(controlnet.SCRIPT)
+        availableScripts.append(controlnet.SCRIPT)
     if needSoftInpaint :
-        avaliableScripts.append(soft_inpainting.SCRIPT)
+        availableScripts.append(soft_inpainting.SCRIPT)
     if animatediff.SCRIPT is not None:
-        avaliableScripts.append(animatediff.SCRIPT)
+        availableScripts.append(animatediff.SCRIPT)
 
-    if len(avaliableScripts) == 0:
+    if len(availableScripts) == 0:
         return
 
-    allArgsLen = max(x.args_to for x in avaliableScripts)
+    allArgsLen = max(x.args_to for x in availableScripts)
 
     p.scripts = copy.copy(scripts.scripts_img2img)
-    p.scripts.alwayson_scripts = avaliableScripts
+    p.scripts.alwayson_scripts = availableScripts
     p.scripts.alwayson_scripts.extend(background_extensions.SCRIPTS)
     p.script_args = [None] * allArgsLen
 
     if needControlNet:
         for i in range(len(gArgs.cn_args)):
             p.script_args[controlnet.SCRIPT.args_from + i] = gArgs.cn_args[i]
-    
+
     if needSoftInpaint:
         for i in range(len(gArgs.soft_inpaint_args)):
             p.script_args[soft_inpainting.SCRIPT.args_from + i] = gArgs.soft_inpaint_args[i]
-    
+
     if animatediff.SCRIPT is not None:
         animatediff.apply(p, gArgs.animatediff_args)
 
@@ -98,7 +98,7 @@ def prepareScriptsArgs_api(scriptsApi : dict):
     return [cn_args, soft_inpaint_args]
 
 
-def getAvaliableScripts_api():
+def getAvailableScripts_api():
     result = []
     if controlnet.SCRIPT:
         result.append(controlnet.SCRIPT.name)

@@ -2,12 +2,12 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, 
+    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions,
 )
 from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_tab_ui
 from replacer.tools import getReplacerFooter
-from replacer.ui.tools_ui import watchOuputPanel, watchSetCustomScriptSourceForComponents
+from replacer.ui.tools_ui import watchOutputPanel, watchSetCustomScriptSourceForComponents
 from replacer.extensions import replacer_extensions
 
 
@@ -41,7 +41,7 @@ def mountDedicatedPage(demo, app):
             footer = getReplacerFooter()
             gr.HTML(footer, elem_id="footer")
 
-        loadsave = copy.copy(demo.ui_loadsave)  
+        loadsave = copy.copy(demo.ui_loadsave)
         loadsave.finalized_ui = False
         loadsave.add_block(replacerUi, EXT_NAME)
         loadsave.dump_defaults()
@@ -78,7 +78,7 @@ if needHideAnimateDiffAccordions():
 script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)
 script_callbacks.on_after_component(replacer_extensions.controlnet.watchControlNetUI)
 script_callbacks.on_after_component(replacer_extensions.soft_inpainting.watchSoftInpaintUI)
-script_callbacks.on_after_component(watchOuputPanel)
+script_callbacks.on_after_component(watchOutputPanel)
 script_callbacks.on_after_component(watchSetCustomScriptSourceForComponents)
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_after_component(replacer_extensions.image_comparison.addButtonIntoComparisonTab)

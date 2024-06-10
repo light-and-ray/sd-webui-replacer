@@ -14,10 +14,10 @@ def makeVideoUI(comp: AttrDict):
         comp.video_output_dir = gr.Textbox(
             label="Output directory",
             placeholder="Leave blank to save images to the default path.",
-            info='(default is the same directory with input video. Rusult is in "out_seed_timestamp" subdirectory)',
+            info='(default is the same directory with input video. Result is in "out_seed_timestamp" subdirectory)',
             elem_id="replacer_video_output_dir")
         comp.target_video_fps = gr.Slider(
-            label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0, 
+            label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0,
             info="(0 = fps from input video)",
             elem_id="replacer_video_fps")
 
@@ -42,10 +42,10 @@ def makeVideoUI(comp: AttrDict):
                     comp.ad_internal_fps = gr.Number(
                         value=0, precision=0, info="Set 0 to use the same with input video",
                         minimum=0,
-                        label="Internal AD FPS", 
+                        label="Internal AD FPS",
                         elem_id="replacer_ad_internal_fps"
                     )
-                
+
                 with gr.Row():
                     comp.ad_batch_size = gr.Slider(
                         minimum=1, maximum=32, value=12,
@@ -108,16 +108,16 @@ def makeVideoUI(comp: AttrDict):
                         comp.ad_force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
 
                     with gr.Row():
-                        moutionModels = replacer_extensions.animatediff.getModels()
+                        motionModels = replacer_extensions.animatediff.getModels()
                         default = "mm_sd15_v3.safetensors"
-                        if default not in moutionModels:
-                            default = moutionModels[0]
-                        comp.ad_moution_model = gr.Dropdown(
-                            choices=moutionModels,
+                        if default not in motionModels:
+                            default = motionModels[0]
+                        comp.ad_motion_model = gr.Dropdown(
+                            choices=motionModels,
                             value=default,
                             label="Motion module",
                             type="value",
-                            elem_id="replacer_ad_moution_model",
+                            elem_id="replacer_ad_motion_model",
                         )
 
                 with gr.Accordion("Help", open=False):
@@ -133,11 +133,11 @@ def makeVideoUI(comp: AttrDict):
                         "upscalers work and consistent enough.\n\n"
                         \
                         "To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use "
-                        "`Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recomment make "
+                        "`Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recommend make "
                         "`Fragment length` few times more then `Context batch size`\n\n"
                         \
                         "`Context batch size` is set up for 12GB VRAM with one additional "
-                        "ControlNet unit. If you get OutOfMemort error, decrease it\n\n"
+                        "ControlNet unit. If you get OutOfMemory error, decrease it\n\n"
                         \
                         "Read [here](https://github.com/light-and-ray/sd-webui-replacer/blob/master/docs/video.md#animatediff-options) "
                         "about AnimateDiff options\n\n"
@@ -166,7 +166,7 @@ def makeVideoUI(comp: AttrDict):
                         "https://github.com/deforum-art/sd-webui-deforum/wiki/Upscaling-and-Frame-Interpolation))\n\n"\
                         \
                         "You can also use [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) or "\
-                        "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denosing) "\
+                        "[lama-cleaner](https://github.com/light-and-ray/sd-webui-lama-cleaner-masked-content) with (low denoising) "\
                         "extensions to increase consistency, if it fits to your scenario\n\n"\
                         \
                         "Also a good can be to use `Pass the previous frame into ControlNet` "\

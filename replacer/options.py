@@ -85,7 +85,7 @@ avoidancePromptExamples_defaults = [
             "clothes",
         ]
 
-positvePromptExamples_defaults = [
+positivePromptExamples_defaults = [
             "waterfall",
             "photo of blonde girl",
             "photo of girl with red t-shirt",
@@ -110,21 +110,21 @@ def getDetectionPromptExamples():
         return detectionPromptExamples_defaults
     else:
         return res.split("\n")
-    
+
 def getAvoidancePromptExamples():
     res : str = shared.opts.data.get(EXT_NAME_LOWER + "_avoidance_prompt_examples", "")
     if res == "":
         return avoidancePromptExamples_defaults
     else:
         return res.split("\n")
-    
+
 def getPositivePromptExamples():
     res : str = shared.opts.data.get(EXT_NAME_LOWER + "_positive_prompt_examples", "")
     if res == "":
-        return positvePromptExamples_defaults
+        return positivePromptExamples_defaults
     else:
         return res.split("\n")
-    
+
 def getNegativePromptExamples():
     res : str = shared.opts.data.get(EXT_NAME_LOWER + "_negative_prompt_examples", "")
     if res == "":
@@ -190,7 +190,7 @@ preloaded_options = {
         "Defaults for Extra include in gallery",
         gr.CheckboxGroup,
         {
-            'choices' : ["mask", "box", "cutted", "preview", "script"],
+            'choices' : ["mask", "box", "cut", "preview", "script"],
         },
         section=section,
     ).needs_reload_ui(),
@@ -205,7 +205,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_first_positive_prompt_from_examples",
         shared.OptionInfo(
             True,
-            "Use first positive pormpt form examples, if field is empty",
+            "Use first positive prompt form examples, if field is empty",
             gr.Checkbox,
             section=section,
         ).needs_reload_ui()
@@ -215,7 +215,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_first_negative_prompt_from_examples",
         shared.OptionInfo(
             True,
-            "Use first negative pormpt form examples, if field is empty",
+            "Use first negative prompt form examples, if field is empty",
             gr.Checkbox,
             section=section,
         ).needs_reload_ui()
@@ -262,7 +262,7 @@ def on_ui_settings():
                 'choices' : ['Automatic', 'Enabled', 'Only SDXL', 'Disabled'],
             },
             section=section,
-        ).info("Significally increases detection time but reduces vram usage. "\
+        ).info("Significantly increases detection time but reduces vram usage. "\
                "Automatic means enable only for --lowvram and --medvram mode. "\
             )
     )
@@ -272,7 +272,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_use_cpu_for_detection",
         shared.OptionInfo(
             False,
-            "Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enought vram",
+            "Use CPU for detection (SAM + Dino). For AMD Radeon and Intel ARC or if you don't have enough vram",
             gr.Checkbox,
             section=section,
         ).needs_restart()
@@ -338,7 +338,7 @@ def on_ui_settings():
             gr.Textbox,
             {
                 "lines" : 2,
-                "placeholder" : "\n".join(positvePromptExamples_defaults),
+                "placeholder" : "\n".join(positivePromptExamples_defaults),
             },
             section=section,
         ).needs_reload_ui()

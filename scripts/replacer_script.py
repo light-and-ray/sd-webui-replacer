@@ -53,13 +53,13 @@ class ReplacerScript(scripts.Script):
                     value=True, elem_id=f"replacer_{tabName}_force_override_sd_model",
                     info='Be sure you use inpainting model here')
                 force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
-        
+
         comp = replacer_tab_ui.replacerMainUI.components
-        
+
         main_tab_inputs = [
             comp.detectionPrompt,
             comp.avoidancePrompt,
-            comp.positvePrompt,
+            comp.positivePrompt,
             comp.negativePrompt,
             comp.upscaler_for_img2img,
             comp.seed,
@@ -112,7 +112,7 @@ class ReplacerScript(scripts.Script):
             comp.hf_unload_detection_models,
             comp.hf_disable_cn,
             comp.hf_extra_mask_expand,
-            comp.hf_positvePrompt,
+            comp.hf_positivePrompt,
             comp.hf_negativePrompt,
             comp.hf_sd_model_checkpoint,
             comp.hf_extra_inpaint_padding,
@@ -145,7 +145,7 @@ class ReplacerScript(scripts.Script):
 
         detectionPrompt,
         avoidancePrompt,
-        positvePrompt,
+        positivePrompt,
         negativePrompt,
         upscaler_for_img2img,
         seed,
@@ -198,14 +198,14 @@ class ReplacerScript(scripts.Script):
         hf_unload_detection_models,
         hf_disable_cn,
         hf_extra_mask_expand,
-        hf_positvePrompt,
+        hf_positivePrompt,
         hf_negativePrompt,
         hf_sd_model_checkpoint,
         hf_extra_inpaint_padding,
         hf_extra_mask_blur,
         hf_randomize_seed,
         hf_soft_inpaint,
-        
+
         *scripts_args,
     ):
         self.enable = enable
@@ -216,7 +216,7 @@ class ReplacerScript(scripts.Script):
         self.save_samples = getattr(p, 'save_samples', lambda: True)()
         if not save_originals:
             p.do_not_save_samples = True
-        
+
         self.save_originals = save_originals
         self.extra_includes = extra_includes
         self.force_override_sd_model = force_override_sd_model
@@ -239,7 +239,7 @@ class ReplacerScript(scripts.Script):
             unload_detection_models = hf_unload_detection_models,
             disable_cn = hf_disable_cn,
             extra_mask_expand = hf_extra_mask_expand,
-            positve_prompt = hf_positvePrompt,
+            positive_prompt = hf_positivePrompt,
             negative_prompt = hf_negativePrompt,
             sd_model_checkpoint = hf_sd_model_checkpoint,
             extra_inpaint_padding = hf_extra_inpaint_padding,
@@ -249,7 +249,7 @@ class ReplacerScript(scripts.Script):
         )
 
         self.gArgs = GenerationArgs(
-            positvePrompt=positvePrompt,
+            positivePrompt=positivePrompt,
             negativePrompt=negativePrompt,
             detectionPrompt=detectionPrompt,
             avoidancePrompt=avoidancePrompt,
@@ -260,7 +260,7 @@ class ReplacerScript(scripts.Script):
             boxThreshold=box_threshold,
             maskExpand=mask_expand,
             maxResolutionOnDetection=max_resolution_on_detection,
-            
+
             steps=steps,
             sampler_name=sampler,
             scheduler=scheduler,

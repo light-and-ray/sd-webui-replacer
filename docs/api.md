@@ -1,7 +1,7 @@
 
 
 ### API
-API is avaliable on `/replacer/replace`
+API is available on `/replacer/replace`
 
 ```python
     input_image: str = "base64 image"
@@ -48,7 +48,7 @@ API is avaliable on `/replacer/replace`
     hf_unload_detection_models: bool = True
     hf_disable_cn: bool = True
     hf_extra_mask_expand: int = 5
-    hf_positve_prompt: str = ""
+    hf_positive_prompt: str = ""
     hf_negative_prompt: str = ""
     hf_sd_model_checkpoint: str = "Use same checkpoint"
     hf_extra_inpaint_padding: int = 250
@@ -59,7 +59,7 @@ API is avaliable on `/replacer/replace`
     scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```
 
-Avaliable options on `/replacer/avaliable_options`
+Available options on `/replacer/available_options`
 
 http://127.0.0.1:7860/docs#/default/api_replacer_replace_replacer_replace_post
 

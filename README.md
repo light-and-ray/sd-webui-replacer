@@ -10,16 +10,16 @@ You also can draw your mask instead of or in addition to detection, and take adv
 > If you find this project useful, please star it on GitHub!
 
 ## Installation
-1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extension. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Avaliable` -> click `Load from` and search _"sd-webui-segment-anything"_
+1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extension. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Available` -> click `Load from` and search _"sd-webui-segment-anything"_
 2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
 3. For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`. Or if you have already lcm lora, then change hires suffix in the extension options
-4. Install this extension. Go to tab `Extension` -> `Available` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.5.0. For AMD and Intel GPUs, and maby something else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
+4. Install this extension. Go to tab `Extension` -> `Available` -> click `Load from` and search _"Replacer"_. Be sure your sd-webui version is >= 1.5.0. For AMD and Intel GPUs, and maybe something else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
 5. Reload UI
 
 If you don't want to use Video feature, that's all for you. Further steps are for Video:
 
 1. Install [sd-webui-animatediff](https://github.com/continue-revolution/sd-webui-animatediff) and [sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet) extensions. You should also use `Extension` -> `Available` tab and find them there
-2. Download [mm_sd15_v3.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/motion_module/mm_sd15_v3.safetensors) animatediff's moution model, and put it into `extensions/sd-webui-animatediff/model` directory
+2. Download [mm_sd15_v3.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/motion_module/mm_sd15_v3.safetensors) animatediff's motion model, and put it into `extensions/sd-webui-animatediff/model` directory
 3. Download [control_v11p_sd15_inpaint_fp16.safetensors](https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_inpaint_fp16.safetensors) controlnet's model and put it into `models/ControlNet` directory
 4. I strongly recommend you to download [mm_sd15_v3_sparsectrl_rgb.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_rgb.safetensors) and [mm_sd15_v3_sparsectrl_scribble.safetensors](https://huggingface.co/conrevo/AnimateDiff-A1111/resolve/main/control/mm_sd15_v3_sparsectrl_scribble.safetensors) controlnet's models. Put them also into `models/ControlNet` directory. Then you can select SparseCtrl module in ControlNet extension. The rgb one requires "none" preprocessor
 
@@ -96,10 +96,10 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 - ☑️ control net
 - ☑️ pass previous frame into ControlNet for video
 - tiled vae
-- ☑️ "hide segment anything extention" option
+- ☑️ "hide segment anything extension" option
 - ☑️ txt2img script
 - more video and mask input types
-- RIFE frames inperpolation
+- RIFE frames interpolation
 - allow multiply instances (presets)
 
 ### small todo:

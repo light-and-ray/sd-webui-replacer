@@ -43,7 +43,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         maximum=150,
                         elem_id="replacer_steps"
                     )
-                
+
                 with gr.Row():
                     comp.cfg_scale = gr.Slider(label='CFG Scale',
                         value=5.5, elem_id="replacer_cfg_scale",
@@ -91,7 +91,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         elem_id="replacer_reuse_seed",
                         label='Reuse seed'
                     )
-                
+
                 with gr.Row():
                     comp.rotation_fix = gr.Radio(label='Rotation fix',
                         choices=['-', '⟲', '⟳', '🗘'],
@@ -139,7 +139,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     comp.sam_refresh_models.click(refresh_sam_models, comp.sam_model_name, comp.sam_model_name)
 
                     comp.dino_model_name = gr.Dropdown(label="GroundingDINO Model", choices=dino_model_list, value=dino_model_list[0])
-                
+
                 with gr.Row():
                     comp.mask_num = gr.Radio(label='Mask num',
                         choices=['Random', '1', '2', '3'],
@@ -169,7 +169,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    if replacer_extensions.background_extensions.lamaCleanerAvaliable():
+                    if replacer_extensions.background_extensions.lamaCleanerAvailable():
                         comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
                     else:
                         comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
@@ -192,7 +192,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                                 comp.soft_inpaint_inputs = list(replacer_extensions.soft_inpainting.SCRIPT.ui(True))
                                 replacer_extensions.soft_inpainting.needWatchSoftInpaintUI = False
                                 from modules.ui_components import InputAccordion
-                                new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replaer_soft_inpainting_enabled")
+                                new_soft_inpaint_accordion = InputAccordion(False, label="Soft inpainting", elem_id="replacer_soft_inpainting_enabled")
                                 new_soft_inpaint_accordion.accordion.children = comp.soft_inpaint_inputs[0].accordion.children
                                 for child in new_soft_inpaint_accordion.accordion.children:
                                     child.parent = new_soft_inpaint_accordion.accordion
@@ -244,7 +244,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     )
                     if IS_WEBUI_1_5:
                         comp.avoid_mask_brush_color.visible = False
-            
+
             with gr.Tab('Custom mask'):
                 with gr.Row():
                     comp.only_custom_mask = gr.Checkbox(label='Do not use detection prompt if use custom mask',

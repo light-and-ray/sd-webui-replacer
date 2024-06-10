@@ -5,7 +5,7 @@ from modules.api.api import encode_pil_to_base64, decode_base64_to_image
 from replacer.options import ( EXT_NAME, getDetectionPromptExamples, getNegativePromptExamples,
     getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
 )
-from replacer.tools import limitImageByOneDemention, generateSeed
+from replacer.tools import limitImageByOneDimension, generateSeed
 from replacer.generation_args import GenerationArgs
 
 
@@ -40,7 +40,7 @@ def get_current_image(image, isAvoid, needLimit, maxResolutionOnDetection):
         return
     if needLimit:
         image = decode_base64_to_image(image)
-        image = limitImageByOneDemention(image, maxResolutionOnDetection)
+        image = limitImageByOneDimension(image, maxResolutionOnDetection)
         image = 'data:image/png;base64,' + encode_pil_to_base64(image).decode()
     return gr.Image.update(image)
 
@@ -52,7 +52,7 @@ def unloadModels():
     clear_cache()
     mem_stats = {k: -(v//-(1024*1024)) for k, v in shared.mem_mon.stop().items()}
     memAfter = mem_stats['reserved']
-    
+
     text = f'[{EXT_NAME}] {(memBefore - memAfter) / 1024 :.2f} GB of VRAM were freed'
     print(text, flush=True)
     if not IS_WEBUI_1_5:
@@ -85,29 +85,29 @@ def sendBackToReplacer(gallery, gallery_index):
 
 
 
-class OuputPanelWatcher():
+class OutputPanelWatcher():
     send_to_img2img = None
     send_to_inpaint = None
     send_to_extras = None
     send_back_to_replacer = None
 
 
-def watchOuputPanel(component, **kwargs):
+def watchOutputPanel(component, **kwargs):
     elem_id = kwargs.get('elem_id', None)
     if elem_id is None:
         return
 
     if elem_id == 'replacer_send_to_img2img' or elem_id == 'img2img_tab':
-        OuputPanelWatcher.send_to_img2img = component
+        OutputPanelWatcher.send_to_img2img = component
 
     if elem_id == 'replacer_send_to_inpaint' or elem_id == 'inpaint_tab':
-        OuputPanelWatcher.send_to_inpaint = component
+        OutputPanelWatcher.send_to_inpaint = component
 
     if elem_id == 'replacer_send_to_extras' or elem_id == 'extras_tab':
-        OuputPanelWatcher.send_to_extras = component
-        OuputPanelWatcher.send_back_to_replacer = ToolButton('↙️',
+        OutputPanelWatcher.send_to_extras = component
+        OutputPanelWatcher.send_back_to_replacer = ToolButton('↙️',
             elem_id=f'replacer_send_back_to_replacer',
-            tooltip="Send image back to Replcer's input",
+            tooltip="Send image back to Replacer's input",
             visible=elem_id=='replacer_send_to_extras')
 
 
@@ -126,8 +126,8 @@ def prepareExpectedUIBehavior(gArgs: GenerationArgs):
     if gArgs.detectionPrompt == '':
         gArgs.detectionPrompt = getDetectionPromptExamples()[0]
 
-    if gArgs.positvePrompt == '' and useFirstPositivePromptFromExamples():
-        gArgs.positvePrompt = getPositivePromptExamples()[0]
+    if gArgs.positivePrompt == '' and useFirstPositivePromptFromExamples():
+        gArgs.positivePrompt = getPositivePromptExamples()[0]
 
     if gArgs.negativePrompt == '' and useFirstNegativePromptFromExamples():
         gArgs.negativePrompt = getNegativePromptExamples()[0]
@@ -152,10 +152,10 @@ def _setCustomScriptSourceForComponents(text: str):
 class OverrideCustomScriptSource:
     def __init__(self, text):
         self.text = text
-    
+
     def __enter__(self):
         _setCustomScriptSourceForComponents(self.text)
-    
+
     def __exit__(self, *args):
         _setCustomScriptSourceForComponents(None)
 

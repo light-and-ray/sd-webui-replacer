@@ -48,7 +48,7 @@ def areImagesTheSame(image_one, image_two):
         return True
 
 
-def limiSizeByOneDemention(size: tuple, limit: int) -> tuple:
+def limitSizeByOneDimension(size: tuple, limit: int) -> tuple:
     w, h = size
     if h > w:
         if h > limit:
@@ -62,10 +62,10 @@ def limiSizeByOneDemention(size: tuple, limit: int) -> tuple:
     return (int(w), int(h))
 
 
-def limitImageByOneDemention(image: Image.Image, limit: int) -> Image.Image:
+def limitImageByOneDimension(image: Image.Image, limit: int) -> Image.Image:
     if image is None:
         return None
-    return image.resize(limiSizeByOneDemention(image.size, limit))
+    return image.resize(limitSizeByOneDimension(image.size, limit))
 
 
 def fastMaskDilate_(mask, dilation_amount):
@@ -228,7 +228,7 @@ class Pause:
         print(text)
         if Pause.paused:
             shared.state.textinfo = "will be paused"
-    
+
     @staticmethod
     def wait():
         if not Pause.paused:

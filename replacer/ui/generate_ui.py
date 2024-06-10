@@ -3,7 +3,7 @@ from PIL import Image
 import modules.shared as shared
 from modules.ui import plaintext_to_html
 from replacer.generation_args import GenerationArgs, HiresFixArgs, HiresFixCacheData, AnimateDiffArgs
-from replacer.video_tools import getVideoFrames, save_video, overriveSettingsForVideo
+from replacer.video_tools import getVideoFrames, save_video, overrideSettingsForVideo
 from replacer.options import getSaveDir
 from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask, generateSeed, convertIntoPath
@@ -27,7 +27,7 @@ def generate_ui_(
     selected_input_mode: str,
     detectionPrompt: str,
     avoidancePrompt: str,
-    positvePrompt: str,
+    positivePrompt: str,
     negativePrompt: str,
     image_single,
     image_batch,
@@ -92,7 +92,7 @@ def generate_ui_(
     ad_control_weight,
     ad_force_override_sd_model,
     ad_force_sd_model_checkpoint,
-    ad_moution_model,
+    ad_motion_model,
 
     hf_upscaler,
     hf_steps,
@@ -106,7 +106,7 @@ def generate_ui_(
     hf_unload_detection_models,
     hf_disable_cn,
     hf_extra_mask_expand,
-    hf_positve_prompt,
+    hf_positive_prompt,
     hf_negative_prompt,
     hf_sd_model_checkpoint,
     hf_extra_inpaint_padding,
@@ -204,7 +204,7 @@ def generate_ui_(
         unload_detection_models = hf_unload_detection_models,
         disable_cn = hf_disable_cn,
         extra_mask_expand = hf_extra_mask_expand,
-        positve_prompt = hf_positve_prompt,
+        positive_prompt = hf_positive_prompt,
         negative_prompt = hf_negative_prompt,
         sd_model_checkpoint = hf_sd_model_checkpoint,
         extra_inpaint_padding = hf_extra_inpaint_padding,
@@ -226,11 +226,11 @@ def generate_ui_(
         control_weight=ad_control_weight,
         force_override_sd_model=ad_force_override_sd_model,
         force_sd_model_checkpoint=ad_force_sd_model_checkpoint,
-        moution_model=ad_moution_model,
+        motion_model=ad_motion_model,
     )
 
     gArgs = GenerationArgs(
-        positvePrompt=positvePrompt,
+        positivePrompt=positivePrompt,
         negativePrompt=negativePrompt,
         detectionPrompt=detectionPrompt,
         avoidancePrompt=avoidancePrompt,
@@ -241,7 +241,7 @@ def generate_ui_(
         boxThreshold=box_threshold,
         maskExpand=mask_expand,
         maxResolutionOnDetection=max_resolution_on_detection,
-        
+
         steps=steps,
         sampler_name=sampler,
         scheduler=scheduler,
@@ -337,7 +337,7 @@ def generate_ui_(
 def generate_ui(*args, **kwargs):
     restoreList = []
     try:
-        restoreList.append(overriveSettingsForVideo())
+        restoreList.append(overrideSettingsForVideo())
         return generate_ui_(*args, **kwargs)
     finally:
         for f in restoreList:

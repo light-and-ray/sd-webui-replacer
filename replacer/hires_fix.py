@@ -34,9 +34,9 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     if hf.soft_inpaint != 'Same' and hrGArgs.soft_inpaint_args is not None and len(hrGArgs.soft_inpaint_args) != 0:
         hrGArgs.soft_inpaint_args = list(hrGArgs.soft_inpaint_args)
         hrGArgs.soft_inpaint_args[0] = hf.soft_inpaint == 'Enable'
-    if hf.positve_prompt != "":
-        hrGArgs.positvePrompt = hf.positve_prompt
-    hrGArgs.positvePrompt = hrGArgs.positvePrompt + " " + hf.positive_prompt_suffix
+    if hf.positive_prompt != "":
+        hrGArgs.positivePrompt = hf.positive_prompt
+    hrGArgs.positivePrompt = hrGArgs.positivePrompt + " " + hf.positive_prompt_suffix
     if hf.negative_prompt != "":
         hrGArgs.negativePrompt = hf.negative_prompt
     if hf.sd_model_checkpoint is not None and hf.sd_model_checkpoint != 'Use same model'\
@@ -49,13 +49,13 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
 
     if hf.unload_detection_models:
         clearCache()
-    
+
     hrGArgs.width, hrGArgs.height = image.size
     if hrGArgs.height > hf.size_limit:
         hrGArgs.height = hf.size_limit
     if hrGArgs.width > hf.size_limit:
         hrGArgs.width = hf.size_limit
-    
+
     hrGArgs.batch_count = 1
     hrGArgs.batch_size = 1
     hrGArgs.addHiresFixIntoMetadata = True

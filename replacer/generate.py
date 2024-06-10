@@ -12,9 +12,9 @@ from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
 
 
-class InterrupredDetection(Exception):
+class InterruptedDetection(Exception):
     def __init__(self):
-        super().__init__("InterrupredDetection")
+        super().__init__("InterruptedDetection")
 
 
 
@@ -28,7 +28,7 @@ def generateSingle(
     batch_processed : list,
 ):
     if interrupted():
-        raise InterrupredDetection()
+        raise InterruptedDetection()
 
     maskResult: MaskResult = createMask(image, gArgs)
     gArgs.mask = maskResult.mask
@@ -37,7 +37,7 @@ def generateSingle(
         clearCache()
 
     if interrupted():
-        raise InterrupredDetection()
+        raise InterruptedDetection()
 
     shared.state.assign_current_image(maskResult.maskPreview)
     shared.state.textinfo = "inpainting"
@@ -50,8 +50,8 @@ def generateSingle(
         extraImages.append(gArgs.mask)
     if "box" in extra_includes and maskResult.maskBox is not None:
         extraImages.append(maskResult.maskBox)
-    if "cutted" in extra_includes and maskResult.maskCutted is not None:
-        extraImages.append(maskResult.maskCutted)
+    if "cut" in extra_includes and maskResult.maskCut is not None:
+        extraImages.append(maskResult.maskCut)
     if "preview" in extra_includes and maskResult.maskPreview is not None:
         extraImages.append(maskResult.maskPreview)
     if "script" in extra_includes:
@@ -104,7 +104,7 @@ def generate(
 
         for idx, image in enumerate(gArgs.images):
             progressInfo = "generating mask"
-            if n > 1: 
+            if n > 1:
                 print(flush=True)
                 print()
                 print(f'    [{EXT_NAME}]    processing {idx+1}/{n}')
@@ -145,7 +145,7 @@ def generate(
                     processed.images[lenImagesBefore+i].appropriateInputImageData = AppropriateData(idx, gArgs.mask, gArgs.seed+i)
 
             except Exception as e:
-                if type(e) is InterrupredDetection:
+                if type(e) is InterruptedDetection:
                     break
                 print(f'    [{EXT_NAME}]    Exception: {e}')
                 if type(e) is not NothingDetectedError:
@@ -155,7 +155,7 @@ def generate(
                 if n == 1:
                     raise
                 if useSaveFormatForVideo:
-                    save_image(image, saveDir, "", gArgs.seed, gArgs.positvePrompt,
+                    save_image(image, saveDir, "", gArgs.seed, gArgs.positivePrompt,
                             opts.samples_format, save_to_dirs=False)
                 shared.state.nextjob()
                 continue

@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer.extensions import replacer_extensions
-from replacer.tools import addReplacerMetadata, limiSizeByOneDemention, applyRotationFix, removeRotationFix
+from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
@@ -27,7 +27,7 @@ def inpaint(
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
-    if replacer_extensions.background_extensions.lamaCleanerAvaliable():
+    if replacer_extensions.background_extensions.lamaCleanerAvailable():
         override_settings["upscaling_upscaler_for_lama_cleaner_masked_content"] = gArgs.lama_cleaner_upscaler
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
 
@@ -43,7 +43,7 @@ def inpaint(
         sd_model=shared.sd_model,
         outpath_samples=opts.outdir_samples or opts.outdir_img2img_samples,
         outpath_grids=opts.outdir_grids or opts.outdir_img2img_grids,
-        prompt=gArgs.positvePrompt,
+        prompt=gArgs.positivePrompt,
         negative_prompt=gArgs.negativePrompt,
         styles=[],
         sampler_name=gArgs.sampler_name,
@@ -71,7 +71,7 @@ def inpaint(
     if gArgs.do_not_use_mask and (not gArgs.upscalerForImg2Img or gArgs.upscalerForImg2Img == "None"):
         p.inpaint_full_res = False
         p.resize_mode = 2 # resize and fill
-        p.width, p.height = limiSizeByOneDemention(image.size, max(p.width, p.height))
+        p.width, p.height = limitSizeByOneDimension(image.size, max(p.width, p.height))
     p.extra_generation_params["Mask blur"] = gArgs.mask_blur
     addReplacerMetadata(p, gArgs)
     p.seed = gArgs.seed
@@ -114,7 +114,7 @@ def inpaint(
             suffix = saveSuffix
             if additional_save_suffix:
                 suffix = additional_save_suffix + suffix
-            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positvePrompt, opts.samples_format,
+            save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positivePrompt, opts.samples_format,
                     info=processed.infotext(p, i), p=p, suffix=suffix, save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
