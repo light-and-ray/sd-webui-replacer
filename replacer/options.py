@@ -18,7 +18,7 @@ if EXT_NAME is None or EXT_NAME == "":
 
 EXT_NAME_LOWER = EXT_NAME.lower().replace(' ', '_')
 
-defaultOutputDirectory = os.path.join('outputs', EXT_NAME_LOWER)
+defaultOutputDirectory = os.path.join('output', EXT_NAME_LOWER)
 
 
 def getSaveDir():
