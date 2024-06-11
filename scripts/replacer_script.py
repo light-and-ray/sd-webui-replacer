@@ -34,107 +34,111 @@ class ReplacerScript(scripts.Script):
         return scripts.AlwaysVisible
 
     def ui(self, is_img2img):
-        tabName = 'img2img' if is_img2img else 'txt2img'
-        with (
-            InputAccordion(False, label=EXT_NAME) if InputAccordion
-            else gr.Accordion(EXT_NAME, open=False)
-            as enable
-        ):
-            if not InputAccordion:
+        try:
+            tabName = 'img2img' if is_img2img else 'txt2img'
+            with (
+                InputAccordion(False, label=EXT_NAME) if InputAccordion
+                else gr.Accordion(EXT_NAME, open=False)
+                as enable
+            ):
+                if not InputAccordion:
+                    with gr.Row():
+                        enable = gr.Checkbox(False, label="Enable")
                 with gr.Row():
-                    enable = gr.Checkbox(False, label="Enable")
-            with gr.Row():
-                gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
-            with gr.Row():
-                save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
-                follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix',visible=not is_img2img)
-            with gr.Row():
-                force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
-                    value=True, elem_id=f"replacer_{tabName}_force_override_sd_model",
-                    info='Be sure you use inpainting model here')
-                force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                    gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
+                with gr.Row():
+                    save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
+                    follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix',visible=not is_img2img)
+                with gr.Row():
+                    force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
+                        value=True, elem_id=f"replacer_{tabName}_force_override_sd_model",
+                        info='Be sure you use inpainting model here')
+                    force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
 
-        comp = replacer_tab_ui.replacerMainUI.components
+            comp = replacer_tab_ui.replacerMainUI.components
 
-        main_tab_inputs = [
-            comp.detectionPrompt,
-            comp.avoidancePrompt,
-            comp.positivePrompt,
-            comp.negativePrompt,
-            comp.upscaler_for_img2img,
-            comp.seed,
-            comp.sampler,
-            comp.scheduler,
-            comp.steps,
-            comp.box_threshold,
-            comp.mask_expand,
-            comp.mask_blur,
-            comp.max_resolution_on_detection,
-            comp.sam_model_name,
-            comp.dino_model_name,
-            comp.cfg_scale,
-            comp.denoise,
-            comp.inpaint_padding,
-            comp.inpainting_fill,
-            comp.width,
-            comp.height,
-            comp.batch_count,
-            comp.batch_size,
-            comp.inpainting_mask_invert,
-            comp.extra_includes,
-            comp.fix_steps,
-            comp.override_sd_model,
-            comp.sd_model_checkpoint,
-            comp.mask_num,
-            comp.avoid_mask_mode,
-            comp.avoidance_mask,
-            comp.only_custom_mask,
-            comp.custom_mask_mode,
-            comp.custom_mask,
-            comp.use_inpaint_diff,
-            comp.inpaint_diff_mask_view,
-            comp.lama_cleaner_upscaler,
-            comp.clip_skip,
-            comp.pass_into_hires_fix_automatically,
-            comp.save_before_hires_fix,
-            comp.do_not_use_mask,
-            comp.rotation_fix,
+            main_tab_inputs = [
+                comp.detectionPrompt,
+                comp.avoidancePrompt,
+                comp.positivePrompt,
+                comp.negativePrompt,
+                comp.upscaler_for_img2img,
+                comp.seed,
+                comp.sampler,
+                comp.scheduler,
+                comp.steps,
+                comp.box_threshold,
+                comp.mask_expand,
+                comp.mask_blur,
+                comp.max_resolution_on_detection,
+                comp.sam_model_name,
+                comp.dino_model_name,
+                comp.cfg_scale,
+                comp.denoise,
+                comp.inpaint_padding,
+                comp.inpainting_fill,
+                comp.width,
+                comp.height,
+                comp.batch_count,
+                comp.batch_size,
+                comp.inpainting_mask_invert,
+                comp.extra_includes,
+                comp.fix_steps,
+                comp.override_sd_model,
+                comp.sd_model_checkpoint,
+                comp.mask_num,
+                comp.avoid_mask_mode,
+                comp.avoidance_mask,
+                comp.only_custom_mask,
+                comp.custom_mask_mode,
+                comp.custom_mask,
+                comp.use_inpaint_diff,
+                comp.inpaint_diff_mask_view,
+                comp.lama_cleaner_upscaler,
+                comp.clip_skip,
+                comp.pass_into_hires_fix_automatically,
+                comp.save_before_hires_fix,
+                comp.do_not_use_mask,
+                comp.rotation_fix,
 
-            comp.hf_upscaler,
-            comp.hf_steps,
-            comp.hf_sampler,
-            comp.hf_scheduler,
-            comp.hf_denoise,
-            comp.hf_cfg_scale,
-            comp.hfPositivePromptSuffix,
-            comp.hf_size_limit,
-            comp.hf_above_limit_upscaler,
-            comp.hf_unload_detection_models,
-            comp.hf_disable_cn,
-            comp.hf_extra_mask_expand,
-            comp.hf_positivePrompt,
-            comp.hf_negativePrompt,
-            comp.hf_sd_model_checkpoint,
-            comp.hf_extra_inpaint_padding,
-            comp.hf_extra_mask_blur,
-            comp.hf_randomize_seed,
-            comp.hf_soft_inpaint,
-        ] + comp.cn_inputs \
-          + comp.soft_inpaint_inputs
+                comp.hf_upscaler,
+                comp.hf_steps,
+                comp.hf_sampler,
+                comp.hf_scheduler,
+                comp.hf_denoise,
+                comp.hf_cfg_scale,
+                comp.hfPositivePromptSuffix,
+                comp.hf_size_limit,
+                comp.hf_above_limit_upscaler,
+                comp.hf_unload_detection_models,
+                comp.hf_disable_cn,
+                comp.hf_extra_mask_expand,
+                comp.hf_positivePrompt,
+                comp.hf_negativePrompt,
+                comp.hf_sd_model_checkpoint,
+                comp.hf_extra_inpaint_padding,
+                comp.hf_extra_mask_blur,
+                comp.hf_randomize_seed,
+                comp.hf_soft_inpaint,
+            ] + comp.cn_inputs \
+            + comp.soft_inpaint_inputs
 
-        for i in range(len(main_tab_inputs)):
-            main_tab_inputs[i] = copy.copy(main_tab_inputs[i])
-            main_tab_inputs[i].do_not_save_to_config = True
+            for i in range(len(main_tab_inputs)):
+                main_tab_inputs[i] = copy.copy(main_tab_inputs[i])
+                main_tab_inputs[i].do_not_save_to_config = True
 
-        inputs = [
-            enable,
-            save_originals,
-            force_override_sd_model,
-            force_sd_model_checkpoint,
-            follow_txt2img_hires_fix,
-        ]
+            inputs = [
+                enable,
+                save_originals,
+                force_override_sd_model,
+                force_sd_model_checkpoint,
+                follow_txt2img_hires_fix,
+            ]
 
-        return inputs + main_tab_inputs
+            return inputs + main_tab_inputs
+
+        except:
+            return []
 
     def before_process(self, p: StableDiffusionProcessingTxt2Img,
         enable,
