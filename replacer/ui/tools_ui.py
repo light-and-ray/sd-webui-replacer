@@ -76,6 +76,8 @@ def getSubmitJsFunction(galleryId, buttonsId, extraShowButtonsId, fillGalleryIdx
 
 def sendBackToReplacer(gallery, gallery_index):
     assert len(gallery) > 0, 'No image'
+    if len(gallery) == 1:
+        gallery_index = 0
     assert 0 <= gallery_index < len(gallery), f'Bad image index: {gallery_index}'
     assert not IS_WEBUI_1_5, 'sendBackToReplacer is not supported for webui < 1.8'
     image_info = gallery[gallery_index] if 0 <= gallery_index < len(gallery) else gallery[0]
