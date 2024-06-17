@@ -1,6 +1,6 @@
 import copy
 import gradio as gr
-from modules import scripts, scripts_postprocessing, errors, ui_settings
+from modules import scripts, scripts_postprocessing, errors, ui_settings, shared
 from modules.processing import Processed, StableDiffusionProcessingTxt2Img
 from replacer.options import EXT_NAME, needHideReplacerScript
 from replacer.ui import replacer_tab_ui
@@ -334,7 +334,8 @@ class ReplacerScript(scripts.Script):
             self.gArgs.positivePrompt = processed.prompt + ", " + self.gArgs.positivePrompt
 
         saveDir = p.outpath_samples if self.save_samples else None
-        saveToSubdirs = True
+        saveToSubdirs = p.override_settings.get('save_to_dirs', None)
+        if saveToSubdirs is None: saveToSubdirs = shared.opts.save_to_dirs
 
         try:
             processedReplacer, allExtraImages = generate(self.gArgs, saveDir, saveToSubdirs, False, self.extra_includes)
