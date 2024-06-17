@@ -48,7 +48,13 @@ class ReplacerScript(scripts.Script):
                     gr.Markdown(f'This script takes all {EXT_NAME} settings from its tab')
                 with gr.Row():
                     save_originals = gr.Checkbox(True, label="Save originals", elem_id=f'replacer_{tabName}_save_originals')
-                    follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix", elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix',visible=not is_img2img)
+                    follow_txt2img_hires_fix = gr.Checkbox(True, label="Follow txt2img hires fix",
+                        elem_id=f'replacer_{tabName}_follow_txt2img_hires_fix',visible=not is_img2img)
+                with gr.Row():
+                    override_seed = gr.Checkbox(True, label=f"Use {tabName} seed",
+                        elem_id=f'replacer_{tabName}_override_seed', tooltip=f"If false, seed in {EXT_NAME} tab is used")
+                    append_positive_prompt = gr.Checkbox(False, label=f"Append positive prompt", elem_id=f'replacer_{tabName}_append_positive_prompt',
+                        tooltip=f"If true, positive prompt from generation will be appended at the beginning of {EXT_NAME} tab's positive prompt")
                 with gr.Row():
                     force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
                         value=True, elem_id=f"replacer_{tabName}_force_override_sd_model",
@@ -133,6 +139,8 @@ class ReplacerScript(scripts.Script):
                 force_override_sd_model,
                 force_sd_model_checkpoint,
                 follow_txt2img_hires_fix,
+                override_seed,
+                append_positive_prompt,
             ]
 
             return inputs + main_tab_inputs
@@ -146,6 +154,8 @@ class ReplacerScript(scripts.Script):
         force_override_sd_model,
         force_sd_model_checkpoint,
         follow_txt2img_hires_fix,
+        override_seed,
+        append_positive_prompt,
 
         detectionPrompt,
         avoidancePrompt,
@@ -226,6 +236,8 @@ class ReplacerScript(scripts.Script):
         self.force_override_sd_model = force_override_sd_model
         self.force_sd_model_checkpoint = force_sd_model_checkpoint
         self.follow_txt2img_hires_fix = follow_txt2img_hires_fix
+        self.override_seed = override_seed
+        self.append_positive_prompt = append_positive_prompt
 
 
         cn_args, soft_inpaint_args = replacer_extensions.prepareScriptsArgs(scripts_args)
@@ -316,6 +328,10 @@ class ReplacerScript(scripts.Script):
             self.gArgs.sd_model_checkpoint = self.force_sd_model_checkpoint
         if self.follow_txt2img_hires_fix and hasattr(p, 'enable_hr'):
             self.gArgs.pass_into_hires_fix_automatically = p.enable_hr
+        if self.override_seed:
+            self.gArgs.seed = processed.all_seeds[0]
+        if self.append_positive_prompt:
+            self.gArgs.positivePrompt = processed.prompt + ", " + self.gArgs.positivePrompt
 
         saveDir = p.outpath_samples if self.save_samples else None
         saveToSubdirs = True
