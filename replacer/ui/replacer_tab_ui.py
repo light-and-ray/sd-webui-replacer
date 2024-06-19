@@ -2,7 +2,7 @@ import gradio as gr
 from modules import shared, ui_settings, errors, infotext_utils
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, update_generation_info
-from replacer.ui.generate_ui import generate_ui, getLastUsedSeed
+from replacer.ui.generate_ui import generate_ui, getLastUsedSeed, getLastUsedVariationSeed
 from replacer.ui.apply_hires_fix import applyHiresFix
 from replacer.options import (EXT_NAME, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
@@ -338,6 +338,8 @@ class ReplacerMainUI:
                     comp.do_not_use_mask,
                     comp.selected_video_mode,
                     comp.rotation_fix,
+                    comp.variation_seed,
+                    comp.variation_strength,
 
                     comp.ad_fragment_length,
                     comp.ad_internal_fps,
@@ -436,6 +438,23 @@ class ReplacerMainUI:
                 inputs=[],
                 outputs=[
                     comp.seed,
+                ]
+            )
+
+            comp.random_variation_seed.click(
+                fn=lambda: -1,
+                inputs=[
+                ],
+                outputs=[
+                    comp.variation_seed,
+                ]
+            )
+
+            comp.reuse_variation_seed.click(
+                fn=getLastUsedVariationSeed,
+                inputs=[],
+                outputs=[
+                    comp.variation_seed,
                 ]
             )
 

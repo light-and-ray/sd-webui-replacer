@@ -106,6 +106,8 @@ class ReplacerScript(scripts.Script):
                 comp.save_before_hires_fix,
                 comp.do_not_use_mask,
                 comp.rotation_fix,
+                comp.variation_seed,
+                comp.variation_strength,
 
                 comp.hf_upscaler,
                 comp.hf_steps,
@@ -199,6 +201,8 @@ class ReplacerScript(scripts.Script):
         save_before_hires_fix,
         do_not_use_mask,
         rotation_fix,
+        variation_seed,
+        variation_strength,
 
         hf_upscaler,
         hf_steps,
@@ -310,6 +314,8 @@ class ReplacerScript(scripts.Script):
             do_not_use_mask=do_not_use_mask,
             animatediff_args=DUMMY_ANIMATEDIFF_ARGS,
             rotation_fix=rotation_fix,
+            variation_seed=variation_seed,
+            variation_strength=variation_strength,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

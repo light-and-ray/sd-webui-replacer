@@ -76,10 +76,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         elem_id="replacer_upscaler_for_img2img",
                     )
 
-                    if shared.cmd_opts.use_textbox_seed:
-                        comp.seed = gr.Textbox(label='Seed', value="", elem_id="replacer_seed", min_width=100)
-                    else:
-                        comp.seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
+                    comp.seed = gr.Number(label='Seed', value=-1, elem_id="replacer_seed", min_width=100, precision=0)
 
                     comp.random_seed = ToolButton(
                         ui.random_symbol,
@@ -91,6 +88,25 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         elem_id="replacer_reuse_seed",
                         label='Reuse seed'
                     )
+
+                with gr.Row():
+                    comp.variation_seed = gr.Number(label='Variation seed', value=-1, elem_id="replacer_variation_seed", min_width=100, precision=0)
+
+                    comp.random_variation_seed = ToolButton(
+                        ui.random_symbol,
+                        elem_id="replacer_random_variation_seed",
+                        label='Random variation seed'
+                    )
+                    comp.reuse_variation_seed = ToolButton(
+                        ui.reuse_symbol,
+                        elem_id="replacer_reuse_variation_seed",
+                        label='Reuse variation seed'
+                    )
+
+                    comp.variation_strength = gr.Slider(label='Variation strength',
+                        value=0.0, elem_id="replacer_variation_strength",
+                        minimum=0.0, maximum=1.0, step=0.01)
+
 
                 with gr.Row():
                     comp.rotation_fix = gr.Radio(label='Rotation fix',

@@ -137,6 +137,9 @@ def prepareExpectedUIBehavior(gArgs: GenerationArgs):
     if (gArgs.seed == -1):
         gArgs.seed = generateSeed()
 
+    if (gArgs.variation_seed == -1):
+        gArgs.variation_seed = generateSeed()
+
     gArgs.detectionPrompt = gArgs.detectionPrompt.strip()
     gArgs.avoidancePrompt = gArgs.avoidancePrompt.strip()
     if gArgs.inpainting_mask_invert:

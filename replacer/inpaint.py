@@ -65,6 +65,8 @@ def inpaint(
         inpainting_mask_invert=gArgs.inpainting_mask_invert,
         override_settings=override_settings,
         do_not_save_samples=True,
+        subseed=gArgs.variation_seed,
+        subseed_strength=gArgs.variation_strength,
         **schedulerKWargs,
     )
 

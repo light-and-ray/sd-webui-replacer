@@ -33,7 +33,9 @@ API is available on `/replacer/replace`
     lama_cleaner_upscaler: str = ""
     clip_skip: int = 1
     rotation_fix: str = '-' # choices: '-', '⟲', '⟳', '🗘'
-    extra_include: list = ["mask", "box", "cutted", "preview", "script"]
+    extra_include: list = ["mask", "box", "cut", "preview", "script"]
+    variation_seed: int = -1
+    variation_strength: float = 0.0
 
     use_hires_fix: bool = False
     hf_upscaler: str = "ESRGAN_4x"

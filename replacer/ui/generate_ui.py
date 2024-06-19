@@ -21,6 +21,12 @@ def getLastUsedSeed():
         return lastGenerationArgs.seed
 
 
+def getLastUsedVariationSeed():
+    if lastGenerationArgs is None:
+        return -1
+    else:
+        return lastGenerationArgs.variation_seed
+
 
 def generate_ui_(
     id_task,
@@ -79,6 +85,8 @@ def generate_ui_(
     do_not_use_mask,
     selected_video_mode: str,
     rotation_fix: str,
+    variation_seed: int,
+    variation_strength: float,
 
     ad_fragment_length,
     ad_internal_fps,
@@ -276,6 +284,8 @@ def generate_ui_(
         do_not_use_mask=do_not_use_mask,
         animatediff_args=animatediff_args,
         rotation_fix=rotation_fix,
+        variation_seed=variation_seed,
+        variation_strength=variation_strength,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,
