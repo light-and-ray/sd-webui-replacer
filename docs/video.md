@@ -5,6 +5,8 @@
 
 You need to provide a path to your video file, or url in `file://` format. On Windows you need to make right mouse click on your file with Alt key holden, and then select "copy file as path"
 
+To avoid accidental interrupting I recommend to use my extension [prevent-interruption](https://github.com/light-and-ray/sd-webui-prevent-interruption) and w-e-w's [close-confirmation-dialogue](https://github.com/w-e-w/sdwebui-close-confirmation-dialogue)
+
 ## AnimateDiff mode
 ![](/docs/images/replacer_video_animate_diff.jpg)
 

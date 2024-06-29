@@ -187,6 +187,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                 with gr.Row():
                     if replacer_extensions.background_extensions.lamaCleanerAvailable():
                         comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
+                        comp.lama_cleaner_upscaler.info = "I recommend to use Waifu2x upscaler from extension, because it's very fast and good enough for this purpose"
                     else:
                         comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
 
