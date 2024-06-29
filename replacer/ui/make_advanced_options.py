@@ -251,7 +251,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         type="pil",
                         tool="sketch",
                         image_mode="RGBA",
-                        brush_color=getMaskColorStr()
+                        brush_color=getMaskColorStr(),
+                        height=shared.opts.img2img_editor_height
                     )
                 with gr.Row():
                     comp.avoid_mask_brush_color = gr.ColorPicker(
@@ -280,7 +281,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         type="pil",
                         tool="sketch",
                         image_mode="RGBA",
-                        brush_color=getMaskColorStr()
+                        brush_color=getMaskColorStr(),
+                        height=shared.opts.img2img_editor_height
                     )
                 with gr.Row():
                     comp.custom_mask_brush_color = gr.ColorPicker(

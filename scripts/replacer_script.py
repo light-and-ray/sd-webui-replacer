@@ -26,6 +26,8 @@ class ReplacerScript(scripts.Script):
         self.force_override_sd_model: bool = None
         self.force_sd_model_checkpoint: str = None
         self.save_samples: bool = None
+        self.override_seed: bool = None
+        self.append_positive_prompt: bool = None
 
     def title(self):
         return EXT_NAME
