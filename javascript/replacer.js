@@ -74,14 +74,14 @@ async function replacer_waitForOpts() {
 var isZoomAndPanIntegrationApplied = false;
 
 function replacerApplyZoomAndPanIntegration() {
-    if (typeof window.applyZoomAndPanIntegration === "function") {
+    if (typeof window.applyZoomAndPanIntegration === "function" && !isZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
         isZoomAndPanIntegrationApplied = true;
     }
 }
 
 function replacerApplyZoomAndPanIntegration_withMod() {
-    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function") {
+    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function" && !isZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
         isZoomAndPanIntegrationApplied = true;
     }
