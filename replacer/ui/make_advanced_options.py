@@ -256,6 +256,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         height=shared.opts.img2img_editor_height
                     )
                 with gr.Row():
+                    gr.Markdown("*If image isn't fit, use fullscreen hotkey or resize column*")
+                with gr.Row():
                     comp.avoid_mask_brush_color = gr.ColorPicker(
                         getMaskColorStr(), label='Brush color',
                         info='visual only, use when brush color is hard to see'
@@ -285,6 +287,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         brush_color=getMaskColorStr(),
                         height=shared.opts.img2img_editor_height
                     )
+                with gr.Row():
+                    gr.Markdown("*If image isn't fit, use fullscreen hotkey or resize column*")
                 with gr.Row():
                     comp.custom_mask_brush_color = gr.ColorPicker(
                         getMaskColorStr(), label='Brush color',
