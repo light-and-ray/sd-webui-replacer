@@ -30,7 +30,6 @@ API is available on `/replacer/replace`
     fix_steps : bool = False
     inpainting_fill : int = 0
     sd_model_checkpoint : str = ""
-    lama_cleaner_upscaler: str = ""
     clip_skip: int = 1
     rotation_fix: str = '-' # choices: '-', '⟲', '⟳', '🗘'
     extra_include: list = ["mask", "box", "cut", "preview", "script"]

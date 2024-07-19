@@ -99,7 +99,6 @@ class GenerationArgs:
     only_custom_mask: bool
     custom_mask: Image.Image
     use_inpaint_diff: bool
-    lama_cleaner_upscaler: str
     clip_skip: int
 
     pass_into_hires_fix_automatically: bool

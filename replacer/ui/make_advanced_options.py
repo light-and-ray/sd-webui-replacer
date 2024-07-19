@@ -89,37 +89,6 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         label='Reuse seed'
                     )
 
-                with gr.Row():
-                    comp.variation_seed = gr.Number(label='Variation seed', value=-1, elem_id="replacer_variation_seed", min_width=100, precision=0)
-
-                    comp.random_variation_seed = ToolButton(
-                        ui.random_symbol,
-                        elem_id="replacer_random_variation_seed",
-                        label='Random variation seed'
-                    )
-                    comp.reuse_variation_seed = ToolButton(
-                        ui.reuse_symbol,
-                        elem_id="replacer_reuse_variation_seed",
-                        label='Reuse variation seed'
-                    )
-
-                    comp.variation_strength = gr.Slider(label='Variation strength',
-                        value=0.0, elem_id="replacer_variation_strength",
-                        minimum=0.0, maximum=1.0, step=0.01)
-
-
-                with gr.Row():
-                    comp.rotation_fix = gr.Radio(label='Rotation fix',
-                        choices=['-', '⟲', '⟳', '🗘'],
-                        value='-', type="value", elem_id="replacer_rotation_fix")
-                with gr.Row():
-                    if not isDedicatedPage:
-                        comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
-                        comp.override_sd_model = gr.Checkbox(label='Override stable diffusion model',
-                            value=False, elem_id="replacer_override_sd_model")
-
-                    comp.clip_skip = ui_settings.create_setting_component('CLIP_stop_at_last_layers')
-
 
             with gr.Tab('Detection'):
                 with gr.Row():
@@ -185,13 +154,6 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    if replacer_extensions.background_extensions.lamaCleanerAvailable():
-                        comp.lama_cleaner_upscaler = ui_settings.create_setting_component('upscaling_upscaler_for_lama_cleaner_masked_content')
-                        comp.lama_cleaner_upscaler.info = "I recommend to use Waifu2x upscaler from extension, because it's very fast and good enough for this purpose"
-                    else:
-                        comp.lama_cleaner_upscaler = gr.Textbox(visible=False)
-
-                with gr.Row():
                     comp.inpainting_mask_invert = gr.Radio(
                         label='Mask mode',
                         choices=['Inpaint masked', 'Inpaint not masked'],
@@ -218,6 +180,39 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         except Exception as e:
                             errors.report(f"Cannot add soft inpaint accordion {e}", exc_info=True)
                             replacer_extensions.soft_inpainting.SCRIPT = None
+
+
+            with gr.Tab('Others'):
+                with gr.Row():
+                    comp.variation_seed = gr.Number(label='Variation seed', value=-1, elem_id="replacer_variation_seed", min_width=100, precision=0)
+
+                    comp.random_variation_seed = ToolButton(
+                        ui.random_symbol,
+                        elem_id="replacer_random_variation_seed",
+                        label='Random variation seed'
+                    )
+                    comp.reuse_variation_seed = ToolButton(
+                        ui.reuse_symbol,
+                        elem_id="replacer_reuse_variation_seed",
+                        label='Reuse variation seed'
+                    )
+
+                    comp.variation_strength = gr.Slider(label='Variation strength',
+                        value=0.0, elem_id="replacer_variation_strength",
+                        minimum=0.0, maximum=1.0, step=0.01)
+
+
+                with gr.Row():
+                    comp.rotation_fix = gr.Radio(label='Rotation fix',
+                        choices=['-', '⟲', '⟳', '🗘'],
+                        value='-', type="value", elem_id="replacer_rotation_fix")
+                with gr.Row():
+                    if not isDedicatedPage:
+                        comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
+                        comp.override_sd_model = gr.Checkbox(label='Override stable diffusion model',
+                            value=False, elem_id="replacer_override_sd_model")
+
+                    comp.clip_skip = ui_settings.create_setting_component('CLIP_stop_at_last_layers')
 
 
             with gr.Tab('Avoidance'):

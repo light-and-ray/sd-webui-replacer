@@ -330,7 +330,6 @@ class ReplacerMainUI:
                     comp.custom_mask,
                     comp.use_inpaint_diff,
                     comp.inpaint_diff_mask_view,
-                    comp.lama_cleaner_upscaler,
                     comp.clip_skip,
                     comp.pass_into_hires_fix_automatically,
                     comp.save_before_hires_fix,

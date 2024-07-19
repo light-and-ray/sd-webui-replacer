@@ -77,7 +77,6 @@ def generate_ui_(
     custom_mask,
     use_inpaint_diff,
     inpaint_diff_mask_view,
-    lama_cleaner_upscaler,
     clip_skip,
     pass_into_hires_fix_automatically,
     save_before_hires_fix,
@@ -275,7 +274,6 @@ def generate_ui_(
         use_inpaint_diff=use_inpaint_diff and inpaint_diff_mask_view is not None and \
             replacer_extensions.inpaint_difference.Globals is not None and \
             replacer_extensions.inpaint_difference.Globals.generated_mask is not None,
-        lama_cleaner_upscaler=lama_cleaner_upscaler,
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,

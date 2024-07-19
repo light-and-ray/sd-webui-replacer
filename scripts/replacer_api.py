@@ -50,7 +50,6 @@ def replacer_api(_, app: FastAPI):
         fix_steps : bool = False
         inpainting_fill : int = 0
         sd_model_checkpoint : str = ""
-        lama_cleaner_upscaler: str = ""
         clip_skip: int = 1
         rotation_fix: str = '-' # choices: '-', '⟲', '⟳', '🗘'
         extra_include: list = ["mask", "box", "cut", "preview", "script"]
@@ -145,7 +144,6 @@ def replacer_api(_, app: FastAPI):
             only_custom_mask=False,
             custom_mask=None,
             use_inpaint_diff=False,
-            lama_cleaner_upscaler=data.lama_cleaner_upscaler,
             clip_skip=data.clip_skip,
             pass_into_hires_fix_automatically=data.use_hires_fix,
             save_before_hires_fix=False,
