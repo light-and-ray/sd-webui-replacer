@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import shared, sd_samplers, ui, ui_settings, errors
+from modules import shared, sd_samplers, ui, ui_settings, errors, masking
 from modules.ui_components import ToolButton
 from modules.ui_common import refresh_symbol
 from replacer.options import (EXT_NAME_LOWER, doNotShowUnloadButton, getAvoidancePromptExamples,
@@ -155,7 +155,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
 
                 with gr.Row():
                     comp.integer_only_masked = gr.Checkbox(label='Correct padding to have integer upscaling to better image fit',
-                        value=False, info="Only in dev branch of webui", elem_id="replacer_integer_only_masked")
+                        value=False, visible=hasattr(masking, 'fix_crop_region_integer_scale'), elem_id="replacer_integer_only_masked")
 
                 with gr.Row():
                     comp.inpainting_mask_invert = gr.Radio(
