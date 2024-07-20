@@ -28,6 +28,7 @@ def inpaint(
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
+    override_settings["integer_only_masked"] = gArgs.integer_only_masked
 
     mask = gArgs.mask
     if mask:

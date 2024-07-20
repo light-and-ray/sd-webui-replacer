@@ -339,6 +339,7 @@ class ReplacerMainUI:
                     comp.rotation_fix,
                     comp.variation_seed,
                     comp.variation_strength,
+                    comp.integer_only_masked,
 
                     comp.ad_fragment_length,
                     comp.ad_internal_fps,

@@ -35,6 +35,7 @@ API is available on `/replacer/replace`
     extra_include: list = ["mask", "box", "cut", "preview", "script"]
     variation_seed: int = -1
     variation_strength: float = 0.0
+    integer_only_masked: bool = False
 
     use_hires_fix: bool = False
     hf_upscaler: str = "ESRGAN_4x"

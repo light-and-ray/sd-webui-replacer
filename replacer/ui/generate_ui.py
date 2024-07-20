@@ -86,6 +86,7 @@ def generate_ui_(
     rotation_fix: str,
     variation_seed: int,
     variation_strength: float,
+    integer_only_masked: bool,
 
     ad_fragment_length,
     ad_internal_fps,
@@ -284,6 +285,7 @@ def generate_ui_(
         rotation_fix=rotation_fix,
         variation_seed=variation_seed,
         variation_strength=variation_strength,
+        integer_only_masked=integer_only_masked,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,

@@ -109,6 +109,7 @@ class GenerationArgs:
     rotation_fix: str
     variation_seed: int
     variation_strength: float
+    integer_only_masked: bool
 
     hires_fix_args: HiresFixArgs
     cn_args: list

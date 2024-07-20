@@ -55,6 +55,7 @@ def replacer_api(_, app: FastAPI):
         extra_include: list = ["mask", "box", "cut", "preview", "script"]
         variation_seed: int = -1
         variation_strength: float = 0.0
+        integer_only_masked: bool = False
 
         use_hires_fix: bool = False
         hf_upscaler: str = "ESRGAN_4x"
@@ -153,6 +154,7 @@ def replacer_api(_, app: FastAPI):
             rotation_fix=data.rotation_fix,
             variation_seed=data.variation_seed,
             variation_strength=data.variation_strength,
+            integer_only_masked=data.integer_only_masked,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

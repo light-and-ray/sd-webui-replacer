@@ -109,6 +109,7 @@ class ReplacerScript(scripts.Script):
                 comp.rotation_fix,
                 comp.variation_seed,
                 comp.variation_strength,
+                comp.integer_only_masked,
 
                 comp.hf_upscaler,
                 comp.hf_steps,
@@ -203,6 +204,7 @@ class ReplacerScript(scripts.Script):
         rotation_fix,
         variation_seed,
         variation_strength,
+        integer_only_masked,
 
         hf_upscaler,
         hf_steps,
@@ -315,6 +317,7 @@ class ReplacerScript(scripts.Script):
             rotation_fix=rotation_fix,
             variation_seed=variation_seed,
             variation_strength=variation_strength,
+            integer_only_masked=integer_only_masked,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,
