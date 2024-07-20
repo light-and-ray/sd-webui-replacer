@@ -29,6 +29,7 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
         hrGArgs.mask = extraMaskExpand(hrGArgs.mask, hf.extra_mask_expand)
     hrGArgs.inpainting_fill = 1 # Original
     hrGArgs.img2img_fix_steps = True
+    hrGArgs.integer_only_masked = True
     if hf.disable_cn:
         hrGArgs.cn_args = None
     if hf.soft_inpaint != 'Same' and hrGArgs.soft_inpaint_args is not None and len(hrGArgs.soft_inpaint_args) != 0:

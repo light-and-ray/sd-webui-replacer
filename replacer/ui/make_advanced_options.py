@@ -154,7 +154,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    comp.integer_only_masked = ui_settings.create_setting_component('integer_only_masked')
+                    comp.integer_only_masked = gr.Checkbox(label='Correct padding to have integer upscaling to better image fit',
+                        value=False, info="Only in dev branch of webui", elem_id="replacer_integer_only_masked")
 
                 with gr.Row():
                     comp.inpainting_mask_invert = gr.Radio(
