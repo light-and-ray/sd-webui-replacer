@@ -69,6 +69,8 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 
 1. [AnimateDiff](https://github.com/continue-revolution/sd-webui-animatediff)
 
+1. [ar-plusplus](https://github.com/altoiddealer/--sd-webui-ar-plusplus) (maybe works with "Aspect Ratio and Resolution Buttons" forks)
+
 1. Other extension scripts which doesn't have control arguments, e.g. [Hardware Info in metadata](https://github.com/light-and-ray/sd-webui-hardware-info-in-metadata), [NudeNet NSFW Censor](https://github.com/w-e-w/sd-webui-nudenet-nsfw-censor), built-in **Hypertile**
 
 </blockquote>

@@ -89,6 +89,17 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         label='Reuse seed'
                     )
 
+                with gr.Row():
+                    with OverrideCustomScriptSource("arplusplus"):
+                        if replacer_extensions.arplusplus.SCRIPT:
+                            try:
+                                replacer_extensions.arplusplus.SCRIPT.i2i_w = comp.width
+                                replacer_extensions.arplusplus.SCRIPT.i2i_h = comp.height
+                                replacer_extensions.arplusplus.SCRIPT.ui(True)
+                            except Exception as e:
+                                errors.report(f"Cannot add arplusplus ui {e}", exc_info=True)
+                                replacer_extensions.arplusplus.SCRIPT = None
+
 
             with gr.Tab('Detection'):
                 with gr.Row():
