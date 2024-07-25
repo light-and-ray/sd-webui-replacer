@@ -165,10 +165,6 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value='fill', type="index", elem_id="replacer_inpainting_fill")
 
                 with gr.Row():
-                    comp.integer_only_masked = gr.Checkbox(label='Correct padding to have integer upscaling to better image fit',
-                        value=False, visible=hasattr(masking, 'fix_crop_region_integer_scale'), elem_id="replacer_integer_only_masked")
-
-                with gr.Row():
                     comp.inpainting_mask_invert = gr.Radio(
                         label='Mask mode',
                         choices=['Inpaint masked', 'Inpaint not masked'],
@@ -221,6 +217,9 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     comp.rotation_fix = gr.Radio(label='Rotation fix',
                         choices=['-', '⟲', '⟳', '🗘'],
                         value='-', type="value", elem_id="replacer_rotation_fix")
+                    comp.integer_only_masked = gr.Checkbox(label='Correct padding to have integer upscaling to better image fit',
+                        value=False, visible=hasattr(masking, 'fix_crop_region_integer_scale'), elem_id="replacer_integer_only_masked")
+
                 with gr.Row():
                     if not isDedicatedPage:
                         comp.sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
