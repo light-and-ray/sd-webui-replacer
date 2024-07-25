@@ -36,6 +36,7 @@ API is available on `/replacer/replace`
     variation_seed: int = -1
     variation_strength: float = 0.0
     integer_only_masked: bool = False
+    forbid_too_small_crop_region: bool = True
 
     use_hires_fix: bool = False
     hf_upscaler: str = "ESRGAN_4x"

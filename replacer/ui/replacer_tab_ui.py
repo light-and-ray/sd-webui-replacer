@@ -340,6 +340,7 @@ class ReplacerMainUI:
                     comp.variation_seed,
                     comp.variation_strength,
                     comp.integer_only_masked,
+                    comp.forbid_too_small_crop_region,
 
                     comp.ad_fragment_length,
                     comp.ad_internal_fps,

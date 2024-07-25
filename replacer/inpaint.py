@@ -4,7 +4,7 @@ import modules.shared as shared
 from modules.processing import StableDiffusionProcessingImg2Img, process_images, Processed
 from modules.shared import opts
 from modules.images import save_image
-from modules import errors, masking
+from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer.extensions import replacer_extensions
 from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix
@@ -30,8 +30,10 @@ def inpaint(
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
     override_settings["CLIP_stop_at_last_layers"] = gArgs.clip_skip
-    if hasattr(masking, 'fix_crop_region_integer_scale'):
+    if hasattr(shared.opts, 'integer_only_masked'):
         override_settings["integer_only_masked"] = gArgs.integer_only_masked
+    if hasattr(shared.opts, "forbid_too_small_crop_region"):
+        override_settings["forbid_too_small_crop_region"] = gArgs.forbid_too_small_crop_region
 
     mask = gArgs.mask
     if mask:

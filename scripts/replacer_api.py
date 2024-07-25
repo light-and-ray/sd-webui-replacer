@@ -56,6 +56,7 @@ def replacer_api(_, app: FastAPI):
         variation_seed: int = -1
         variation_strength: float = 0.0
         integer_only_masked: bool = False
+        forbid_too_small_crop_region: bool = True
 
         use_hires_fix: bool = False
         hf_upscaler: str = "ESRGAN_4x"
@@ -155,6 +156,7 @@ def replacer_api(_, app: FastAPI):
             variation_seed=data.variation_seed,
             variation_strength=data.variation_strength,
             integer_only_masked=data.integer_only_masked,
+            forbid_too_small_crop_region=data.forbid_too_small_crop_region,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

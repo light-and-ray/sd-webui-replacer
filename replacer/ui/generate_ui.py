@@ -87,6 +87,7 @@ def generate_ui_(
     variation_seed: int,
     variation_strength: float,
     integer_only_masked: bool,
+    forbid_too_small_crop_region: bool,
 
     ad_fragment_length,
     ad_internal_fps,
@@ -286,6 +287,7 @@ def generate_ui_(
         variation_seed=variation_seed,
         variation_strength=variation_strength,
         integer_only_masked=integer_only_masked,
+        forbid_too_small_crop_region=forbid_too_small_crop_region,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,

@@ -110,6 +110,7 @@ class GenerationArgs:
     variation_seed: int
     variation_strength: float
     integer_only_masked: bool
+    forbid_too_small_crop_region: bool
 
     hires_fix_args: HiresFixArgs
     cn_args: list

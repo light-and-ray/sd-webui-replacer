@@ -110,6 +110,7 @@ class ReplacerScript(scripts.Script):
                 comp.variation_seed,
                 comp.variation_strength,
                 comp.integer_only_masked,
+                comp.forbid_too_small_crop_region,
 
                 comp.hf_upscaler,
                 comp.hf_steps,
@@ -205,6 +206,7 @@ class ReplacerScript(scripts.Script):
         variation_seed,
         variation_strength,
         integer_only_masked,
+        forbid_too_small_crop_region,
 
         hf_upscaler,
         hf_steps,
@@ -318,6 +320,7 @@ class ReplacerScript(scripts.Script):
             variation_seed=variation_seed,
             variation_strength=variation_strength,
             integer_only_masked=integer_only_masked,
+            forbid_too_small_crop_region=forbid_too_small_crop_region,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

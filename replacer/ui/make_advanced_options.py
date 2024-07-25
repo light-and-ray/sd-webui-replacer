@@ -1,5 +1,5 @@
 import gradio as gr
-from modules import shared, sd_samplers, ui, ui_settings, errors, masking
+from modules import shared, sd_samplers, ui, ui_settings, errors
 from modules.ui_components import ToolButton
 from modules.ui_common import refresh_symbol
 from replacer.options import (EXT_NAME_LOWER, doNotShowUnloadButton, getAvoidancePromptExamples,
@@ -218,7 +218,11 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         choices=['-', '⟲', '⟳', '🗘'],
                         value='-', type="value", elem_id="replacer_rotation_fix")
                     comp.integer_only_masked = gr.Checkbox(label='Correct padding to have integer upscaling to better image fit',
-                        value=False, visible=hasattr(masking, 'fix_crop_region_integer_scale'), elem_id="replacer_integer_only_masked")
+                        value=False, visible=hasattr(shared.opts, 'integer_only_masked'), elem_id="replacer_integer_only_masked")
+
+                with gr.Row():
+                    comp.forbid_too_small_crop_region = gr.Checkbox(label='Forbid too small crop region',
+                        value=True, visible=hasattr(shared.opts, 'forbid_too_small_crop_region'), elem_id="replacer_forbid_too_small_crop_region")
 
                 with gr.Row():
                     if not isDedicatedPage:
