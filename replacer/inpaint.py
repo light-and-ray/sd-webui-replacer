@@ -24,6 +24,8 @@ def inpaint(
     override_settings = {}
     if gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != "" and gArgs.upscalerForImg2Img != "None":
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
+        if hasattr(shared.opts, "img2img_upscaler_preserve_colors"):
+            override_settings["img2img_upscaler_preserve_colors"] = True
     if gArgs.sd_model_checkpoint is not None and gArgs.sd_model_checkpoint != "":
         override_settings["sd_model_checkpoint"] = gArgs.sd_model_checkpoint
     override_settings["img2img_fix_steps"] = gArgs.img2img_fix_steps
