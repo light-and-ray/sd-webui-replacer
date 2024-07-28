@@ -39,7 +39,8 @@ def generateSingle(
     if interrupted():
         raise InterruptedDetection()
 
-    shared.state.assign_current_image(maskResult.maskPreview)
+    if maskResult.maskPreview:
+        shared.state.assign_current_image(maskResult.maskPreview)
     shared.state.textinfo = "inpainting"
 
     processed, scriptImages = inpaint(image, gArgs, savePath, saveSuffix, save_to_dirs,
