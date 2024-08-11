@@ -53,7 +53,9 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding,
                                          hrGArgs.forbid_too_small_crop_region, hrGArgs.integer_only_masked)
     hrGArgs.width = int((x2-x1) * hf.supersampling)
+    hrGArgs.width = hrGArgs.width - hrGArgs.width%8 + 8
     hrGArgs.height = int((y2-y1) * hf.supersampling)
+    hrGArgs.height = hrGArgs.height - hrGArgs.height%8 + 8
     if hrGArgs.width > hf.size_limit:
         hrGArgs.width = hf.size_limit
     if hrGArgs.height > hf.size_limit:

@@ -80,8 +80,10 @@ def inpaint(
         pixels = gArgs.width * gArgs.height
         p.width = (pixels * ratio)**0.5
         p.width = int(p.width)
+        p.width = p.width - p.width%8
         p.height = (pixels / ratio)**0.5
         p.height = int(p.height)
+        p.height = p.height - p.height%8
         print(f'Aspect ratio has been corrected from {gArgs.width}x{gArgs.height} to {p.width}x{p.height}')
 
 
