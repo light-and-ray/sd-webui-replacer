@@ -37,6 +37,7 @@ API is available on `/replacer/replace`
     variation_strength: float = 0.0
     integer_only_masked: bool = False
     forbid_too_small_crop_region: bool = True
+    correct_aspect_ratio: bool = True
 
     use_hires_fix: bool = False
     hf_upscaler: str = "ESRGAN_4x"
@@ -58,6 +59,7 @@ API is available on `/replacer/replace`
     hf_extra_mask_blur: int = 2
     hf_randomize_seed: bool = True
     hf_soft_inpaint: str = "Same"
+    hf_supersampling: float = 1.0
 
     scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```

@@ -1,7 +1,7 @@
 import copy
 from replacer.generation_args import GenerationArgs
 from replacer.options import getHiresFixPositivePromptSuffixExamples
-from replacer.tools import clearCache, generateSeed, extraMaskExpand
+from replacer.tools import clearCache, generateSeed, extraMaskExpand, getActualCropRegion
 
 
 
@@ -11,7 +11,7 @@ def prepareGenerationArgsBeforeHiresFixPass(gArgs: GenerationArgs) -> None:
 
 
 def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
-    image = next(iter(copy.copy(gArgs.images)))
+    # image = next(iter(copy.copy(gArgs.images)))
     hf = gArgs.hires_fix_args
     if hf.positive_prompt_suffix == "":
         hf.positive_prompt_suffix = getHiresFixPositivePromptSuffixExamples()[0]
@@ -29,7 +29,6 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
         hrGArgs.mask = extraMaskExpand(hrGArgs.mask, hf.extra_mask_expand)
     hrGArgs.inpainting_fill = 1 # Original
     hrGArgs.img2img_fix_steps = True
-    hrGArgs.integer_only_masked = True
     if hf.disable_cn:
         hrGArgs.cn_args = None
     if hf.soft_inpaint != 'Same' and hrGArgs.soft_inpaint_args is not None and len(hrGArgs.soft_inpaint_args) != 0:
@@ -51,11 +50,16 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     if hf.unload_detection_models:
         clearCache()
 
-    hrGArgs.width, hrGArgs.height = image.size
-    if hrGArgs.height > hf.size_limit:
-        hrGArgs.height = hf.size_limit
+    x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding,
+                                         hrGArgs.forbid_too_small_crop_region, hrGArgs.integer_only_masked)
+    hrGArgs.width = int((x2-x1) * hf.supersampling)
+    hrGArgs.height = int((y2-y1) * hf.supersampling)
     if hrGArgs.width > hf.size_limit:
         hrGArgs.width = hf.size_limit
+    if hrGArgs.height > hf.size_limit:
+        hrGArgs.height = hf.size_limit
+    hrGArgs.correct_aspect_ratio = False
+    print(f'Hires fix resolution is {hrGArgs.width}x{hrGArgs.height}')
 
     hrGArgs.batch_count = 1
     hrGArgs.batch_size = 1

@@ -49,8 +49,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value=5.5, elem_id="replacer_cfg_scale",
                         minimum=1.0, maximum=30.0, step=0.5)
 
-                    comp.fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
-                        value=False, elem_id="replacer_fix_steps")
+                    comp.correct_aspect_ratio = gr.Checkbox(label='Correct aspect ratio',
+                        value=True, elem_id="replacer_fix_steps")
 
                 with gr.Row():
                     with gr.Column(elem_id="replacer_width_height_column", elem_classes="replacer-generation-size"):
@@ -223,6 +223,8 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                 with gr.Row():
                     comp.forbid_too_small_crop_region = gr.Checkbox(label='Forbid too small crop region',
                         value=True, visible=hasattr(shared.opts, 'forbid_too_small_crop_region'), elem_id="replacer_forbid_too_small_crop_region")
+                    comp.fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
+                        value=False, elem_id="replacer_fix_steps")
 
                 with gr.Row():
                     if not isDedicatedPage:

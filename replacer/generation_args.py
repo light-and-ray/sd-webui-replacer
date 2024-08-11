@@ -24,6 +24,7 @@ class HiresFixArgs:
     extra_mask_blur: int
     randomize_seed: bool
     soft_inpaint: str
+    supersampling: float
 
 
 @dataclass
@@ -111,6 +112,7 @@ class GenerationArgs:
     variation_strength: float
     integer_only_masked: bool
     forbid_too_small_crop_region: bool
+    correct_aspect_ratio: bool
 
     hires_fix_args: HiresFixArgs
     cn_args: list

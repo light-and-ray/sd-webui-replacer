@@ -4,7 +4,7 @@ from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
 import gradio as gr
 from modules.images import resize_image
-from modules import errors, shared
+from modules import errors, shared, masking
 from modules.ui import versions_html
 from replacer.generation_args import GenerationArgs
 from replacer.options import useFastDilation, getMaskColorStr, EXT_ROOT_DIRECTORY, EXT_NAME
@@ -291,3 +291,23 @@ def removeRotationFix(image: Image.Image, fix: str) -> Image.Image:
         return image.transpose(Image.ROTATE_180)
     if fix == '⟳':
         return image.transpose(Image.ROTATE_90)
+
+
+def getActualCropRegion(mask: Image.Image, padding: int, forbid_too_small_crop_region: bool, integer_only_masked: bool):
+    if hasattr(masking, 'get_crop_region_v2'):
+        crop_region = masking.get_crop_region_v2(mask, padding)
+    else:
+        crop_region = masking.get_crop_region(mask, padding)
+
+    if crop_region:
+        x1, y1, x2, y2 = crop_region
+        w = (x2-x1)
+        h = (y2-y1)
+        crop_region = masking.expand_crop_region(crop_region, w, h, mask.width, mask.height)
+        if forbid_too_small_crop_region and hasattr(masking, 'expand_too_small_crop_region'):
+            crop_region = masking.expand_too_small_crop_region(crop_region, w, h, mask.width, mask.height)
+        if integer_only_masked and hasattr(masking, 'fix_crop_region_integer_scale'):
+            crop_region = masking.fix_crop_region_integer_scale(crop_region, w, h, mask.width, mask.height)
+
+    return crop_region
+

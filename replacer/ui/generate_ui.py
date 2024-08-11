@@ -88,6 +88,7 @@ def generate_ui_(
     variation_strength: float,
     integer_only_masked: bool,
     forbid_too_small_crop_region: bool,
+    correct_aspect_ratio: bool,
 
     ad_fragment_length,
     ad_internal_fps,
@@ -122,6 +123,7 @@ def generate_ui_(
     hf_extra_mask_blur,
     hf_randomize_seed,
     hf_soft_inpaint,
+    hf_supersampling,
 
     *scripts_args,
 ):
@@ -220,6 +222,7 @@ def generate_ui_(
         extra_mask_blur = hf_extra_mask_blur,
         randomize_seed = hf_randomize_seed,
         soft_inpaint = hf_soft_inpaint,
+        supersampling = hf_supersampling,
     )
 
     animatediff_args = AnimateDiffArgs(
@@ -288,6 +291,7 @@ def generate_ui_(
         variation_strength=variation_strength,
         integer_only_masked=integer_only_masked,
         forbid_too_small_crop_region=forbid_too_small_crop_region,
+        correct_aspect_ratio=correct_aspect_ratio,
 
         hires_fix_args=hires_fix_args,
         cn_args=cn_args,

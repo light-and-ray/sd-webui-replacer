@@ -57,6 +57,7 @@ def replacer_api(_, app: FastAPI):
         variation_strength: float = 0.0
         integer_only_masked: bool = False
         forbid_too_small_crop_region: bool = True
+        correct_aspect_ratio: bool = True
 
         use_hires_fix: bool = False
         hf_upscaler: str = "ESRGAN_4x"
@@ -78,6 +79,7 @@ def replacer_api(_, app: FastAPI):
         hf_extra_mask_blur: int = 2
         hf_randomize_seed: bool = True
         hf_soft_inpaint: str = "Same"
+        hf_supersampling: float = 1.0
 
         scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 
@@ -108,6 +110,7 @@ def replacer_api(_, app: FastAPI):
             extra_mask_blur = data.hf_extra_mask_blur,
             randomize_seed = data.hf_randomize_seed,
             soft_inpaint = data.hf_soft_inpaint,
+            supersampling = data.hf_supersampling,
         )
 
         gArgs = GenerationArgs(
@@ -157,6 +160,7 @@ def replacer_api(_, app: FastAPI):
             variation_strength=data.variation_strength,
             integer_only_masked=data.integer_only_masked,
             forbid_too_small_crop_region=data.forbid_too_small_crop_region,
+            correct_aspect_ratio=data.correct_aspect_ratio,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

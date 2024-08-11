@@ -341,6 +341,7 @@ class ReplacerMainUI:
                     comp.variation_strength,
                     comp.integer_only_masked,
                     comp.forbid_too_small_crop_region,
+                    comp.correct_aspect_ratio,
 
                     comp.ad_fragment_length,
                     comp.ad_internal_fps,
@@ -375,6 +376,7 @@ class ReplacerMainUI:
                     comp.hf_extra_mask_blur,
                     comp.hf_randomize_seed,
                     comp.hf_soft_inpaint,
+                    comp.hf_supersampling,
                 ] + comp.cn_inputs
                   + comp.soft_inpaint_inputs,
                 outputs=[
@@ -414,6 +416,7 @@ class ReplacerMainUI:
                     comp.hf_extra_mask_blur,
                     comp.hf_randomize_seed,
                     comp.hf_soft_inpaint,
+                    comp.hf_supersampling,
                 ],
                 outputs=[
                     comp.replacer_gallery,

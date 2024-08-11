@@ -37,6 +37,7 @@ def applyHiresFix(
     hf_extra_mask_blur,
     hf_randomize_seed,
     hf_soft_inpaint,
+    hf_supersampling,
 ):
     original_gallery = []
     for image in gallery:
@@ -68,6 +69,7 @@ def applyHiresFix(
         extra_mask_blur = hf_extra_mask_blur,
         randomize_seed = hf_randomize_seed,
         soft_inpaint = hf_soft_inpaint,
+        supersampling = hf_supersampling,
     )
 
     if len(gArgs.appropriateInputImageDataList) == 1:

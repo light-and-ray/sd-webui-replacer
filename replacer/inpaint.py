@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer.extensions import replacer_extensions
-from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix
+from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix, getActualCropRegion
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
@@ -73,6 +73,17 @@ def inpaint(
         subseed_strength=gArgs.variation_strength,
         **schedulerKWargs,
     )
+    if gArgs.correct_aspect_ratio:
+        x1, y1, x2, y2 = getActualCropRegion(mask, gArgs.inpaint_full_res_padding,
+                                             gArgs.forbid_too_small_crop_region, gArgs.integer_only_masked)
+        ratio = (x2-x1) / (y2-y1)
+        pixels = gArgs.width * gArgs.height
+        p.width = (pixels * ratio)**0.5
+        p.width = int(p.width)
+        p.height = (pixels / ratio)**0.5
+        p.height = int(p.height)
+        print(f'Aspect ratio has been corrected from {gArgs.width}x{gArgs.height} to {p.width}x{p.height}')
+
 
     if gArgs.do_not_use_mask and (not gArgs.upscalerForImg2Img or gArgs.upscalerForImg2Img == "None"):
         p.inpaint_full_res = False

@@ -111,6 +111,7 @@ class ReplacerScript(scripts.Script):
                 comp.variation_strength,
                 comp.integer_only_masked,
                 comp.forbid_too_small_crop_region,
+                comp.correct_aspect_ratio,
 
                 comp.hf_upscaler,
                 comp.hf_steps,
@@ -131,6 +132,7 @@ class ReplacerScript(scripts.Script):
                 comp.hf_extra_mask_blur,
                 comp.hf_randomize_seed,
                 comp.hf_soft_inpaint,
+                comp.hf_supersampling,
             ] + comp.cn_inputs \
             + comp.soft_inpaint_inputs
 
@@ -207,6 +209,7 @@ class ReplacerScript(scripts.Script):
         variation_strength,
         integer_only_masked,
         forbid_too_small_crop_region,
+        correct_aspect_ratio,
 
         hf_upscaler,
         hf_steps,
@@ -227,6 +230,7 @@ class ReplacerScript(scripts.Script):
         hf_extra_mask_blur,
         hf_randomize_seed,
         hf_soft_inpaint,
+        hf_supersampling,
 
         *scripts_args,
     ):
@@ -270,6 +274,7 @@ class ReplacerScript(scripts.Script):
             extra_mask_blur = hf_extra_mask_blur,
             randomize_seed = hf_randomize_seed,
             soft_inpaint = hf_soft_inpaint,
+            supersampling = hf_supersampling,
         )
 
         self.gArgs = GenerationArgs(
@@ -321,6 +326,7 @@ class ReplacerScript(scripts.Script):
             variation_strength=variation_strength,
             integer_only_masked=integer_only_masked,
             forbid_too_small_crop_region=forbid_too_small_crop_region,
+            correct_aspect_ratio=correct_aspect_ratio,
 
             hires_fix_args=hires_fix_args,
             cn_args=cn_args,

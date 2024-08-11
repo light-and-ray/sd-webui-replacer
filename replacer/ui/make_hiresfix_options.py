@@ -175,6 +175,16 @@ def makeHiresFixOptions(comp: AttrDict):
                         comp.hf_disable_cn.visible = False
 
                 with gr.Row():
+                    comp.hf_supersampling = gr.Slider(
+                        label='Hires supersampling',
+                        value=1.6,
+                        step=0.1,
+                        minimum=1.0,
+                        maximum=5.0,
+                        elem_id="replacer_hf_supersampling"
+                    )
+
+                with gr.Row():
                     comp.hf_soft_inpaint = gr.Radio(label='Soft inpainting for hires fix',
                         choices=['Same', 'Enable', 'Disable'],
                         value='Same', type="value", elem_id="replacer_hf_soft_inpaint")
