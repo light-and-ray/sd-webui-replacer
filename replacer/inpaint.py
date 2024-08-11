@@ -122,9 +122,6 @@ def inpaint(
                 suffix = additional_save_suffix + suffix
             save_image(processed.images[i], savePath, "", processed.all_seeds[i], gArgs.positivePrompt, opts.samples_format,
                     info=processed.infotext(p, i), p=p, suffix=suffix, save_to_dirs=save_to_dirs)
-        if shared.opts.save_mask:
-            save_image(gArgs.mask, savePath, "", processed.all_seeds[0], gArgs.positivePrompt, opts.samples_format,
-                    info=processed.infotext(p, 0), p=p, suffix='-mask', save_to_dirs=save_to_dirs)
 
     if opts.do_not_show_images:
         processed.images = []

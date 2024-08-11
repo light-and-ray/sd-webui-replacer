@@ -132,6 +132,11 @@ def generate(
                 processed, extraImages = generateSingle(image, gArgs, saveDir_, saveSuffix,
                     saveToSubdirs, extra_includes, batch_processed)
 
+                if saveDir_ and shared.opts.save_mask:
+                    save_image(gArgs.mask, saveDir_, "", processed.all_seeds[0], gArgs.positivePrompt, opts.samples_format,
+                            suffix='-mask', save_to_dirs=saveToSubdirs)
+
+
                 if gArgs.pass_into_hires_fix_automatically:
                     hrGArgs = getGenerationArgsForHiresFixPass(gArgs)
                     for i in range(lenImagesBefore, len(processed.images)):
