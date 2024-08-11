@@ -73,7 +73,7 @@ def makeHiresFixOptions(comp: AttrDict):
                     )
 
                     comp.hf_extra_inpaint_padding = gr.Slider(label='Extra inpaint padding',
-                        value=250, elem_id="replacer_hf_extra_inpaint_padding",
+                        value=90, elem_id="replacer_hf_extra_inpaint_padding",
                         minimum=0, maximum=3000, step=1)
 
                     comp.hf_extra_mask_blur = gr.Slider(label='Extra mask blur',
