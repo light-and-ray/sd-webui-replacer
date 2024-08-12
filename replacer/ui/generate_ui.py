@@ -29,7 +29,7 @@ def getLastUsedVariationSeed():
 
 
 def getLastUsedMaskNum():
-    if lastGenerationArgs is None:
+    if lastGenerationArgs is None or not lastGenerationArgs.mask_num_for_metadata:
         return "Random"
     else:
         return str(lastGenerationArgs.mask_num_for_metadata)
