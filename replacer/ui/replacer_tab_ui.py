@@ -2,7 +2,7 @@ import gradio as gr
 from modules import shared, ui_settings, errors, infotext_utils
 from modules.call_queue import wrap_gradio_gpu_call, wrap_queued_call
 from modules.ui_common import create_output_panel, update_generation_info
-from replacer.ui.generate_ui import generate_ui, getLastUsedSeed, getLastUsedVariationSeed
+from replacer.ui.generate_ui import generate_ui, getLastUsedSeed, getLastUsedVariationSeed, getLastUsedMaskNum
 from replacer.ui.apply_hires_fix import applyHiresFix
 from replacer.options import (EXT_NAME, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
@@ -462,6 +462,13 @@ class ReplacerMainUI:
                 ]
             )
 
+            comp.reuse_mask_num.click(
+                fn=getLastUsedMaskNum,
+                inputs=[],
+                outputs=[
+                    comp.mask_num,
+                ]
+            )
 
             OutputPanelWatcher.send_back_to_replacer.click(
                 fn=sendBackToReplacer,

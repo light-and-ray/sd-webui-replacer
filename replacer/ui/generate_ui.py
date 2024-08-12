@@ -28,6 +28,13 @@ def getLastUsedVariationSeed():
         return lastGenerationArgs.variation_seed
 
 
+def getLastUsedMaskNum():
+    if lastGenerationArgs is None:
+        return "Random"
+    else:
+        return str(lastGenerationArgs.mask_num_for_metadata)
+
+
 def generate_ui_(
     id_task,
     selected_input_mode: str,

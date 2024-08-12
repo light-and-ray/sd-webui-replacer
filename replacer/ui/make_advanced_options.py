@@ -140,6 +140,11 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     comp.mask_num = gr.Radio(label='Mask num',
                         choices=['Random', '1', '2', '3'],
                         value='Random', type="value", elem_id="replacer_mask_num")
+                    comp.reuse_mask_num = ToolButton(
+                        ui.reuse_symbol,
+                        elem_id="replacer_reuse_mask_num",
+                        label='Reuse mask num'
+                    )
 
                 with gr.Row():
                     comp.extra_includes = ui_settings.create_setting_component(EXT_NAME_LOWER + "_default_extra_includes")
