@@ -50,17 +50,22 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     if hf.unload_detection_models:
         clearCache()
 
-    x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding,
-                                         hrGArgs.forbid_too_small_crop_region, hrGArgs.integer_only_masked)
-    hrGArgs.width = int((x2-x1) * hf.supersampling)
+    x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding)
+    width = (x2-x1)
+    height = (y2-y1)
+    if width < gArgs.width and height < gArgs.height:
+        width = gArgs.width
+        height = gArgs.height
+    hrGArgs.width = int(width * hf.supersampling)
     hrGArgs.width = hrGArgs.width - hrGArgs.width%8 + 8
-    hrGArgs.height = int((y2-y1) * hf.supersampling)
+    hrGArgs.height = int(height * hf.supersampling)
     hrGArgs.height = hrGArgs.height - hrGArgs.height%8 + 8
     if hrGArgs.width > hf.size_limit:
         hrGArgs.width = hf.size_limit
     if hrGArgs.height > hf.size_limit:
         hrGArgs.height = hf.size_limit
     hrGArgs.correct_aspect_ratio = False
+    hrGArgs.forbid_too_small_crop_region = False
     print(f'Hires fix resolution is {hrGArgs.width}x{hrGArgs.height}')
 
     hrGArgs.batch_count = 1
