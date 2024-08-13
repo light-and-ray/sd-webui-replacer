@@ -40,7 +40,7 @@ def generateSingle(
         raise InterruptedDetection()
 
     if gArgs.correct_aspect_ratio:
-        x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding)
+        x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
         if (x2-x1) > gArgs.width or (y2-y1) > gArgs.height:
             ratio = (x2-x1) / (y2-y1)
             pixels = gArgs.width * gArgs.height

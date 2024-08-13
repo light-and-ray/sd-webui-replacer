@@ -50,7 +50,7 @@ def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
     if hf.unload_detection_models:
         clearCache()
 
-    x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding)
+    x1, y1, x2, y2 = getActualCropRegion(hrGArgs.mask, hrGArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
     width = (x2-x1)
     height = (y2-y1)
     if width < gArgs.width and height < gArgs.height:

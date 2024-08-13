@@ -293,7 +293,9 @@ def removeRotationFix(image: Image.Image, fix: str) -> Image.Image:
         return image.transpose(Image.ROTATE_90)
 
 
-def getActualCropRegion(mask: Image.Image, padding: int):
+def getActualCropRegion(mask: Image.Image, padding: int, invert: bool):
+    if invert:
+        mask = ImageChops.invert(mask)
     if hasattr(masking, 'get_crop_region_v2'):
         crop_region = masking.get_crop_region_v2(mask, padding)
     else:
