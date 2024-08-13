@@ -7,7 +7,7 @@ from modules import sd_models, errors
 from replacer.mask_creator import MaskResult, NothingDetectedError, createMask
 from replacer.generation_args import GenerationArgs, AppropriateData
 from replacer.options import EXT_NAME, needAutoUnloadModels
-from replacer.tools import clearCache, interrupted, Pause, getActualCropRegion
+from replacer.tools import clearCache, interrupted, Pause
 from replacer.inpaint import inpaint
 from replacer.hires_fix import getGenerationArgsForHiresFixPass, prepareGenerationArgsBeforeHiresFixPass
 
@@ -38,21 +38,6 @@ def generateSingle(
 
     if interrupted():
         raise InterruptedDetection()
-
-    if gArgs.correct_aspect_ratio:
-        x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
-        if (x2-x1) > gArgs.width or (y2-y1) > gArgs.height:
-            ratio = (x2-x1) / (y2-y1)
-            pixels = gArgs.width * gArgs.height
-            newW = (pixels * ratio)**0.5
-            newW = int(newW)
-            newW = newW - newW%8
-            newH = (pixels / ratio)**0.5
-            newH = int(newH)
-            newH = newH - newH%8
-            print(f'Aspect ratio has been corrected from {gArgs.width}x{gArgs.height} to {newW}x{newH}')
-            gArgs.width = newW
-            gArgs.height = newH
 
     if maskResult.maskPreview:
         shared.state.assign_current_image(maskResult.maskPreview)

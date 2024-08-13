@@ -8,6 +8,9 @@ from replacer.tools import clearCache, generateSeed, extraMaskExpand, getActualC
 def prepareGenerationArgsBeforeHiresFixPass(gArgs: GenerationArgs) -> None:
     hf = gArgs.hires_fix_args
     gArgs.upscalerForImg2Img = hf.upscaler
+    if gArgs.originalW is not None:
+        gArgs.width = gArgs.originalW
+        gArgs.height = gArgs.originalH
 
 
 def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:

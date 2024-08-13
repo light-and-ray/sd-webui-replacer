@@ -63,10 +63,10 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     with gr.Column(elem_id="replacer_batch_count_size_column", elem_classes="replacer-batch-count-size"):
                         comp.batch_count = gr.Slider(label='batch count',
                             value=1, elem_id="replacer_batch_count",
-                            minimum=1, maximum=10, step=1)
+                            minimum=1, maximum=12, step=1)
                         comp.batch_size = gr.Slider(label='batch size',
                             value=1, elem_id="replacer_batch_size",
-                            minimum=1, maximum=10, step=1)
+                            minimum=1, maximum=12, step=1)
 
                 with gr.Row():
                     comp.upscaler_for_img2img = gr.Dropdown(

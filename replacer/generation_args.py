@@ -123,6 +123,8 @@ class GenerationArgs:
     hiresFixCacheData: HiresFixCacheData = None
     addHiresFixIntoMetadata: bool = False
     appropriateInputImageDataList: list[AppropriateData] = None
+    originalW = None
+    originalH = None
 
 
     def copy(self):

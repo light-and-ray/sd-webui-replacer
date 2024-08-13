@@ -7,7 +7,7 @@ from modules.images import save_image
 from modules import errors
 from replacer.generation_args import GenerationArgs
 from replacer.extensions import replacer_extensions
-from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix
+from replacer.tools import addReplacerMetadata, limitSizeByOneDimension, applyRotationFix, removeRotationFix, getActualCropRegion
 from replacer.ui.tools_ui import IS_WEBUI_1_9
 
 
@@ -21,6 +21,24 @@ def inpaint(
     save_to_dirs : bool = True,
     batch_processed : Processed = None
 ):
+    if gArgs.correct_aspect_ratio:
+        if gArgs.originalW is None:
+            gArgs.originalW = gArgs.width
+            gArgs.originalH = gArgs.height
+        x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
+        if (x2-x1) > gArgs.originalW or (y2-y1) > gArgs.originalH:
+            ratio = (x2-x1) / (y2-y1)
+            pixels = gArgs.originalW * gArgs.originalH
+            newW = (pixels * ratio)**0.5
+            newW = int(newW)
+            newW = newW - newW%8
+            newH = (pixels / ratio)**0.5
+            newH = int(newH)
+            newH = newH - newH%8
+            print(f'Aspect ratio has been corrected from {gArgs.originalW}x{gArgs.originalH} to {newW}x{newH}')
+            gArgs.width = newW
+            gArgs.height = newH
+
     override_settings = {}
     if gArgs.upscalerForImg2Img is not None and gArgs.upscalerForImg2Img != "" and gArgs.upscalerForImg2Img != "None":
         override_settings["upscaler_for_img2img"] = gArgs.upscalerForImg2Img
