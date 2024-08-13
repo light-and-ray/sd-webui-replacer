@@ -156,7 +156,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value=4, elem_id="replacer_mask_blur",
                         minimum=0, maximum=100, step=1)
                     comp.inpaint_padding = gr.Slider(label='Padding',
-                        value=40, elem_id="replacer_inpaint_padding",
+                        value=90, elem_id="replacer_inpaint_padding",
                         minimum=0, maximum=1000, step=1)
 
                 with gr.Row():

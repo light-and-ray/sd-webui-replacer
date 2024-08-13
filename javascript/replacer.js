@@ -33,6 +33,8 @@ titles = {
     "Extra mask expand": "Extra mask dilation on hires fix step, px, relative to \"Max resolution on detection\"",
     "Limit avoidance mask canvas resolution on creating": "Limit the canvas created by the button, using \"Max resolution on detection\" option",
     "Limit custom mask canvas resolution on creating": "Limit the canvas created by the button, using \"Max resolution on detection\" option",
+    "Hires supersampling": "1.0 is the resolution of original image's crop region, but not smaller then firstpass resolution. More then 1.0 - multiplying on this number each sides. It calculates before limiting resolution, so it still can't be bigger then you set above",
+    "Correct aspect ratio": "Preserve original width x height number of pixels, but follow generated mask's aspect ratio. In some cases can hide necessary context",
 };
 
 
