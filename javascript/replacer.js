@@ -206,3 +206,16 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
 }
 
 onUiLoaded(replacer_imageComparisonAddButton);
+
+
+function closeAllVideoMasks() {
+    const videoMasks = document.querySelectorAll('.replacer_video_mask');
+    videoMasks.forEach((mask) => {
+        const removeButton = mask.querySelector('button[title="Remove Image"]');
+        if (removeButton) {
+            removeButton.click();
+        }
+    });
+    return [...arguments]
+}
+

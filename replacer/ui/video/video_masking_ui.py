@@ -2,7 +2,7 @@ import gradio as gr
 from replacer.ui.tools_ui import AttrDict
 from replacer.tools import EXT_NAME
 
-from .masking import generateEmptyMasks, reloadMasks, goNextPage, goPrevPage, goToPage
+from .masking import generateEmptyMasks, reloadMasks, goNextPage, goPrevPage, goToPage, addMasks, subMasks
 
 
 def getMaskComponent(num: int):
@@ -14,13 +14,15 @@ def getMaskComponent(num: int):
             tool="sketch",
             image_mode="RGBA",
             brush_color="#5f008f",
-            elem_id=f'replacer_video_mask_{num}')
+            elem_id=f'replacer_video_mask_{num}',
+            elem_classes='replacer_video_mask',
+        )
     return mask
 
 
 def makeVideoMaskingUI(comp: AttrDict):
     with gr.Row():
-        reload_masks = gr.Button("Reload masks")
+        reload_masks = gr.Button("⟳ Reload masks")
         generate_empty_masks = gr.Button("Generate empty masks")
         generate_detected_masks = gr.Button("Generate detected masks")
         gr.Markdown(f"All detection options including prompt are taken from {EXT_NAME} tab")
@@ -41,8 +43,8 @@ def makeVideoMaskingUI(comp: AttrDict):
         selectedPage = gr.Number(value=0, visible=False, precision=0)
         goPrev = gr.Button("← Prev. page")
         goNext = gr.Button("Next page →")
-        addMasks = gr.Button("⧉ Add masks on this page")
-        subMasks = gr.Button("⧉ Subtract masks on this page")
+        addMasksButton = gr.Button("⧉ Add masks on this page")
+        subMasksButton = gr.Button("⧉ Subtract masks on this page")
     with gr.Row():
         pageToGo = gr.Number(label="Page to go", value=1, precision=0)
         goToPageButton = gr.Button("Go to page")
@@ -51,27 +53,54 @@ def makeVideoMaskingUI(comp: AttrDict):
 
     generate_empty_masks.click(
         fn=generateEmptyMasks,
+        _js='closeAllVideoMasks',
         inputs=[comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
     reload_masks.click(
         fn=reloadMasks,
+        _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
     goPrev.click(
         fn=goPrevPage,
+        _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
     goNext.click(
         fn=goNextPage,
+        _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
     goToPageButton.click(
         fn=goToPage,
+        _js='closeAllVideoMasks',
         inputs=[comp.selected_project, pageToGo],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
+
+    addMasksButton.click(
+        fn=addMasks,
+        inputs=[comp.selected_project, selectedPage, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+    ).then(
+        fn=reloadMasks,
+        _js='closeAllVideoMasks',
+        inputs=[comp.selected_project, selectedPage],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+    )
+
+    subMasksButton.click(
+        fn=subMasks,
+        inputs=[comp.selected_project, selectedPage, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+    ).then(
+        fn=reloadMasks,
+        _js='closeAllVideoMasks',
+        inputs=[comp.selected_project, selectedPage],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+    )
 

@@ -1,6 +1,6 @@
 import os, shutil, math
 import gradio as gr
-from PIL import Image
+from PIL import Image, ImageOps
 from modules import shared
 
 from replacer.video_tools import separate_video_into_frames
@@ -57,7 +57,7 @@ def getMasksPreview(project_path: str, page: int):
     for i in range(len(composited), 10):
         composited.append(None)
     # for i in range(len(composited)):
-    #     composited[i] = gr.update(value={'image': composited[i], 'mask': None})
+    #     composited[i] = dict(image=composited[i], mask=composited[i])
     return page, f"**Page {page+1}/{math.ceil(totalFrames/10)}**", *composited
 
 
@@ -122,4 +122,38 @@ def goToPage(project_path: str, page: int):
     if page < 0 or page > totalPages:
         raise gr.Error(f"Page {page+1} is out of range 1, {totalPages+1}")
     return getMasksPreview(project_path, page=page)
+
+
+
+
+def processMasks(action: str, project_path: str, page: int, masksNew: list[Image.Image]):
+    masksOld = getMasks(project_path)
+    if not masksOld:
+        raise gr.Error("This project doesn't have masks")
+    masksOld = list(masksOld)
+    firstMaskIdx = page*10
+    for idx in range(len(masksNew)):
+        maskNew = masksNew[idx]['mask'].convert('L')
+        maskOld = masksOld[firstMaskIdx+idx].convert('L')
+        if not maskNew: continue
+        if action == 'add':
+            whiteFilling = Image.new('L', maskOld.size, 255)
+            editedMask = maskOld
+            editedMask.paste(whiteFilling, maskNew.resize(maskOld.size))
+        elif action == 'sub':
+            maskTmp = ImageOps.invert(maskOld)
+            whiteFilling = Image.new('L', maskTmp.size, 255)
+            maskTmp.paste(whiteFilling, maskNew.resize(maskOld.size))
+            editedMask = ImageOps.invert(maskTmp)
+        saveMask(project_path, editedMask, firstMaskIdx+idx)
+    return getMasksPreview(project_path, page=page)
+
+
+def addMasks(project_path: str, page: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
+    processMasks('add', project_path, page, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
+    return tuple([gr.update()] * 12)
+
+def subMasks(project_path: str, page: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
+    processMasks('sub', project_path, page, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
+    return tuple([gr.update()] * 12)
 
