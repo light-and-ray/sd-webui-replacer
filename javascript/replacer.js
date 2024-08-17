@@ -227,10 +227,12 @@ onUiLoaded(replacer_imageComparisonAddButton);
 
 function closeAllVideoMasks() {
     const videoMasks = document.querySelectorAll('.replacer_video_mask');
-    videoMasks.forEach((mask) => {
+    videoMasks.forEach((mask, index) => {
         const removeButton = mask.querySelector('button[title="Remove Image"]');
         if (removeButton) {
-            removeButton.click();
+            setTimeout(() => {
+                removeButton.click();
+            }, index * 60);
         }
     });
     return [...arguments]
