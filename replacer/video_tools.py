@@ -29,12 +29,7 @@ def separate_video_into_frames(video_path, fps_out, out_path):
     os.makedirs(out_path, exist_ok=True)
 
     # Open the video file
-    video = cv2.VideoCapture(video_path)
-    fps_in = video.get(cv2.CAP_PROP_FPS)
-    # if fps_out == 0:
-    #     fps_out = fps_in
-    print('fps_in:', fps_in, 'fps_out:', fps_out)
-    video.release()
+    assert fps_out != 0, "fps can't be 0"
 
     runFFMPEG(
         '-i', video_path,

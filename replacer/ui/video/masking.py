@@ -5,6 +5,7 @@ from modules import shared
 
 from replacer.video_tools import separate_video_into_frames
 from replacer.tools import limitImageByOneDimension, makePreview
+from replacer.options import getLimitMaskEditingResolution
 from .project import getOriginalVideoPath, getFrames, getMasks
 
 
@@ -49,7 +50,7 @@ def getMasksPreview(project_path: str, page: int):
     masks = masks[start: end]
 
     for i in range(len(frames)):
-        frames[i] = limitImageByOneDimension(frames[i], 800)
+        frames[i] = limitImageByOneDimension(frames[i], getLimitMaskEditingResolution())
         masks[i] = masks[i].resize(frames[i].size)
 
     composited: list[Image.Image] = []
@@ -58,8 +59,7 @@ def getMasksPreview(project_path: str, page: int):
 
     for i in range(len(composited), 10):
         composited.append(None)
-    # for i in range(len(composited)):
-    #     composited[i] = dict(image=composited[i], mask=composited[i])
+
     return page, f"**Page {page+1}/{math.ceil(totalFrames/10)}**", *composited
 
 
@@ -85,9 +85,9 @@ def reloadMasks(project_path: str, page: int):
     if not masks:
         raise gr.Error("This project doesn't have masks")
     totalFrames = len(list(masks))
-    totalPages = math.ceil(totalFrames/10)
+    totalPages = math.ceil(totalFrames/10) - 1
 
-    if page > totalPages:
+    if page > totalPages or page < 0:
         page = 0
     return getMasksPreview(project_path, page=page)
 
@@ -130,7 +130,7 @@ def goToPage(project_path: str, page: int):
     totalFrames = len(list(masks))
     totalPages = math.ceil(totalFrames/10) - 1
     if page < 0 or page > totalPages:
-        raise gr.Error(f"Page {page+1} is out of range 1, {totalPages+1}")
+        raise gr.Error(f"Page {page+1} is out of range [1, {totalPages+1}]")
     return getMasksPreview(project_path, page=page)
 
 

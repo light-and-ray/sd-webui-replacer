@@ -72,6 +72,13 @@ def getMaskColorStr():
     return opt
 
 
+defaultVideoMaskEditingColor = "#5f008f"
+
+def getVideoMaskEditingColorStr():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_video_mask_editing_color", defaultVideoMaskEditingColor)
+    return opt
+
+
 detectionPromptExamples_defaults = [
             "background",
             "hairstyle",
@@ -175,6 +182,10 @@ def getPositivePromptExamplesNumber():
 
 def getNegativePromptExamplesNumber():
     res : int = shared.opts.data.get(EXT_NAME_LOWER + "_examples_per_page_for_negative_prompt", 10)
+    return res
+
+def getLimitMaskEditingResolution():
+    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_limit_mask_editing_resolution", 1280)
     return res
 
 
@@ -421,6 +432,31 @@ def on_ui_settings():
             gr.Textbox,
             {
                 "visible": not shared.cmd_opts.hide_ui_dir_config,
+            },
+            section=section,
+        )
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_video_mask_editing_color",
+        shared.OptionInfo(
+            defaultVideoMaskEditingColor,
+            "Color for editing mask in video masking tab",
+            gr.ColorPicker,
+            section=section,
+        ).needs_reload_ui()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_limit_mask_editing_resolution",
+        shared.OptionInfo(
+            1280,
+            "Limit resolution in all mask editors",
+            gr.Number,
+            {
+                "minimum": 256,
+                "maximum": 4096,
+                "precision": 0,
             },
             section=section,
         )

@@ -461,7 +461,6 @@ def getTabUI(comp: AttrDict, isDedicatedPage: bool):
                 comp.dummy_component,
                 comp.trueComponent,
                 comp.avoid_mask_need_limit,
-                comp.max_resolution_on_detection
             ],
             outputs=[comp.avoidance_mask],
             postprocess=False,
@@ -481,7 +480,6 @@ def getTabUI(comp: AttrDict, isDedicatedPage: bool):
                 comp.dummy_component,
                 comp.falseComponent,
                 comp.custom_mask_need_limit,
-                comp.max_resolution_on_detection
             ],
             outputs=[comp.custom_mask],
             postprocess=False,

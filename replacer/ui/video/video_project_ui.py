@@ -8,7 +8,7 @@ from .project import select, init, genNewProjectPath
 def makeVideoProjectUI(comp: AttrDict):
     with ResizeHandleRow():
         with gr.Column():
-            gr.Markdown("__*Init*__")
+            gr.Markdown("**--Init--**")
             init_video = gr.Textbox(
                 label="Init video",
                 placeholder="A video on the same machine where the server is running.",
@@ -21,7 +21,7 @@ def makeVideoProjectUI(comp: AttrDict):
             init_button = gr.Button("Init")
 
         with gr.Column():
-            gr.Markdown("__*Select*__")
+            gr.Markdown("**--Select--**")
             select_path = gr.Textbox(label="Project path")
             select_button = gr.Button("Select")
 

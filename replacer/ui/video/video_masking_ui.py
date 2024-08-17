@@ -1,6 +1,7 @@
 import gradio as gr
 from replacer.ui.tools_ui import AttrDict
 from replacer.tools import EXT_NAME
+from replacer.options import getVideoMaskEditingColorStr
 
 from .masking import generateEmptyMasks, reloadMasks, goNextPage, goPrevPage, goToPage, addMasks, subMasks
 
@@ -13,7 +14,7 @@ def getMaskComponent(num: int):
             type="pil",
             tool="sketch",
             image_mode="RGBA",
-            brush_color="#5f008f",
+            brush_color=getVideoMaskEditingColorStr(),
             elem_id=f'replacer_video_mask_{num}',
             elem_classes='replacer_video_mask',
         )
@@ -46,7 +47,7 @@ def makeVideoMaskingUI(comp: AttrDict):
         addMasksButton = gr.Button("⧉ Add masks on this page")
         subMasksButton = gr.Button("⧉ Subtract masks on this page")
     with gr.Row():
-        pageToGo = gr.Number(label="Page to go", value=1, precision=0)
+        pageToGo = gr.Number(label="Page to go", value=1, precision=0, minimum=1)
         goToPageButton = gr.Button("Go to page")
         gr.Markdown('If you see broken images, just click "Reload page"')
 
@@ -81,6 +82,8 @@ def makeVideoMaskingUI(comp: AttrDict):
         inputs=[comp.selected_project, pageToGo],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         )
+
+
 
     addMasksButton.click(
         fn=addMasks,
