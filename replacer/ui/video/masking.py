@@ -145,9 +145,11 @@ def processMasks(action: str, project_path: str, page: int, masksNew: list[Image
     masksOld = list(masksOld)
     firstMaskIdx = page*10
     for idx in range(len(masksNew)):
-        maskNew = masksNew[idx]['mask'].convert('L')
-        maskOld = masksOld[firstMaskIdx+idx].convert('L')
+        maskNew = masksNew[idx]
         if not maskNew: continue
+        maskNew = maskNew['mask'].convert('L')
+        maskOld = masksOld[firstMaskIdx+idx].convert('L')
+
         if action == 'add':
             whiteFilling = Image.new('L', maskOld.size, 255)
             editedMask = maskOld
