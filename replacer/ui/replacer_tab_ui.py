@@ -14,15 +14,9 @@ from replacer.ui.make_advanced_options import makeAdvancedOptions
 from replacer.ui.make_hiresfix_options import makeHiresFixOptions
 from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, unloadModels, AttrDict,
     getSubmitJsFunction, sendBackToReplacer, IS_WEBUI_1_8, OutputPanelWatcher, ui_toprow,
-    OverrideCustomScriptSource,
+    OverrideCustomScriptSource, ResizeHandleRow,
 )
 from replacer.tools import Pause
-
-
-try:
-    from modules.ui_components import ResizeHandleRow
-except:
-    ResizeHandleRow = gr.Row
 
 
 

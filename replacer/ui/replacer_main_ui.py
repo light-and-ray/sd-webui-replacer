@@ -2,8 +2,8 @@ import gradio as gr
 from modules import infotext_utils
 from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import AttrDict
-from replacer.tools import Pause
 from replacer.ui.replacer_tab_ui import getTabUI
+from replacer.ui.video.replace_video_tab_ui import getVideoTabUI
 
 
 try:
@@ -23,11 +23,16 @@ class ReplacerMainUI:
     def init_tab(self, isDedicatedPage: bool):
         comp = AttrDict()
         self.replacerTabUI = getTabUI(comp, isDedicatedPage)
+        self.replacerVideoTabUI = getVideoTabUI(comp, isDedicatedPage)
+
         self.components = comp
 
 
     def getReplacerTabUI(self):
         return self.replacerTabUI
+
+    def getReplacerVideoTabUI(self):
+        return self.replacerVideoTabUI
 
 
 replacerMainUI: ReplacerMainUI = None

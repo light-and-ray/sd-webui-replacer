@@ -169,3 +169,9 @@ def watchSetCustomScriptSourceForComponents(component, **kwargs):
     global custom_script_source
     if custom_script_source is not None:
         component.custom_script_source = custom_script_source
+
+
+try:
+    from modules.ui_components import ResizeHandleRow
+except:
+    ResizeHandleRow = gr.Row

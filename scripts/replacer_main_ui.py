@@ -15,7 +15,9 @@ from replacer.extensions import replacer_extensions
 def on_ui_tabs():
     replacer_main_ui.reinitMainUIAfterUICreated()
     tab = replacer_main_ui.replacerMainUI.getReplacerTabUI()
-    return [(tab, EXT_NAME, EXT_NAME)]
+    video_tab = replacer_main_ui.replacerMainUI.getReplacerVideoTabUI()
+    video_title = f"{EXT_NAME} - video"
+    return [(tab, EXT_NAME, EXT_NAME), (video_tab, video_title, video_title)]
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
 
@@ -36,6 +38,9 @@ def mountDedicatedPage(demo, app):
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     tab = replacer_main_ui.replacerMainUI_dedicated.getReplacerTabUI()
                     tab.render()
+                with gr.Tab(label=f"Video", elem_id=f"tab_video"):
+                    tab_video = replacer_main_ui.replacerMainUI_dedicated.getReplacerVideoTabUI()
+                    tab_video.render()
                 replacer_extensions.image_comparison.mountImageComparisonTab()
 
             footer = getReplacerFooter()
