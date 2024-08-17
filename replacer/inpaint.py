@@ -21,7 +21,7 @@ def inpaint(
     save_to_dirs : bool = True,
     batch_processed : Processed = None
 ):
-    if gArgs.correct_aspect_ratio:
+    if gArgs.correct_aspect_ratio and gArgs.mask:
         if gArgs.originalW is None:
             gArgs.originalW = gArgs.width
             gArgs.originalH = gArgs.height
