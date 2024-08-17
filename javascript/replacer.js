@@ -79,16 +79,8 @@ function replacerApplyZoomAndPanIntegration() {
     if (typeof window.applyZoomAndPanIntegration === "function" && !isZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
 
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_1", "#replacer_video_mask_1"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_2", "#replacer_video_mask_2"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_3", "#replacer_video_mask_3"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_4", "#replacer_video_mask_4"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_5", "#replacer_video_mask_5"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_6", "#replacer_video_mask_6"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_7", "#replacer_video_mask_7"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_8", "#replacer_video_mask_8"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_9", "#replacer_video_mask_9"]);
-        // window.applyZoomAndPanIntegration("#replacer_video_masking_tab", ["#replacer_video_mask_group_10", "#replacer_video_mask_10"]);
+        const maskIds = [...Array(10).keys()].map(i => `#replacer_video_mask_${i + 1}`);
+        window.applyZoomAndPanIntegration("#replacer_video_masking_tab", maskIds);
 
         isZoomAndPanIntegrationApplied = true;
     }

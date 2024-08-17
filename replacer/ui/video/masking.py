@@ -37,6 +37,8 @@ def saveMask(project_path: str, mask: Image.Image, number: int):
 
 
 def getMasksPreview(project_path: str, page: int):
+    if not project_path:
+        raise gr.Error("No project selected")
     frames = list(getFrames(project_path))
     masks = list(getMasks(project_path))
     totalFrames = len(masks)
@@ -77,6 +79,8 @@ def generateEmptyMasks(project_path: str, fps_out: int, only_the_first_fragment:
 
 
 def reloadMasks(project_path: str, page: int):
+    if not project_path:
+        raise gr.Error("No project selected")
     masks = getMasks(project_path)
     if not masks:
         raise gr.Error("This project doesn't have masks")
@@ -89,6 +93,8 @@ def reloadMasks(project_path: str, page: int):
 
 
 def goNextPage(project_path: str, page: int):
+    if not project_path:
+        raise gr.Error("No project selected")
     masks = getMasks(project_path)
     if not masks:
         raise gr.Error("This project doesn't have masks")
@@ -101,6 +107,8 @@ def goNextPage(project_path: str, page: int):
 
 
 def goPrevPage(project_path: str, page: int):
+    if not project_path:
+        raise gr.Error("No project selected")
     masks = getMasks(project_path)
     if not masks:
         raise gr.Error("This project doesn't have masks")
@@ -113,6 +121,8 @@ def goPrevPage(project_path: str, page: int):
 
 
 def goToPage(project_path: str, page: int):
+    if not project_path:
+        raise gr.Error("No project selected")
     page = page-1
     masks = getMasks(project_path)
     if not masks:
@@ -127,6 +137,8 @@ def goToPage(project_path: str, page: int):
 
 
 def processMasks(action: str, project_path: str, page: int, masksNew: list[Image.Image]):
+    if not project_path:
+        raise gr.Error("No project selected")
     masksOld = getMasks(project_path)
     if not masksOld:
         raise gr.Error("This project doesn't have masks")
