@@ -34,7 +34,6 @@ def separate_video_into_frames(video_path, fps_out, out_path, ext):
     runFFMPEG(
         '-i', video_path,
         '-vf', f'fps={fps_out}',
-        # '-qscale:v', '2',
         '-y',
         os.path.join(out_path, f'frame_%05d.{ext}'),
     )

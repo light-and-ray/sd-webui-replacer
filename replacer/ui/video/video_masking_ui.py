@@ -40,7 +40,7 @@ def makeVideoMaskingUI(comp: AttrDict):
         mask9 = getMaskComponent(9)
         mask10 = getMaskComponent(10)
     with gr.Row():
-        pageLabel = gr.Markdown("**Page 0/0**")
+        pageLabel = gr.Markdown("**Page 0/0**", elem_id="replacer_video_masking_page_label")
         selectedPage = gr.Number(value=0, visible=False, precision=0)
         goPrev = gr.Button("← Prev. page")
         goNext = gr.Button("Next page →")
