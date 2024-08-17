@@ -31,8 +31,8 @@ def separate_video_into_frames(video_path, fps_out, out_path):
     # Open the video file
     video = cv2.VideoCapture(video_path)
     fps_in = video.get(cv2.CAP_PROP_FPS)
-    if fps_out == 0:
-        fps_out = fps_in
+    # if fps_out == 0:
+    #     fps_out = fps_in
     print('fps_in:', fps_in, 'fps_out:', fps_out)
     video.release()
 
@@ -43,15 +43,13 @@ def separate_video_into_frames(video_path, fps_out, out_path):
         os.path.join(out_path, 'frame_%05d.png'),
     )
 
-    return fps_in, fps_out
-
 
 def readImages(input_dir):
     assert input_dir, 'input directory not selected'
     image_list = shared.listfiles(input_dir)
     for filename in image_list:
         try:
-            image = Image.open(filename).convert('RGBA')
+            image = Image.open(filename)
         except Exception:
             continue
         yield image

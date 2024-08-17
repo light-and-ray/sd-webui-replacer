@@ -34,12 +34,12 @@ def getVideoTabUI(isDedicatedPage: bool):
             with gr.Tabs():
                 with gr.Tab("Step 1 (Project)"):
                     makeVideoProjectUI(comp)
-                with gr.Tab("Step 2 (Masking)", elem_id="replacer_video_masking_tab"):
-                    makeVideoMaskingUI(comp)
-                with gr.Tab("Step 3 (First frame)"):
-                    pass
-                with gr.Tab("Step 4 (Options)"):
+                with gr.Tab("Step 2 (Options)"):
                     makeVideoOptionsUI(comp)
+                with gr.Tab("Step 3 (Masking)", elem_id="replacer_video_masking_tab"):
+                    makeVideoMaskingUI(comp)
+                with gr.Tab("Step 4 (First frame)"):
+                    pass
                 with gr.Tab("Step 5 (Generation)"):
                     pass
             comp.selected_project_status.render()

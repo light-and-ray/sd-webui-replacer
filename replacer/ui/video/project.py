@@ -1,6 +1,8 @@
 import os, glob, shutil, datetime
 import gradio as gr
+from PIL import Image
 from replacer.tools import convertIntoPath, EXT_NAME
+from replacer.video_tools import readImages
 
 
 def getOriginalVideoPath(project_path: str):
@@ -33,10 +35,23 @@ def init(project_path: str, init_video: str):
     return f"✅ Selected a new project {project_path!r}", project_path, project_path
 
 
-def genNewProjectPath(init_video: str):
+def genNewProjectPath(init_video: str) -> str:
     init_video = convertIntoPath(init_video)
     if not init_video:
         return ""
     timestamp = int(datetime.datetime.now().timestamp())
     name = f'{EXT_NAME} project - {timestamp}'
     return os.path.join(os.path.dirname(init_video), name)
+
+
+def getFrames(project_path: str):
+    framesDir = os.path.join(project_path, 'frames')
+    if not os.path.exists(framesDir):
+        return None
+    return readImages(framesDir)
+
+def getMasks(project_path: str):
+    framesDir = os.path.join(project_path, 'masks')
+    if not os.path.exists(framesDir):
+        return None
+    return readImages(framesDir)

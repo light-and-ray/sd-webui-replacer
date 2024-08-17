@@ -8,7 +8,6 @@ from replacer.ui.tools_ui import AttrDict, ResizeHandleRow
 def makeVideoOptionsUI(comp: AttrDict):
     comp.target_video_fps = gr.Slider(
         label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0,
-        info="(0 = fps from input video)",
         elem_id="replacer_video_fps")
 
     comp.selected_video_mode = gr.Textbox(value="video_mode_animatediff", visible=False)
@@ -77,7 +76,7 @@ def makeVideoOptionsUI(comp: AttrDict):
                         )
 
                 with gr.Column():
-                    with gr.Accordion("Models", open=False):
+                    with gr.Accordion("Models", open=True):
                         with gr.Row():
                             inpaintModels = replacer_extensions.controlnet.getInpaintModels()
                             comp.ad_cn_inpainting_model = gr.Dropdown(

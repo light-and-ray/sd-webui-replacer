@@ -94,13 +94,20 @@ def fastMaskDilate_(mask, dilation_amount):
     return Image.fromarray(dilated_mask).convert(oldMode)
 
 
+def makePreview(image: Image.Image, mask: Image.Image):
+    mask = mask.convert('L')
+    maskFilling = Image.new('RGBA', mask.size, (0, 0, 0, 0))
+    maskFilling.paste(Image.new('RGBA', mask.size, ImageColor.getcolor(f'{getMaskColorStr()}7F', 'RGBA')), mask)
+    preview = image.resize(mask.size)
+    preview.paste(maskFilling, (0, 0), maskFilling)
+    return preview
+
+
+
 def fastMaskDilate(mask, _, dilation_amount, imageResized):
     print("Dilation Amount: ", dilation_amount)
     dilated_mask = fastMaskDilate_(mask, dilation_amount // 2)
-    maskFilling = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
-    maskFilling.paste(Image.new('RGBA', dilated_mask.size, ImageColor.getcolor(f'{getMaskColorStr()}7F', 'RGBA')), dilated_mask)
-    preview = imageResized.resize(dilated_mask.size)
-    preview.paste(maskFilling, (0, 0), maskFilling)
+    preview = makePreview(imageResized, dilated_mask)
     cutted = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
     cutted.paste(imageResized, dilated_mask)
 

@@ -38,7 +38,7 @@ def mountDedicatedPage(demo, app):
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
                     tab = replacer_main_ui.replacerMainUI_dedicated.getReplacerTabUI()
                     tab.render()
-                with gr.Tab(label=f"Video", elem_id=f"tab_video"):
+                with gr.Tab(label="Video", elem_id=f"tab_video"):
                     tab_video = replacer_main_ui.replacerMainUI_dedicated.getReplacerVideoTabUI()
                     tab_video.render()
                 replacer_extensions.image_comparison.mountImageComparisonTab()
@@ -48,7 +48,9 @@ def mountDedicatedPage(demo, app):
 
         loadsave = copy.copy(demo.ui_loadsave)
         loadsave.finalized_ui = False
-        loadsave.add_block(replacerUi, EXT_NAME)
+        video_title = f"{EXT_NAME} - video"
+        loadsave.add_block(tab, EXT_NAME)
+        loadsave.add_block(tab_video, video_title)
         loadsave.dump_defaults()
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)
