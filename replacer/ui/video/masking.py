@@ -5,7 +5,7 @@ from modules import shared
 
 from replacer.video_tools import separate_video_into_frames
 from replacer.tools import limitImageByOneDimension, makePreview
-from replacer.options import getLimitMaskEditingResolution
+from replacer.options import getLimitVideoMaskEditingResolution
 from .project import getOriginalVideoPath, getFrames, getMasks
 
 
@@ -50,7 +50,7 @@ def getMasksPreview(project_path: str, page: int):
     masks = masks[start: end]
 
     for i in range(len(frames)):
-        frames[i] = limitImageByOneDimension(frames[i], getLimitMaskEditingResolution())
+        frames[i] = limitImageByOneDimension(frames[i], getLimitVideoMaskEditingResolution())
         masks[i] = masks[i].resize(frames[i].size)
 
     composited: list[Image.Image] = []
