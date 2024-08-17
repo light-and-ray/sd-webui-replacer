@@ -271,7 +271,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         interactive=True,
                         type="pil",
                         tool="sketch",
-                        image_mode="RGBA",
+                        image_mode="RGB",
                         brush_color=getMaskColorStr(),
                         height=shared.opts.img2img_editor_height
                     )
@@ -303,7 +303,7 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         interactive=True,
                         type="pil",
                         tool="sketch",
-                        image_mode="RGBA",
+                        image_mode="RGB",
                         brush_color=getMaskColorStr(),
                         height=shared.opts.img2img_editor_height
                     )

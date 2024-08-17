@@ -13,7 +13,7 @@ def getMaskComponent(num: int):
             interactive=True,
             type="pil",
             tool="sketch",
-            image_mode="RGBA",
+            image_mode="RGB",
             brush_color=getVideoMaskEditingColorStr(),
             elem_id=f'replacer_video_mask_{num}',
             elem_classes='replacer_video_mask',
@@ -49,7 +49,7 @@ def makeVideoMaskingUI(comp: AttrDict):
     with gr.Row():
         pageToGo = gr.Number(label="Page to go", value=1, precision=0, minimum=1)
         goToPageButton = gr.Button("Go to page")
-        gr.Markdown('If you see broken images, just click "Reload page"')
+        gr.Markdown('Quality of masks preview is reduced for performance\nIf you see broken images, just click "Reload page"')
 
 
     generate_empty_masks.click(
@@ -57,30 +57,35 @@ def makeVideoMaskingUI(comp: AttrDict):
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
         )
     reload_masks.click(
         fn=reloadMasks,
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
         )
     goPrev.click(
         fn=goPrevPage,
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
         )
     goNext.click(
         fn=goNextPage,
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
         )
     goToPageButton.click(
         fn=goToPage,
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, pageToGo],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
         )
 
 
@@ -94,6 +99,7 @@ def makeVideoMaskingUI(comp: AttrDict):
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
     )
 
     subMasksButton.click(
@@ -105,5 +111,6 @@ def makeVideoMaskingUI(comp: AttrDict):
         _js='closeAllVideoMasks',
         inputs=[comp.selected_project, selectedPage],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
     )
 

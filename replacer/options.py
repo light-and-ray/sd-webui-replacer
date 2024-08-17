@@ -188,10 +188,6 @@ def getLimitMaskEditingResolution():
     res : int = shared.opts.data.get(EXT_NAME_LOWER + "_limit_mask_editing_resolution", 1280)
     return res
 
-def getLimitVideoMaskEditingResolution():
-    res : int = shared.opts.data.get(EXT_NAME_LOWER + "_limit_video_mask_editing_resolution", 600)
-    return res
-
 
 if not hasattr(shared.OptionInfo, 'needs_reload_ui'): # webui 1.5.0
     shared.OptionInfo.needs_reload_ui = lambda self: self.info('requires Reload UI')
@@ -445,7 +441,7 @@ def on_ui_settings():
         EXT_NAME_LOWER + "_limit_mask_editing_resolution",
         shared.OptionInfo(
             1280,
-            "Limit resolution in mask editors",
+            "Limit resolution in all mask editors",
             gr.Number,
             {
                 "minimum": 256,
@@ -466,19 +462,5 @@ def on_ui_settings():
         ).needs_reload_ui()
     )
 
-    shared.opts.add_option(
-        EXT_NAME_LOWER + "_limit_video_mask_editing_resolution",
-        shared.OptionInfo(
-            600,
-            "Limit resolution in video mask editors",
-            gr.Number,
-            {
-                "minimum": 256,
-                "maximum": 4096,
-                "precision": 0,
-            },
-            section=section,
-        )
-    )
 
 

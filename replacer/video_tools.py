@@ -21,7 +21,7 @@ def runFFMPEG(*ffmpeg_cmd):
 
 
 
-def separate_video_into_frames(video_path, fps_out, out_path):
+def separate_video_into_frames(video_path, fps_out, out_path, ext):
     assert video_path, 'video not selected'
     assert out_path, 'out path not specified'
 
@@ -34,8 +34,9 @@ def separate_video_into_frames(video_path, fps_out, out_path):
     runFFMPEG(
         '-i', video_path,
         '-vf', f'fps={fps_out}',
+        # '-qscale:v', '2',
         '-y',
-        os.path.join(out_path, 'frame_%05d.png'),
+        os.path.join(out_path, f'frame_%05d.{ext}'),
     )
 
 

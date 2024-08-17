@@ -230,9 +230,22 @@ function closeAllVideoMasks() {
     videoMasks.forEach((mask, index) => {
         const removeButton = mask.querySelector('button[title="Remove Image"]');
         if (removeButton) {
-            setTimeout(() => {
-                removeButton.click();
-            }, index * 60);
+            removeButton.click();
+            const canvases = mask.querySelectorAll('canvas');
+            canvases.forEach((canvas) => {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                canvas.width = 0;
+                canvas.height = 0;
+            });
+            const images = mask.querySelectorAll('img');
+            images.forEach((img) => {
+                img.src = '';
+                img.onload = null;
+                img.onerror = null;
+            });
         }
     });
     return [...arguments]

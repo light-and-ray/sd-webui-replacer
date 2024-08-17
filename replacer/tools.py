@@ -2,6 +2,8 @@ import cv2, random, git, torch, os, time, urllib.parse, copy
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
+import base64
+from io import BytesIO
 import gradio as gr
 from modules.images import resize_image
 from modules import errors, shared, masking
@@ -310,3 +312,13 @@ def getActualCropRegion(mask: Image.Image, padding: int, invert: bool):
 
     return crop_region
 
+
+def pil_to_base64_jpeg(pil_image):
+    if not pil_image:
+        return ""
+    buffer = BytesIO()
+    pil_image.convert('RGB').save(buffer, format="JPEG")
+    buffer.seek(0)
+    img_str = base64.b64encode(buffer.read()).decode("utf-8")
+    base64_str = "data:image/jpeg;base64," + img_str
+    return base64_str

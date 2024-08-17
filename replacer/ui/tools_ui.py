@@ -1,12 +1,12 @@
 import gradio as gr
 from modules import shared, sd_samplers
 from modules.ui_components import ToolButton
-from modules.api.api import encode_pil_to_base64, decode_base64_to_image
+from modules.api.api import decode_base64_to_image
 from replacer.options import ( EXT_NAME, getDetectionPromptExamples, getNegativePromptExamples,
     getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
     getLimitMaskEditingResolution,
 )
-from replacer.tools import limitImageByOneDimension, generateSeed
+from replacer.tools import limitImageByOneDimension, generateSeed, pil_to_base64_jpeg
 from replacer.generation_args import GenerationArgs
 
 
@@ -42,7 +42,7 @@ def get_current_image(image, isAvoid, needLimit):
     if needLimit:
         image = decode_base64_to_image(image)
         image = limitImageByOneDimension(image, getLimitMaskEditingResolution())
-        image = 'data:image/png;base64,' + encode_pil_to_base64(image).decode()
+        image = pil_to_base64_jpeg(image)
     return gr.Image.update(image)
 
 

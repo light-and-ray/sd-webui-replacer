@@ -50,6 +50,7 @@ def getFrames(project_path: str):
         return None
     return readImages(framesDir)
 
+
 def getMasks(project_path: str):
     framesDir = os.path.join(project_path, 'masks')
     if not os.path.exists(framesDir):

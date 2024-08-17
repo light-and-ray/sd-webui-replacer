@@ -4,8 +4,8 @@ from PIL import Image, ImageOps
 from modules import shared
 
 from replacer.video_tools import separate_video_into_frames
-from replacer.tools import limitImageByOneDimension, makePreview
-from replacer.options import getLimitVideoMaskEditingResolution
+from replacer.tools import limitImageByOneDimension, makePreview, pil_to_base64_jpeg
+from replacer.options import getLimitMaskEditingResolution
 from .project import getOriginalVideoPath, getFrames, getMasks
 
 
@@ -20,7 +20,7 @@ def prepareMasksDir(project_path: str, fps_out: int):
     os.makedirs(framesDir, exist_ok=True)
 
     originalVideo = getOriginalVideoPath(project_path)
-    separate_video_into_frames(originalVideo, fps_out, framesDir)
+    separate_video_into_frames(originalVideo, fps_out, framesDir, 'png')
 
     masksDir = os.path.join(project_path, 'masks')
     if os.path.exists(masksDir):
@@ -50,7 +50,7 @@ def getMasksPreview(project_path: str, page: int):
     masks = masks[start: end]
 
     for i in range(len(frames)):
-        frames[i] = limitImageByOneDimension(frames[i], getLimitVideoMaskEditingResolution())
+        frames[i] = limitImageByOneDimension(frames[i], getLimitMaskEditingResolution())
         masks[i] = masks[i].resize(frames[i].size)
 
     composited: list[Image.Image] = []
@@ -59,6 +59,8 @@ def getMasksPreview(project_path: str, page: int):
 
     for i in range(len(composited), 10):
         composited.append(None)
+
+    composited = [pil_to_base64_jpeg(x) for x in composited]
 
     return page, f"**Page {page+1}/{math.ceil(totalFrames/10)}**", *composited
 
