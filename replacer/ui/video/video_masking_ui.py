@@ -22,7 +22,7 @@ def getMaskComponent(num: int):
 
 def makeVideoMaskingUI(comp: AttrDict):
     with gr.Row():
-        reload_masks = gr.Button("⟳ Reload masks")
+        reload_masks = gr.Button("⟳ Reload page")
         generate_empty_masks = gr.Button("Generate empty masks")
         generate_detected_masks = gr.Button("Generate detected masks")
         gr.Markdown(f"All detection options including prompt are taken from {EXT_NAME} tab")
@@ -48,7 +48,7 @@ def makeVideoMaskingUI(comp: AttrDict):
     with gr.Row():
         pageToGo = gr.Number(label="Page to go", value=1, precision=0)
         goToPageButton = gr.Button("Go to page")
-        gr.Markdown('If you see broken images, just close them and click reload "Reload masks"')
+        gr.Markdown('If you see broken images, just click "Reload page"')
 
 
     generate_empty_masks.click(

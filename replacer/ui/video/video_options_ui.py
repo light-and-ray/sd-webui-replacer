@@ -6,6 +6,7 @@ from replacer.ui.tools_ui import AttrDict, ResizeHandleRow
 
 
 def makeVideoOptionsUI(comp: AttrDict):
+    gr.Markdown("*The options are not saved in the project")
     comp.target_video_fps = gr.Slider(
         label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0,
         elem_id="replacer_video_fps")
