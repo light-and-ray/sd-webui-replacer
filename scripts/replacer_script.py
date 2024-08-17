@@ -3,8 +3,8 @@ import gradio as gr
 from modules import scripts, scripts_postprocessing, errors, ui_settings, shared
 from modules.processing import Processed, StableDiffusionProcessingTxt2Img
 from replacer.options import EXT_NAME, needHideReplacerScript
-from replacer.ui import replacer_tab_ui
-from replacer.generation_args import GenerationArgs, HiresFixArgs, DUMMY_ANIMATEDIFF_ARGS
+from replacer.ui import replacer_main_ui
+from replacer.generation_args import GenerationArgs, HiresFixArgs
 from replacer.extensions import replacer_extensions
 from replacer.tools import prepareMask
 from replacer.generate import generate
@@ -63,7 +63,7 @@ class ReplacerScript(scripts.Script):
                         info='Be sure you use inpainting model here')
                     force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
 
-            comp = replacer_tab_ui.replacerMainUI.components
+            comp = replacer_main_ui.replacerMainUI.components
 
             main_tab_inputs = [
                 comp.detectionPrompt,
@@ -318,9 +318,7 @@ class ReplacerScript(scripts.Script):
             clip_skip=clip_skip,
             pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
             save_before_hires_fix=save_before_hires_fix,
-            previous_frame_into_controlnet=[],
             do_not_use_mask=do_not_use_mask,
-            animatediff_args=DUMMY_ANIMATEDIFF_ARGS,
             rotation_fix=rotation_fix,
             variation_seed=variation_seed,
             variation_strength=variation_strength,

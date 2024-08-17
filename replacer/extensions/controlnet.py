@@ -116,11 +116,14 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     gArgs.cn_args = list(gArgs.cn_args)
     hasInpainting = False
     mask = None
+    needApplyAnimateDiff = False
+    if gArgs.animatediff_args:
+        needApplyAnimateDiff = gArgs.animatediff_args.needApplyAnimateDiff
 
     for i in range(len(gArgs.cn_args)):
         gArgs.cn_args[i] = copy.copy(external_code.to_processing_unit(gArgs.cn_args[i]))
 
-        if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
+        if gArgs.previous_frame_into_controlnet and f"Unit {i}" in gArgs.previous_frame_into_controlnet:
             if previousFrame:
                 print(f'Passing the previous frame into CN unit {i}')
                 previousFrame = applyRotationFix(previousFrame, gArgs.rotation_fix)
@@ -133,14 +136,14 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 gArgs.cn_args[i].enabled = False
                 continue
 
-        if not gArgs.animatediff_args.needApplyAnimateDiff and \
+        if not needApplyAnimateDiff and \
                 'sparsectrl' in gArgs.cn_args[i].model.lower() and \
                 gArgs.cn_args[i].enabled:
             print(f'Sparsectrl was disabled in unit {i} because of non-animatediff generation')
             gArgs.cn_args[i].enabled = False
             continue
 
-        if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
+        if gArgs.animatediff_args and gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
             if gArgs.cn_args[i].enabled and gArgs.cn_args[i].module != 'inpaint_only':
                 raise UnitIsReserved(i)
             gArgs.cn_args[i].enabled = True
@@ -163,7 +166,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
 
             print('Use cn inpaint instead of sd inpaint')
             image = limitImageByOneDimension(p.init_images[0], max(p.width, p.height))
-            if not gArgs.animatediff_args.needApplyAnimateDiff:
+            if not needApplyAnimateDiff:
                 gArgs.cn_args[i].image = {
                     "image": convertIntoCNImageFormat(image),
                     "mask": convertIntoCNImageFormat(mask.resize(image.size)),

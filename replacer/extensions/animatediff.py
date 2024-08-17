@@ -34,7 +34,7 @@ def apply(p, animatediff_args: AnimateDiffArgs):
     if p.script_args[SCRIPT.args_from] is None:
         p.script_args[SCRIPT.args_from] = AnimateDiffProcess()
 
-    if not animatediff_args.needApplyAnimateDiff:
+    if not animatediff_args or not animatediff_args.needApplyAnimateDiff:
         p.script_args[SCRIPT.args_from].enable = False
     else:
         params = p.script_args[SCRIPT.args_from]

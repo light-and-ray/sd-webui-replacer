@@ -104,9 +104,7 @@ class GenerationArgs:
 
     pass_into_hires_fix_automatically: bool
     save_before_hires_fix: bool
-    previous_frame_into_controlnet: list[str]
     do_not_use_mask: bool
-    animatediff_args: AnimateDiffArgs
     rotation_fix: str
     variation_seed: int
     variation_strength: float
@@ -125,6 +123,8 @@ class GenerationArgs:
     appropriateInputImageDataList: list[AppropriateData] = None
     originalW = None
     originalH = None
+    previous_frame_into_controlnet: list[str] = None
+    animatediff_args: AnimateDiffArgs = None
 
 
     def copy(self):
