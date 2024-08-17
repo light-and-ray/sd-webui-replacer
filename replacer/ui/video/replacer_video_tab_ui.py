@@ -19,6 +19,7 @@ from replacer.ui.tools_ui import ( update_mask_brush_color, get_current_image, u
 from replacer.tools import Pause
 from replacer.ui.video.video_options_ui import makeVideoOptionsUI
 from replacer.ui.video.video_project_ui import makeVideoProjectUI
+from replacer.ui.video.video_masking_ui import makeVideoMaskingUI
 
 
 
@@ -33,8 +34,8 @@ def getVideoTabUI(isDedicatedPage: bool):
             with gr.Tabs():
                 with gr.Tab("Step 1 (Project)"):
                     makeVideoProjectUI(comp)
-                with gr.Tab("Step 2 (Masking)"):
-                    pass
+                with gr.Tab("Step 2 (Masking)", elem_id="replacer_video_masking_tab"):
+                    makeVideoMaskingUI(comp)
                 with gr.Tab("Step 3 (First frame)"):
                     pass
                 with gr.Tab("Step 4 (Options)"):

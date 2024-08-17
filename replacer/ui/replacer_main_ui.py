@@ -3,7 +3,7 @@ from modules import infotext_utils
 from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import AttrDict
 from replacer.ui.replacer_tab_ui import getTabUI
-from replacer.ui.video.replace_video_tab_ui import getVideoTabUI
+from replacer.ui.video.replacer_video_tab_ui import getVideoTabUI
 
 
 try:

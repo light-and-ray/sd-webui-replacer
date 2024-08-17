@@ -19,7 +19,6 @@ def select(project_path: str):
     return f"✅ Selected a project {project_path!r}", project_path
 
 
-
 def init(project_path: str, init_video: str):
     project_path = convertIntoPath(project_path)
     init_video = convertIntoPath(init_video)
