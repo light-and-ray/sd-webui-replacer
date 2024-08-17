@@ -23,8 +23,12 @@ from replacer.ui.video.video_project_ui import makeVideoProjectUI
 
 
 
-def getVideoTabUI(comp: AttrDict, isDedicatedPage: bool):
+
+def getVideoTabUI(isDedicatedPage: bool):
+    comp = AttrDict()
     with OverrideCustomScriptSource('Video'):
+        comp.selected_project_status = gr.Markdown("❌ Project is not selected")
+        comp.selected_project = gr.Textbox(visible=False)
         with gr.Blocks(analytics_enabled=False) as replacerVideoTabUI:
             with gr.Tabs():
                 with gr.Tab("Step 1 (Project)"):
@@ -37,4 +41,7 @@ def getVideoTabUI(comp: AttrDict, isDedicatedPage: bool):
                     makeVideoOptionsUI(comp)
                 with gr.Tab("Step 5 (Generation)"):
                     pass
+            comp.selected_project_status.render()
+            comp.selected_project.render()
+
     return replacerVideoTabUI

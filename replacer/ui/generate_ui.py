@@ -159,7 +159,7 @@ def generate_ui_(
                 yield image
         images = readImages(input_batch_dir)
 
-    timestamp = int(datetime.datetime.now().timestamp())
+    # timestamp = int(datetime.datetime.now().timestamp())
     # if selected_input_mode == "tab_batch_video":
     #     assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
     #     shared.state.textinfo = 'video preparing'
