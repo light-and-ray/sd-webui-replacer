@@ -122,6 +122,31 @@ function replacerRemoveInpaintDiffMaskUpload() {
 onUiUpdate(replacerRemoveInpaintDiffMaskUpload);
 
 
+function replacerRemoveVideoMaskUpload() {
+    const maskIds = [...Array(10).keys()].map(i => `replacer_video_mask_${i + 1}`);
+    maskIds.forEach((maskId) => {
+        const mask = gradioApp().getElementById(maskId);
+        if (!mask) return;
+
+        const removeButton = mask.querySelector('button[title="Remove Image"]');
+        if (removeButton) {
+            removeButton.style.display = "none";
+        }
+
+        const imageContainer = mask.getElementsByClassName('image-container')[0];
+        if (!imageContainer) return;
+        const images = imageContainer.getElementsByTagName('canvas');
+        if (images.length == 0) {
+            imageContainer.style.visibility = 'hidden';
+        } else {
+            imageContainer.style.visibility = 'visible';
+        }
+    });
+}
+
+onUiUpdate(replacerRemoveVideoMaskUpload);
+
+
 onUiLoaded(function () {
     let replacer_generate = gradioApp().getElementById('replacer_generate');
     let replacer_hf_generate = gradioApp().getElementById('replacer_hf_generate');
