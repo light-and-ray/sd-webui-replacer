@@ -264,16 +264,6 @@ def generate_ui_(
     lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
 
 
-
-    # if selected_input_mode == "tab_batch_video":
-    #     shared.state.textinfo = 'video saving'
-    #     print("generate done, generating video")
-    #     save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}_{timestamp}.mp4')
-    #     if len(save_video_path) > 260:
-    #         save_video_path = os.path.join(video_output_dir, f'output_{seed}_{timestamp}.mp4')
-    #     save_video(resultFrames, fps_out, input_video, save_video_path, seed)
-    #     return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
-
     if selected_input_mode == "tab_batch_dir" and not show_batch_dir_results:
         return [], "", plaintext_to_html(f"Saved into {saveDir}"), ""
 

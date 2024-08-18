@@ -2,7 +2,7 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions,
+    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, hideVideoInMainUI,
 )
 from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_main_ui
@@ -13,11 +13,15 @@ from replacer.extensions import replacer_extensions
 
 
 def on_ui_tabs():
+    result = []
     replacer_main_ui.reinitMainUIAfterUICreated()
     tab = replacer_main_ui.replacerMainUI.getReplacerTabUI()
-    video_tab = replacer_main_ui.replacerMainUI.getReplacerVideoTabUI()
-    video_title = f"{EXT_NAME} - video"
-    return [(tab, EXT_NAME, EXT_NAME), (video_tab, video_title, video_title)]
+    result.append((tab, EXT_NAME, EXT_NAME))
+    if not hideVideoInMainUI():
+        video_tab = replacer_main_ui.replacerMainUI.getReplacerVideoTabUI()
+        video_title = f"{EXT_NAME} - video"
+        result.append((video_tab, video_title, video_title))
+    return result
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
 

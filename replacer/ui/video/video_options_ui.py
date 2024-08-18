@@ -140,7 +140,7 @@ def makeVideoOptionsUI(comp: AttrDict):
 
 
         with gr.Tab("Frame by frame mode", elem_id="replacer_video_mode_frame_by_frame") as comp.video_mode_frame_by_frame:
-
+            gr.Markdown("**! Frame by frame mode temporary doesn't work !**")
             if replacer_extensions.controlnet.SCRIPT:
                 comp.previous_frame_into_controlnet = gr.CheckboxGroup(value=[], label='Pass the previous frame into ControlNet',
                     choices=[f"Unit {x}" for x in range(shared.opts.data.get("control_net_unit_count", 3))], elem_id='replacer_previous_frame_into_controlnet')

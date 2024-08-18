@@ -169,7 +169,7 @@ def replacer_api(_, app: FastAPI):
         with queue_lock:
             shared.state.begin('api /replacer/replace')
             try:
-                processed, allExtraImages = generate(gArgs, "", False, False, data.extra_include)
+                processed, allExtraImages = generate(gArgs, "", False, data.extra_include)
             finally:
                 shared.state.end()
 

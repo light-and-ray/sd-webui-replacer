@@ -88,7 +88,7 @@ def convertIntoCNImageFormat(image):
 def restoreAfterCN(origImage, mask, gArgs: GenerationArgs, processed):
     print('Restoring images resolution after ControlNet Inpainting')
 
-    if gArgs.animatediff_args.needApplyAnimateDiff:
+    if gArgs.animatediff_args and gArgs.animatediff_args.needApplyAnimateDiff:
         restoreAfterCN_animatediff(gArgs, processed)
     else:
         origMask = mask.convert('RGBA')
@@ -148,7 +148,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 raise UnitIsReserved(i)
             gArgs.cn_args[i].enabled = True
             gArgs.cn_args[i].module = 'inpaint_only'
-            if gArgs.inpainting_fill == 4: # lama cleaner
+            if gArgs.inpainting_fill > 3: # lama cleaner
                 gArgs.cn_args[i].module += "+lama"
             gArgs.cn_args[i].model = gArgs.animatediff_args.cn_inpainting_model
             gArgs.cn_args[i].weight = gArgs.animatediff_args.control_weight
@@ -158,6 +158,8 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
 
         if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module.startswith('inpaint_only'):
             hasInpainting = True
+            p.height = gArgs.originalH
+            p.width = gArgs.originalW
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:

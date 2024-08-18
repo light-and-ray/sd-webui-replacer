@@ -353,7 +353,7 @@ class ReplacerScript(scripts.Script):
         if saveToSubdirs is None: saveToSubdirs = shared.opts.save_to_dirs
 
         try:
-            processedReplacer, allExtraImages = generate(self.gArgs, saveDir, saveToSubdirs, False, self.extra_includes)
+            processedReplacer, allExtraImages = generate(self.gArgs, saveDir, saveToSubdirs, self.extra_includes)
         except Exception as e:
             print(f"[{EXT_NAME}] Exception: {e}")
             return
