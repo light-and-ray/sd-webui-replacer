@@ -1,5 +1,5 @@
 import gradio as gr
-from replacer.ui.tools_ui import AttrDict
+from replacer.ui.tools_ui import AttrDict, getSubmitJsFunction
 from replacer.tools import EXT_NAME
 from replacer.options import getVideoMaskEditingColorStr
 
@@ -52,13 +52,7 @@ def makeVideoMaskingUI(comp: AttrDict, mainTabComp: AttrDict):
         gr.Markdown('Quality of masks preview is reduced for performance\nIf you see broken images, just click "Reload page"')
 
 
-    generate_empty_masks.click(
-        fn=generateEmptyMasks,
-        _js='closeAllVideoMasks',
-        inputs=[comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length],
-        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
-        postprocess=False,
-        )
+
     reload_masks.click(
         fn=reloadMasks,
         _js='closeAllVideoMasks',
@@ -118,10 +112,25 @@ def makeVideoMaskingUI(comp: AttrDict, mainTabComp: AttrDict):
 
 
 
-    generate_detected_masks.click(
-        fn=generateDetectedMasks,
+    generate_empty_masks.click(
+        fn=lambda: None,
         _js='closeAllVideoMasks',
-        inputs=[comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length,
+    ).then(
+        fn=generateEmptyMasks,
+        _js=getSubmitJsFunction('replacer_video', 'replacer_video_gen', '', False),
+        inputs=[mainTabComp.dummy_component, comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
+        )
+
+
+    generate_detected_masks.click(
+        fn=lambda: None,
+        _js='closeAllVideoMasks',
+    ).then(
+        fn=generateDetectedMasks,
+        _js=getSubmitJsFunction('replacer_video', 'replacer_video_gen', '', False),
+        inputs=[mainTabComp.dummy_component, comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length,
             mainTabComp.detectionPrompt,
             mainTabComp.avoidancePrompt,
             mainTabComp.seed,

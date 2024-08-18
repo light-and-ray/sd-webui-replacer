@@ -258,3 +258,12 @@ onUiLoaded(function () {
     document.getElementById('replacer_video_open_folder').parentElement.style.display = 'none';
 });
 
+
+onUiUpdate(function () {
+    const progressDiv = document.querySelector('#replacer_video_results_panel .progressDiv');
+    const projectStatus = document.getElementById('replacer_video_selected_project_status');
+    if (!progressDiv || !projectStatus) return;
+    projectStatus.parentNode.insertBefore(progressDiv, projectStatus);
+    progressDiv.style.position = 'unset';
+});
+

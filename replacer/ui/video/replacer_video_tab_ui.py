@@ -10,7 +10,7 @@ from replacer.ui.video.video_generation_ui import makeVideoGenerationUI
 def getVideoTabUI(mainTabComp: AttrDict, isDedicatedPage: bool):
     comp = AttrDict()
     with OverrideCustomScriptSource('Video'):
-        comp.selected_project_status = gr.Markdown("❌ Project is not selected")
+        comp.selected_project_status = gr.Markdown("❌ Project is not selected", elem_id="replacer_video_selected_project_status")
         comp.selected_project = gr.Textbox(visible=False)
 
         with gr.Blocks(analytics_enabled=False) as replacerVideoTabUI:

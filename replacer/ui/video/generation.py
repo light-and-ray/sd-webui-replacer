@@ -7,6 +7,7 @@ from replacer.generation_args import GenerationArgs, DUMMY_HIRESFIX_ARGS, Animat
 from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.extensions import replacer_extensions
 from replacer.video_tools import overrideSettingsForVideo, save_video
+from replacer.options import EXT_NAME_LOWER
 
 from .project import getFrames, getMasks, getOriginalVideoPath
 from replacer.video_animatediff import animatediffGenerate
@@ -148,7 +149,7 @@ def videoGenerateUI(
     if not originalVideo:
         raise gr.Error("This project doesn't have original video")
     timestamp = int(datetime.datetime.now().timestamp())
-    fragmentsPath = os.path.join(project_path, f'out {timestamp}')
+    fragmentsPath = os.path.join(project_path, 'outputs', str(timestamp))
     resultPath = os.path.join(fragmentsPath, "result")
     frames = getFrames(project_path)
     masks = getMasks(project_path)
@@ -156,9 +157,9 @@ def videoGenerateUI(
         raise gr.Error("This project doesn't have frames or masks")
     frames = list(frames)
     masks = list(masks)
-    saveVideoPath = os.path.join(fragmentsPath, f'output_{os.path.basename(originalVideo)}_{timestamp}.mp4')
+    saveVideoPath = os.path.join(fragmentsPath, f'{EXT_NAME_LOWER}_{os.path.basename(originalVideo)}_{timestamp}.mp4')
     if len(saveVideoPath) > 260:
-        saveVideoPath = os.path.join(fragmentsPath, f'output_{timestamp}.mp4')
+        saveVideoPath = os.path.join(fragmentsPath, f'{EXT_NAME_LOWER}_{timestamp}.mp4')
 
     restore = overrideSettingsForVideo()
     try:

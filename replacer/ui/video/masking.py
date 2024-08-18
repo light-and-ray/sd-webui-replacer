@@ -1,4 +1,4 @@
-import os, shutil, math
+import os, shutil, math, datetime
 import gradio as gr
 from PIL import Image, ImageOps
 from modules import shared
@@ -28,8 +28,11 @@ def prepareMasksDir(project_path: str, fps_out: int):
 
     masksDir = os.path.join(project_path, 'masks')
     if os.path.exists(masksDir):
-        assert masksDir.endswith('masks')
-        shutil.rmtree(masksDir)
+        timestamp = int(datetime.datetime.now().timestamp())
+        oldMasksDir = os.path.join(project_path, "old masks")
+        rmDir = os.path.join(oldMasksDir, str(timestamp))
+        os.makedirs(oldMasksDir, exist_ok=True)
+        shutil.move(masksDir, rmDir)
     os.makedirs(masksDir, exist_ok=True)
 
 
@@ -72,7 +75,7 @@ def getMasksPreview(project_path: str, page: int):
 
 
 
-def generateEmptyMasks(project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length):
+def generateEmptyMasks(task_id, project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length):
     prepareMasksDir(project_path, fps_out)
     frames = list(getFrames(project_path))
     maxNum = len(frames)
@@ -87,7 +90,7 @@ def generateEmptyMasks(project_path: str, fps_out: int, only_the_first_fragment:
 
 
 
-def generateDetectedMasks(project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length,
+def generateDetectedMasks(task_id, project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length,
         detectionPrompt,
         avoidancePrompt,
         seed,
