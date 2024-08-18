@@ -88,7 +88,7 @@ def convertIntoCNImageFormat(image):
 def restoreAfterCN(origImage, mask, gArgs: GenerationArgs, processed):
     print('Restoring images resolution after ControlNet Inpainting')
 
-    if gArgs.animatediff_args.needApplyAnimateDiff:
+    if gArgs.animatediff_args and gArgs.animatediff_args.needApplyAnimateDiff:
         restoreAfterCN_animatediff(gArgs, processed)
     else:
         origMask = mask.convert('RGBA')
@@ -116,11 +116,14 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
     gArgs.cn_args = list(gArgs.cn_args)
     hasInpainting = False
     mask = None
+    needApplyAnimateDiff = False
+    if gArgs.animatediff_args:
+        needApplyAnimateDiff = gArgs.animatediff_args.needApplyAnimateDiff
 
     for i in range(len(gArgs.cn_args)):
         gArgs.cn_args[i] = copy.copy(external_code.to_processing_unit(gArgs.cn_args[i]))
 
-        if f"Unit {i}" in gArgs.previous_frame_into_controlnet:
+        if gArgs.previous_frame_into_controlnet and f"Unit {i}" in gArgs.previous_frame_into_controlnet:
             if previousFrame:
                 print(f'Passing the previous frame into CN unit {i}')
                 previousFrame = applyRotationFix(previousFrame, gArgs.rotation_fix)
@@ -133,19 +136,19 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
                 gArgs.cn_args[i].enabled = False
                 continue
 
-        if not gArgs.animatediff_args.needApplyAnimateDiff and \
+        if not needApplyAnimateDiff and \
                 'sparsectrl' in gArgs.cn_args[i].model.lower() and \
                 gArgs.cn_args[i].enabled:
             print(f'Sparsectrl was disabled in unit {i} because of non-animatediff generation')
             gArgs.cn_args[i].enabled = False
             continue
 
-        if gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
+        if gArgs.animatediff_args and gArgs.animatediff_args.needApplyCNForAnimateDiff and i+1 == len(gArgs.cn_args):
             if gArgs.cn_args[i].enabled and gArgs.cn_args[i].module != 'inpaint_only':
                 raise UnitIsReserved(i)
             gArgs.cn_args[i].enabled = True
             gArgs.cn_args[i].module = 'inpaint_only'
-            if gArgs.inpainting_fill == 4: # lama cleaner
+            if gArgs.inpainting_fill > 3: # lama cleaner
                 gArgs.cn_args[i].module += "+lama"
             gArgs.cn_args[i].model = gArgs.animatediff_args.cn_inpainting_model
             gArgs.cn_args[i].weight = gArgs.animatediff_args.control_weight
@@ -155,6 +158,8 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
 
         if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module.startswith('inpaint_only'):
             hasInpainting = True
+            p.height = gArgs.originalH
+            p.width = gArgs.originalW
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:
@@ -163,7 +168,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
 
             print('Use cn inpaint instead of sd inpaint')
             image = limitImageByOneDimension(p.init_images[0], max(p.width, p.height))
-            if not gArgs.animatediff_args.needApplyAnimateDiff:
+            if not needApplyAnimateDiff:
                 gArgs.cn_args[i].image = {
                     "image": convertIntoCNImageFormat(image),
                     "mask": convertIntoCNImageFormat(mask.resize(image.size)),

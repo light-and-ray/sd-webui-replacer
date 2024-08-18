@@ -1,11 +1,12 @@
 import gradio as gr
 from modules import shared, sd_samplers
 from modules.ui_components import ToolButton
-from modules.api.api import encode_pil_to_base64, decode_base64_to_image
+from modules.api.api import decode_base64_to_image
 from replacer.options import ( EXT_NAME, getDetectionPromptExamples, getNegativePromptExamples,
-    getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples
+    getPositivePromptExamples, useFirstPositivePromptFromExamples, useFirstNegativePromptFromExamples,
+    getLimitMaskEditingResolution,
 )
-from replacer.tools import limitImageByOneDimension, generateSeed
+from replacer.tools import limitImageByOneDimension, generateSeed, pil_to_base64_jpeg
 from replacer.generation_args import GenerationArgs
 
 
@@ -35,13 +36,13 @@ if IS_WEBUI_1_8:
 def update_mask_brush_color(color):
     return gr.Image.update(brush_color=color)
 
-def get_current_image(image, isAvoid, needLimit, maxResolutionOnDetection):
+def get_current_image(image, isAvoid, needLimit):
     if image is None:
         return
     if needLimit:
         image = decode_base64_to_image(image)
-        image = limitImageByOneDimension(image, maxResolutionOnDetection)
-        image = 'data:image/png;base64,' + encode_pil_to_base64(image).decode()
+        image = limitImageByOneDimension(image, getLimitMaskEditingResolution())
+        image = pil_to_base64_jpeg(image)
     return gr.Image.update(image)
 
 
@@ -169,3 +170,9 @@ def watchSetCustomScriptSourceForComponents(component, **kwargs):
     global custom_script_source
     if custom_script_source is not None:
         component.custom_script_source = custom_script_source
+
+
+try:
+    from modules.ui_components import ResizeHandleRow
+except:
+    ResizeHandleRow = gr.Row

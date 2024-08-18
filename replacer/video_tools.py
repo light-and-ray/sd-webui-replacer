@@ -21,7 +21,7 @@ def runFFMPEG(*ffmpeg_cmd):
 
 
 
-def separate_video_into_frames(video_path, fps_out, out_path):
+def separate_video_into_frames(video_path, fps_out, out_path, ext):
     assert video_path, 'video not selected'
     assert out_path, 'out path not specified'
 
@@ -29,21 +29,14 @@ def separate_video_into_frames(video_path, fps_out, out_path):
     os.makedirs(out_path, exist_ok=True)
 
     # Open the video file
-    video = cv2.VideoCapture(video_path)
-    fps_in = video.get(cv2.CAP_PROP_FPS)
-    if fps_out == 0:
-        fps_out = fps_in
-    print('fps_in:', fps_in, 'fps_out:', fps_out)
-    video.release()
+    assert fps_out != 0, "fps can't be 0"
 
     runFFMPEG(
         '-i', video_path,
         '-vf', f'fps={fps_out}',
         '-y',
-        os.path.join(out_path, 'frame_%05d.png'),
+        os.path.join(out_path, f'frame_%05d.{ext}'),
     )
-
-    return fps_in, fps_out
 
 
 def readImages(input_dir):
@@ -51,7 +44,7 @@ def readImages(input_dir):
     image_list = shared.listfiles(input_dir)
     for filename in image_list:
         try:
-            image = Image.open(filename).convert('RGBA')
+            image = Image.open(filename)
         except Exception:
             continue
         yield image

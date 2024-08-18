@@ -2,10 +2,10 @@ import copy
 import gradio as gr
 from modules import script_callbacks, progress, shared, errors
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions,
+    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, hideVideoInMainUI,
 )
 from replacer.ui.tools_ui import IS_WEBUI_1_5
-from replacer.ui import replacer_tab_ui
+from replacer.ui import replacer_main_ui
 from replacer.tools import getReplacerFooter
 from replacer.ui.tools_ui import watchOutputPanel, watchSetCustomScriptSourceForComponents
 from replacer.extensions import replacer_extensions
@@ -13,9 +13,15 @@ from replacer.extensions import replacer_extensions
 
 
 def on_ui_tabs():
-    replacer_tab_ui.reinitMainUIAfterUICreated()
-    tab = replacer_tab_ui.replacerMainUI.getReplacerTabUI()
-    return [(tab, EXT_NAME, EXT_NAME)]
+    result = []
+    replacer_main_ui.reinitMainUIAfterUICreated()
+    tab = replacer_main_ui.replacerMainUI.getReplacerTabUI()
+    result.append((tab, EXT_NAME, EXT_NAME))
+    if not hideVideoInMainUI():
+        video_tab = replacer_main_ui.replacerMainUI.getReplacerVideoTabUI()
+        video_title = f"{EXT_NAME} - video"
+        result.append((video_tab, video_title, video_title))
+    return result
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
 
@@ -34,8 +40,11 @@ def mountDedicatedPage(demo, app):
 
             with gr.Tabs(elem_id='tabs'): # triggers progressbar
                 with gr.Tab(label=f"{EXT_NAME} dedicated", elem_id=f"tab_{EXT_NAME_LOWER}_dedicated"):
-                    tab = replacer_tab_ui.replacerMainUI_dedicated.getReplacerTabUI()
+                    tab = replacer_main_ui.replacerMainUI_dedicated.getReplacerTabUI()
                     tab.render()
+                with gr.Tab(label="Video", elem_id=f"tab_video"):
+                    tab_video = replacer_main_ui.replacerMainUI_dedicated.getReplacerVideoTabUI()
+                    tab_video.render()
                 replacer_extensions.image_comparison.mountImageComparisonTab()
 
             footer = getReplacerFooter()
@@ -43,7 +52,9 @@ def mountDedicatedPage(demo, app):
 
         loadsave = copy.copy(demo.ui_loadsave)
         loadsave.finalized_ui = False
-        loadsave.add_block(replacerUi, EXT_NAME)
+        video_title = f"{EXT_NAME} - video"
+        loadsave.add_block(tab, EXT_NAME)
+        loadsave.add_block(tab_video, video_title)
         loadsave.dump_defaults()
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)
@@ -75,7 +86,7 @@ if needHideAnimateDiffAccordions():
     script_callbacks.on_after_component(hideAnimateDiffAccordions)
 
 
-script_callbacks.on_before_ui(replacer_tab_ui.initMainUI)
+script_callbacks.on_before_ui(replacer_main_ui.initMainUI)
 script_callbacks.on_after_component(replacer_extensions.controlnet.watchControlNetUI)
 script_callbacks.on_after_component(replacer_extensions.soft_inpainting.watchSoftInpaintUI)
 script_callbacks.on_after_component(watchOutputPanel)

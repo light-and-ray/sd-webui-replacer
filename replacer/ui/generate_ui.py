@@ -49,9 +49,6 @@ def generate_ui_(
     output_batch_dir: str,
     keep_original_filenames_from_dir,
     show_batch_dir_results,
-    input_video: str,
-    video_output_dir: str,
-    target_video_fps,
     upscalerForImg2Img,
     seed,
     sampler,
@@ -87,29 +84,13 @@ def generate_ui_(
     clip_skip,
     pass_into_hires_fix_automatically,
     save_before_hires_fix,
-    previous_frame_into_controlnet,
     do_not_use_mask,
-    selected_video_mode: str,
     rotation_fix: str,
     variation_seed: int,
     variation_strength: float,
     integer_only_masked: bool,
     forbid_too_small_crop_region: bool,
     correct_aspect_ratio: bool,
-
-    ad_fragment_length,
-    ad_internal_fps,
-    ad_batch_size,
-    ad_stride,
-    ad_overlap,
-    ad_latent_power,
-    ad_latent_scale,
-    ad_generate_only_first_fragment,
-    ad_cn_inpainting_model,
-    ad_control_weight,
-    ad_force_override_sd_model,
-    ad_force_sd_model_checkpoint,
-    ad_motion_model,
 
     hf_upscaler,
     hf_steps,
@@ -139,8 +120,6 @@ def generate_ui_(
 
     input_batch_dir = convertIntoPath(input_batch_dir)
     output_batch_dir = convertIntoPath(output_batch_dir)
-    input_video = convertIntoPath(input_video)
-    video_output_dir = convertIntoPath(video_output_dir)
 
     images = []
 
@@ -180,27 +159,6 @@ def generate_ui_(
                 yield image
         images = readImages(input_batch_dir)
 
-    timestamp = int(datetime.datetime.now().timestamp())
-    if selected_input_mode == "tab_batch_video":
-        assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
-        shared.state.textinfo = 'video preparing'
-        if video_output_dir == "":
-            video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}_{timestamp}')
-        else:
-            video_output_dir = os.path.join(video_output_dir, f'out_{seed}_{timestamp}')
-        if os.path.exists(video_output_dir):
-            for file in os.listdir(video_output_dir):
-                if file.endswith(f'.{shared.opts.samples_format}'):
-                    os.remove(os.path.join(video_output_dir, file))
-        batch_count = 1
-        batch_size = 1
-        extra_includes = []
-        save_before_hires_fix = False
-        hf_randomize_seed = False
-
-        images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
-        resultFrames = os.path.join(video_output_dir, 'resultFrames')
-
 
     images = list(images)
 
@@ -230,22 +188,6 @@ def generate_ui_(
         randomize_seed = hf_randomize_seed,
         soft_inpaint = hf_soft_inpaint,
         supersampling = hf_supersampling,
-    )
-
-    animatediff_args = AnimateDiffArgs(
-        fragment_length=ad_fragment_length,
-        internal_fps=ad_internal_fps,
-        batch_size=ad_batch_size,
-        stride=ad_stride,
-        overlap=ad_overlap,
-        latent_power=ad_latent_power,
-        latent_scale=ad_latent_scale,
-        generate_only_first_fragment=ad_generate_only_first_fragment,
-        cn_inpainting_model=ad_cn_inpainting_model,
-        control_weight=ad_control_weight,
-        force_override_sd_model=ad_force_override_sd_model,
-        force_sd_model_checkpoint=ad_force_sd_model_checkpoint,
-        motion_model=ad_motion_model,
     )
 
     gArgs = GenerationArgs(
@@ -289,10 +231,7 @@ def generate_ui_(
         clip_skip=clip_skip,
         pass_into_hires_fix_automatically=pass_into_hires_fix_automatically,
         save_before_hires_fix=save_before_hires_fix,
-        previous_frame_into_controlnet=previous_frame_into_controlnet if selected_input_mode == "tab_batch_video" \
-                and selected_video_mode == "video_mode_frame_by_frame" else [],
         do_not_use_mask=do_not_use_mask,
-        animatediff_args=animatediff_args,
         rotation_fix=rotation_fix,
         variation_seed=variation_seed,
         variation_strength=variation_strength,
@@ -308,45 +247,22 @@ def generate_ui_(
 
 
 
-
-    if selected_input_mode == "tab_batch_video" and selected_video_mode == "video_mode_animatediff":
-        processed = None
-        if replacer_extensions.animatediff.SCRIPT is None or replacer_extensions.controlnet.SCRIPT is None:
-            return [], "", plaintext_to_html("controlnet or animatediff extensions are not installed"), ""
-        animatediffGenerate(gArgs, video_output_dir, resultFrames, fps_out)
-        if not os.path.exists(resultFrames) or len(os.listdir(resultFrames)) == 0:
-            return [], "", plaintext_to_html(f"No one frame was processed. See console logs for errors"), ""
-    else:
-        saveDir = getSaveDir()
-        saveToSubdirs = shared.opts.save_to_dirs
-        if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
-            saveDir = output_batch_dir
-            saveToSubdirs = False
-        elif selected_input_mode == "tab_batch_video":
-            saveDir = resultFrames
-            saveToSubdirs = False
-
-        useSaveFormatForVideo = selected_input_mode == "tab_batch_video"
-
-        processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, useSaveFormatForVideo, extra_includes)
-        if processed is None or not getattr(processed, 'images', None):
-            return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
-
-        global lastGenerationArgs
-        gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
-        lastGenerationArgs = gArgs
-        lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
+    saveDir = getSaveDir()
+    saveToSubdirs = shared.opts.save_to_dirs
+    if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
+        saveDir = output_batch_dir
+        saveToSubdirs = False
 
 
+    processed, allExtraImages = generate(gArgs, saveDir, saveToSubdirs, extra_includes)
+    if processed is None or not getattr(processed, 'images', None):
+        return [], "", plaintext_to_html(f"No one image was processed. See console logs for exceptions"), ""
 
-    if selected_input_mode == "tab_batch_video":
-        shared.state.textinfo = 'video saving'
-        print("generate done, generating video")
-        save_video_path = os.path.join(video_output_dir, f'output_{os.path.basename(input_video)}_{seed}_{timestamp}.mp4')
-        if len(save_video_path) > 260:
-            save_video_path = os.path.join(video_output_dir, f'output_{seed}_{timestamp}.mp4')
-        save_video(resultFrames, fps_out, input_video, save_video_path, seed)
-        return [], "", plaintext_to_html(f"Saved as {save_video_path}"), ""
+    global lastGenerationArgs
+    gArgs.appropriateInputImageDataList = [x.appropriateInputImageData for x in processed.images]
+    lastGenerationArgs = gArgs
+    lastGenerationArgs.hiresFixCacheData = HiresFixCacheData(gArgs.upscalerForImg2Img, processed.images[0], 0)
+
 
     if selected_input_mode == "tab_batch_dir" and not show_batch_dir_results:
         return [], "", plaintext_to_html(f"Saved into {saveDir}"), ""
@@ -358,12 +274,7 @@ def generate_ui_(
 
 
 def generate_ui(*args, **kwargs):
-    restoreList = []
-    try:
-        restoreList.append(overrideSettingsForVideo())
-        return generate_ui_(*args, **kwargs)
-    finally:
-        for f in restoreList:
-            f()
+    return generate_ui_(*args, **kwargs)
+
 
 

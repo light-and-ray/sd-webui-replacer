@@ -1,7 +1,9 @@
-import cv2, random, git, torch, os, time, urllib.parse, copy
+import cv2, random, git, torch, os, time, urllib.parse, copy, shutil
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
+import base64
+from io import BytesIO
 import gradio as gr
 from modules.images import resize_image
 from modules import errors, shared, masking
@@ -94,13 +96,20 @@ def fastMaskDilate_(mask, dilation_amount):
     return Image.fromarray(dilated_mask).convert(oldMode)
 
 
+def makePreview(image: Image.Image, mask: Image.Image):
+    mask = mask.convert('L')
+    maskFilling = Image.new('RGBA', mask.size, (0, 0, 0, 0))
+    maskFilling.paste(Image.new('RGBA', mask.size, ImageColor.getcolor(f'{getMaskColorStr()}7F', 'RGBA')), mask)
+    preview = image.resize(mask.size)
+    preview.paste(maskFilling, (0, 0), maskFilling)
+    return preview
+
+
+
 def fastMaskDilate(mask, _, dilation_amount, imageResized):
     print("Dilation Amount: ", dilation_amount)
     dilated_mask = fastMaskDilate_(mask, dilation_amount // 2)
-    maskFilling = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
-    maskFilling.paste(Image.new('RGBA', dilated_mask.size, ImageColor.getcolor(f'{getMaskColorStr()}7F', 'RGBA')), dilated_mask)
-    preview = imageResized.resize(dilated_mask.size)
-    preview.paste(maskFilling, (0, 0), maskFilling)
+    preview = makePreview(imageResized, dilated_mask)
     cutted = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
     cutted.paste(imageResized, dilated_mask)
 
@@ -271,7 +280,7 @@ def convertIntoPath(string: str) -> str:
 def applyRotationFix(image: Image.Image, fix: str) -> Image.Image:
     if image is None:
         return None
-    if fix == '-':
+    if fix == '-' or not fix:
         return image
     if fix == '⟲':
         return image.transpose(Image.ROTATE_90)
@@ -283,7 +292,7 @@ def applyRotationFix(image: Image.Image, fix: str) -> Image.Image:
 def removeRotationFix(image: Image.Image, fix: str) -> Image.Image:
     if image is None:
         return None
-    if fix == '-':
+    if fix == '-' or not fix:
         return image
     if fix == '⟲':
         return image.transpose(Image.ROTATE_270)
@@ -302,4 +311,25 @@ def getActualCropRegion(mask: Image.Image, padding: int, invert: bool):
         crop_region = masking.get_crop_region(mask, padding)
 
     return crop_region
+
+
+def pil_to_base64_jpeg(pil_image):
+    if not pil_image:
+        return ""
+    buffer = BytesIO()
+    pil_image.convert('RGB').save(buffer, format="JPEG")
+    buffer.seek(0)
+    img_str = base64.b64encode(buffer.read()).decode("utf-8")
+    base64_str = "data:image/jpeg;base64," + img_str
+    return base64_str
+
+
+def copyOrHardLink(source: str, target: str) -> None:
+    if os.name == 'nt':
+        shutil.copy(source, target)
+    else:
+        try:
+            os.link(source, target)
+        except Exception as e:
+            shutil.copy(source, target)
 

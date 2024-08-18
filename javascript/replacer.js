@@ -12,7 +12,9 @@ function submit_replacer() {
         gradioApp().getElementById(galleryId + "_gallery"),
         function () {
             showSubmitButtons(buttonsId, true);
-            showSubmitButtons(extraShowButtonsId, true);
+            if (extraShowButtonsId) {
+                showSubmitButtons(extraShowButtonsId, true);
+            }
         }
     );
 
@@ -78,6 +80,10 @@ var isZoomAndPanIntegrationApplied = false;
 function replacerApplyZoomAndPanIntegration() {
     if (typeof window.applyZoomAndPanIntegration === "function" && !isZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
+
+        const maskIds = [...Array(10).keys()].map(i => `#replacer_video_mask_${i + 1}`);
+        window.applyZoomAndPanIntegration("#replacer_video_masking_tab", maskIds);
+
         isZoomAndPanIntegrationApplied = true;
     }
 }
@@ -116,6 +122,31 @@ function replacerRemoveInpaintDiffMaskUpload() {
 }
 
 onUiUpdate(replacerRemoveInpaintDiffMaskUpload);
+
+
+function replacerRemoveVideoMaskUpload() {
+    const maskIds = [...Array(10).keys()].map(i => `replacer_video_mask_${i + 1}`);
+    maskIds.forEach((maskId) => {
+        const mask = gradioApp().getElementById(maskId);
+        if (!mask) return;
+
+        const removeButton = mask.querySelector('button[title="Remove Image"]');
+        if (removeButton) {
+            removeButton.style.display = "none";
+        }
+
+        const imageContainer = mask.getElementsByClassName('image-container')[0];
+        if (!imageContainer) return;
+        const images = imageContainer.getElementsByTagName('canvas');
+        if (images.length == 0) {
+            imageContainer.style.visibility = 'hidden';
+        } else {
+            imageContainer.style.visibility = 'visible';
+        }
+    });
+}
+
+onUiUpdate(replacerRemoveVideoMaskUpload);
 
 
 onUiLoaded(function () {
@@ -194,3 +225,37 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
 }
 
 onUiLoaded(replacer_imageComparisonAddButton);
+
+
+function closeAllVideoMasks() {
+    const videoMasks = document.querySelectorAll('.replacer_video_mask');
+    videoMasks.forEach((mask, index) => {
+        const removeButton = mask.querySelector('button[title="Remove Image"]');
+        if (removeButton) {
+            removeButton.click();
+            const canvases = mask.querySelectorAll('canvas');
+            canvases.forEach((canvas) => {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                canvas.width = 0;
+                canvas.height = 0;
+            });
+            const images = mask.querySelectorAll('img');
+            images.forEach((img) => {
+                img.src = '';
+                img.onload = null;
+                img.onerror = null;
+            });
+        }
+    });
+    return [...arguments]
+}
+
+
+onUiLoaded(function () {
+    document.getElementById('replacer_video_open_folder').parentElement.style.display = 'none';
+});
+
+

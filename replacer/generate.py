@@ -66,7 +66,6 @@ def generate(
     gArgs: GenerationArgs,
     saveDir: str,
     saveToSubdirs: bool,
-    useSaveFormatForVideo: bool,
     extra_includes: list,
 ):
     restoreList = []
@@ -160,9 +159,6 @@ def generate(
                     clearCache()
                 if n == 1:
                     raise
-                if useSaveFormatForVideo:
-                    save_image(image, saveDir, "", gArgs.seed, gArgs.positivePrompt,
-                            opts.samples_format, save_to_dirs=False)
                 shared.state.nextjob()
                 continue
 
