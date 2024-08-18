@@ -158,8 +158,9 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
 
         if not IS_SD_WEBUI_FORGE and gArgs.cn_args[i].module.startswith('inpaint_only'):
             hasInpainting = True
-            p.height = gArgs.originalH
-            p.width = gArgs.originalW
+            if not needApplyAnimateDiff:
+                p.height = gArgs.originalH
+                p.width = gArgs.originalW
             if p.image_mask is not None:
                 mask = p.image_mask
                 if p.inpainting_mask_invert:
