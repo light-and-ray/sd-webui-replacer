@@ -3,7 +3,7 @@ from replacer.ui.tools_ui import AttrDict
 from replacer.tools import EXT_NAME
 from replacer.options import getVideoMaskEditingColorStr
 
-from .masking import generateEmptyMasks, reloadMasks, goNextPage, goPrevPage, goToPage, addMasks, subMasks
+from .masking import generateEmptyMasks, reloadMasks, goNextPage, goPrevPage, goToPage, addMasks, subMasks, generateDetectedMasks
 
 
 def getMaskComponent(num: int):
@@ -21,12 +21,12 @@ def getMaskComponent(num: int):
     return mask
 
 
-def makeVideoMaskingUI(comp: AttrDict):
+def makeVideoMaskingUI(comp: AttrDict, mainTabComp: AttrDict):
     with gr.Row():
         reload_masks = gr.Button("⟳ Reload page")
-        generate_empty_masks = gr.Button("Generate empty masks")
         generate_detected_masks = gr.Button("Generate detected masks")
         gr.Markdown(f"All detection options including prompt are taken from {EXT_NAME} tab")
+        generate_empty_masks = gr.Button("Generate empty masks")
     with gr.Row(elem_id="replacer_video_masking_row_1"):
         mask1 = getMaskComponent(1)
         mask2 = getMaskComponent(2)
@@ -92,7 +92,7 @@ def makeVideoMaskingUI(comp: AttrDict):
 
     addMasksButton.click(
         fn=addMasks,
-        inputs=[comp.selected_project, selectedPage, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        inputs=[comp.selected_project, selectedPage, mainTabComp.mask_blur, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
     ).then(
         fn=reloadMasks,
@@ -104,7 +104,7 @@ def makeVideoMaskingUI(comp: AttrDict):
 
     subMasksButton.click(
         fn=subMasks,
-        inputs=[comp.selected_project, selectedPage, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        inputs=[comp.selected_project, selectedPage, mainTabComp.mask_blur, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10,],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
     ).then(
         fn=reloadMasks,
@@ -113,4 +113,34 @@ def makeVideoMaskingUI(comp: AttrDict):
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         postprocess=False,
     )
+
+
+
+
+
+    generate_detected_masks.click(
+        fn=generateDetectedMasks,
+        _js='closeAllVideoMasks',
+        inputs=[comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length,
+            mainTabComp.detectionPrompt,
+            mainTabComp.avoidancePrompt,
+            mainTabComp.seed,
+            mainTabComp.sam_model_name,
+            mainTabComp.dino_model_name,
+            mainTabComp.box_threshold,
+            mainTabComp.mask_expand,
+            mainTabComp.mask_blur,
+            mainTabComp.max_resolution_on_detection,
+            mainTabComp.inpainting_mask_invert,
+            mainTabComp.mask_num,
+            mainTabComp.avoid_mask_mode,
+            mainTabComp.avoidance_mask,
+            mainTabComp.only_custom_mask,
+            mainTabComp.custom_mask_mode,
+            mainTabComp.custom_mask,
+            mainTabComp.do_not_use_mask,
+        ],
+        outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
+        postprocess=False,
+        )
 

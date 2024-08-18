@@ -31,6 +31,35 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
     return processed
 
 
+def detectVideoMasks(gArgs: GenerationArgs, frames: list[Image.Image], masksPath: str, maxNum: int|None) -> None:
+    blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
+    if not maxNum:
+        maxNum = len(frames)
+    mask = None
+
+    for idx in range(maxNum):
+        Pause.wait()
+        if interrupted(): return
+        shared.state.textinfo = f"generating mask {idx+1} / {maxNum}"
+        print(f"    {idx+1} / {maxNum}")
+
+        frame = frames[idx].convert('RGBA')
+        try:
+            mask = createMask(frame, gArgs).mask
+            if gArgs.inpainting_mask_invert:
+                mask = ImageChops.invert(mask.convert('L'))
+            mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
+            mask = mask.resize(frame.size)
+        except NothingDetectedError as e:
+            print(e)
+            if mask is None or mask is blackFilling:
+                mask = blackFilling
+            else:
+                mask = extraMaskExpand(mask, 50)
+
+        fastFrameSave(mask, masksPath, idx)
+
+
 
 def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: int):
     fragmentSize = gArgs.animatediff_args.fragment_length
@@ -54,7 +83,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
             frameInFragmentIdx = 0
             fragmentNum += 1
             fragmentPath = os.path.join(video_output_dir, f"fragment_{fragmentNum}")
-            
+
             framesDir = os.path.join(fragmentPath, 'frames'); os.makedirs(framesDir, exist_ok=True)
             masksDir = os.path.join(fragmentPath, 'masks'); os.makedirs(masksDir, exist_ok=True)
             outDir = os.path.join(fragmentPath, 'out'); os.makedirs(outDir, exist_ok=True)
@@ -170,7 +199,7 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
             images[0] = Image.blend(images[0], theLastImage, 0.5)
         theLastImage = images[-1]
         images = images[:-1]
-        
+
         for image in images:
             saveImage(image)
             frameNum += 1

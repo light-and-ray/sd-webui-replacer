@@ -1,4 +1,4 @@
-import cv2, random, git, torch, os, time, urllib.parse, copy
+import cv2, random, git, torch, os, time, urllib.parse, copy, shutil
 import numpy as np
 from PIL import ImageChops, Image, ImageColor
 from dataclasses import dataclass
@@ -280,7 +280,7 @@ def convertIntoPath(string: str) -> str:
 def applyRotationFix(image: Image.Image, fix: str) -> Image.Image:
     if image is None:
         return None
-    if fix == '-':
+    if fix == '-' or not fix:
         return image
     if fix == '⟲':
         return image.transpose(Image.ROTATE_90)
@@ -292,7 +292,7 @@ def applyRotationFix(image: Image.Image, fix: str) -> Image.Image:
 def removeRotationFix(image: Image.Image, fix: str) -> Image.Image:
     if image is None:
         return None
-    if fix == '-':
+    if fix == '-' or not fix:
         return image
     if fix == '⟲':
         return image.transpose(Image.ROTATE_270)
@@ -322,3 +322,14 @@ def pil_to_base64_jpeg(pil_image):
     img_str = base64.b64encode(buffer.read()).decode("utf-8")
     base64_str = "data:image/jpeg;base64," + img_str
     return base64_str
+
+
+def copyOrHardLink(source: str, target: str) -> None:
+    if os.name == 'nt':
+        shutil.copy(source, target)
+    else:
+        try:
+            os.link(source, target)
+        except Exception as e:
+            shutil.copy(source, target)
+

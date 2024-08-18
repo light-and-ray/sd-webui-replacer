@@ -4,9 +4,13 @@ from PIL import Image, ImageOps
 from modules import shared
 
 from replacer.video_tools import separate_video_into_frames
-from replacer.tools import limitImageByOneDimension, makePreview, pil_to_base64_jpeg
+from replacer.tools import limitImageByOneDimension, makePreview, pil_to_base64_jpeg, prepareMask, applyMaskBlur
+from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.options import getLimitMaskEditingResolution
+from replacer.generation_args import GenerationArgs, DUMMY_HIRESFIX_ARGS
 from .project import getOriginalVideoPath, getFrames, getMasks
+
+from replacer.video_animatediff import detectVideoMasks
 
 
 def prepareMasksDir(project_path: str, fps_out: int):
@@ -67,6 +71,7 @@ def getMasksPreview(project_path: str, page: int):
 
 
 
+
 def generateEmptyMasks(project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length):
     prepareMasksDir(project_path, fps_out)
     frames = list(getFrames(project_path))
@@ -78,6 +83,98 @@ def generateEmptyMasks(project_path: str, fps_out: int, only_the_first_fragment:
         saveMask(project_path, blackFilling, i)
 
     return getMasksPreview(project_path, page=0)
+
+
+
+
+def generateDetectedMasks(project_path: str, fps_out: int, only_the_first_fragment: bool, fragment_length,
+        detectionPrompt,
+        avoidancePrompt,
+        seed,
+        sam_model_name,
+        dino_model_name,
+        box_threshold,
+        mask_expand,
+        mask_blur,
+        max_resolution_on_detection,
+        inpainting_mask_invert,
+        mask_num,
+        avoidance_mask_mode,
+        avoidance_mask,
+        only_custom_mask,
+        custom_mask_mode,
+        custom_mask,
+        do_not_use_mask,
+    ):
+
+    gArgs = GenerationArgs(
+        positivePrompt="",
+        negativePrompt="",
+        detectionPrompt=detectionPrompt,
+        avoidancePrompt=avoidancePrompt,
+        upscalerForImg2Img="",
+        seed=seed,
+        samModel=sam_model_name,
+        grdinoModel=dino_model_name,
+        boxThreshold=box_threshold,
+        maskExpand=mask_expand,
+        maxResolutionOnDetection=max_resolution_on_detection,
+
+        steps=0,
+        sampler_name="",
+        scheduler="",
+        mask_blur=mask_blur,
+        inpainting_fill=0,
+        batch_count=0,
+        batch_size=0,
+        cfg_scale=0,
+        denoising_strength=0,
+        height=0,
+        width=0,
+        inpaint_full_res_padding=False,
+        img2img_fix_steps=False,
+        inpainting_mask_invert=inpainting_mask_invert,
+
+        images=[],
+        override_sd_model=False,
+        sd_model_checkpoint="",
+        mask_num=mask_num,
+        avoidance_mask=prepareMask(avoidance_mask_mode, avoidance_mask),
+        only_custom_mask=only_custom_mask,
+        custom_mask=prepareMask(custom_mask_mode, custom_mask),
+        use_inpaint_diff=False,
+        clip_skip=0,
+        pass_into_hires_fix_automatically=False,
+        save_before_hires_fix=False,
+        do_not_use_mask=do_not_use_mask,
+        rotation_fix=None,
+        variation_seed=0,
+        variation_strength=0,
+        integer_only_masked=False,
+        forbid_too_small_crop_region=False,
+        correct_aspect_ratio=False,
+
+        hires_fix_args=DUMMY_HIRESFIX_ARGS,
+        cn_args=None,
+        soft_inpaint_args=None,
+        )
+    prepareExpectedUIBehavior(gArgs)
+
+
+
+    prepareMasksDir(project_path, fps_out)
+    frames = list(getFrames(project_path))
+    maxNum = len(frames)
+    if only_the_first_fragment and fragment_length != 0:
+        maxNum = fragment_length
+    masksDir = os.path.join(project_path, 'masks')
+
+    detectVideoMasks(gArgs, frames, masksDir, maxNum)
+
+    return getMasksPreview(project_path, page=0)
+
+
+
 
 
 def reloadMasks(project_path: str, page: int):
@@ -138,7 +235,7 @@ def goToPage(project_path: str, page: int):
 
 
 
-def processMasks(action: str, project_path: str, page: int, masksNew: list[Image.Image]):
+def processMasks(action: str, project_path: str, page: int, mask_blur: int, masksNew: list[Image.Image]):
     if not project_path:
         raise gr.Error("No project selected")
     masksOld = getMasks(project_path)
@@ -150,6 +247,7 @@ def processMasks(action: str, project_path: str, page: int, masksNew: list[Image
         maskNew = masksNew[idx]
         if not maskNew: continue
         maskNew = maskNew['mask'].convert('L')
+        maskNew = applyMaskBlur(maskNew, mask_blur)
         maskOld = masksOld[firstMaskIdx+idx].convert('L')
 
         if action == 'add':
@@ -165,11 +263,11 @@ def processMasks(action: str, project_path: str, page: int, masksNew: list[Image
     return getMasksPreview(project_path, page=page)
 
 
-def addMasks(project_path: str, page: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
-    processMasks('add', project_path, page, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
+def addMasks(project_path: str, page: int, mask_blur: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
+    processMasks('add', project_path, page, mask_blur, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
     return tuple([gr.update()] * 12)
 
-def subMasks(project_path: str, page: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
-    processMasks('sub', project_path, page, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
+def subMasks(project_path: str, page: int, mask_blur: int, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10):
+    processMasks('sub', project_path, page, mask_blur, [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10])
     return tuple([gr.update()] * 12)
 

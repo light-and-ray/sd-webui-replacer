@@ -23,7 +23,7 @@ class ReplacerMainUI:
     def init_tab(self, isDedicatedPage: bool):
         comp = AttrDict()
         self.replacerTabUI = getTabUI(comp, isDedicatedPage)
-        self.replacerVideoTabUI = getVideoTabUI(isDedicatedPage)
+        self.replacerVideoTabUI = getVideoTabUI(comp, isDedicatedPage)
 
         self.components = comp
 

@@ -7,7 +7,7 @@ from replacer.ui.video.video_masking_ui import makeVideoMaskingUI
 
 
 
-def getVideoTabUI(isDedicatedPage: bool):
+def getVideoTabUI(mainTabComp: AttrDict, isDedicatedPage: bool):
     comp = AttrDict()
     with OverrideCustomScriptSource('Video'):
         comp.selected_project_status = gr.Markdown("❌ Project is not selected")
@@ -19,7 +19,7 @@ def getVideoTabUI(isDedicatedPage: bool):
                 with gr.Tab("Step 2 (Options)"):
                     makeVideoOptionsUI(comp)
                 with gr.Tab("Step 3 (Masking)", elem_id="replacer_video_masking_tab"):
-                    makeVideoMaskingUI(comp)
+                    makeVideoMaskingUI(comp, mainTabComp)
                 with gr.Tab("Step 4 (First frame)"):
                     pass
                 with gr.Tab("Step 5 (Generation)"):

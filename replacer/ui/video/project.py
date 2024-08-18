@@ -1,7 +1,6 @@
-import os, glob, shutil, datetime
+import os, glob, datetime
 import gradio as gr
-from PIL import Image
-from replacer.tools import convertIntoPath, EXT_NAME
+from replacer.tools import convertIntoPath, EXT_NAME, copyOrHardLink
 from replacer.video_tools import readImages
 
 
@@ -31,7 +30,7 @@ def init(project_path: str, init_video: str):
     ext = os.path.basename(init_video).split('.')[-1]
     original_video = os.path.join(project_path, f'original.{ext}')
     os.makedirs(project_path, exist_ok=True)
-    shutil.copy(init_video, original_video)
+    copyOrHardLink(init_video, original_video)
     return f"✅ Selected a new project {project_path!r}", project_path, project_path
 
 

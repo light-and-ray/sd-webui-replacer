@@ -26,6 +26,7 @@ class HiresFixArgs:
     soft_inpaint: str
     supersampling: float
 
+DUMMY_HIRESFIX_ARGS = HiresFixArgs("", 0, "", "", 0.0, 0.0, "", 0, "", False, True, 0, "", "", "", 0, 0, False, "Same", 1.0)
 
 @dataclass
 class HiresFixCacheData:
