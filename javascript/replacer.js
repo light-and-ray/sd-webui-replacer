@@ -12,7 +12,9 @@ function submit_replacer() {
         gradioApp().getElementById(galleryId + "_gallery"),
         function () {
             showSubmitButtons(buttonsId, true);
-            showSubmitButtons(extraShowButtonsId, true);
+            if (extraShowButtonsId) {
+                showSubmitButtons(extraShowButtonsId, true);
+            }
         }
     );
 
@@ -250,4 +252,9 @@ function closeAllVideoMasks() {
     });
     return [...arguments]
 }
+
+
+onUiLoaded(function () {
+    document.getElementById('replacer_video_open_folder').parentElement.style.display = 'none';
+});
 

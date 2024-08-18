@@ -12,6 +12,7 @@ def getVideoTabUI(mainTabComp: AttrDict, isDedicatedPage: bool):
     with OverrideCustomScriptSource('Video'):
         comp.selected_project_status = gr.Markdown("❌ Project is not selected")
         comp.selected_project = gr.Textbox(visible=False)
+
         with gr.Blocks(analytics_enabled=False) as replacerVideoTabUI:
             with gr.Tabs():
                 with gr.Tab("Step 1 (Project)"):

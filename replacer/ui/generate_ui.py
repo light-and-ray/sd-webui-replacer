@@ -159,27 +159,6 @@ def generate_ui_(
                 yield image
         images = readImages(input_batch_dir)
 
-    # timestamp = int(datetime.datetime.now().timestamp())
-    # if selected_input_mode == "tab_batch_video":
-    #     assert not shared.cmd_opts.hide_ui_dir_config, '--hide-ui-dir-config option must be disabled'
-    #     shared.state.textinfo = 'video preparing'
-    #     if video_output_dir == "":
-    #         video_output_dir = os.path.join(os.path.dirname(input_video), f'out_{seed}_{timestamp}')
-    #     else:
-    #         video_output_dir = os.path.join(video_output_dir, f'out_{seed}_{timestamp}')
-    #     if os.path.exists(video_output_dir):
-    #         for file in os.listdir(video_output_dir):
-    #             if file.endswith(f'.{shared.opts.samples_format}'):
-    #                 os.remove(os.path.join(video_output_dir, file))
-    #     batch_count = 1
-    #     batch_size = 1
-    #     extra_includes = []
-    #     save_before_hires_fix = False
-    #     hf_randomize_seed = False
-
-    #     images, fps_in, fps_out = getVideoFrames(input_video, target_video_fps)
-    #     resultFrames = os.path.join(video_output_dir, 'resultFrames')
-
 
     images = list(images)
 

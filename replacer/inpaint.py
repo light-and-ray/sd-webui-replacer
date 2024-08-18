@@ -21,11 +21,14 @@ def inpaint(
     save_to_dirs : bool = True,
     batch_processed : Processed = None
 ):
-    if gArgs.correct_aspect_ratio and gArgs.mask:
+    if gArgs.correct_aspect_ratio:
         if gArgs.originalW is None:
             gArgs.originalW = gArgs.width
             gArgs.originalH = gArgs.height
-        x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
+        if gArgs.mask:
+            x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
+        else:
+            x1, y1, x2, y2 = 0, 0, image.width, image.height
         if (x2-x1) > gArgs.originalW or (y2-y1) > gArgs.originalH:
             ratio = (x2-x1) / (y2-y1)
             pixels = gArgs.originalW * gArgs.originalH

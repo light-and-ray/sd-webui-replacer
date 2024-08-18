@@ -1,15 +1,19 @@
 import datetime, os
 
+from modules import shared
+from modules.ui import plaintext_to_html
+import gradio as gr
 from replacer.generation_args import GenerationArgs, DUMMY_HIRESFIX_ARGS, AnimateDiffArgs
 from replacer.ui.tools_ui import prepareExpectedUIBehavior
 from replacer.extensions import replacer_extensions
-from replacer.video_tools import overrideSettingsForVideo
+from replacer.video_tools import overrideSettingsForVideo, save_video
 
-from .project import getFrames, getMasks
+from .project import getFrames, getMasks, getOriginalVideoPath
 from replacer.video_animatediff import animatediffGenerate
 
 
 def videoGenerateUI(
+    task_id: str,
     project_path: str,
     target_video_fps: int,
 
@@ -140,16 +144,31 @@ def videoGenerateUI(
         )
     prepareExpectedUIBehavior(gArgs)
 
+    originalVideo = getOriginalVideoPath(project_path)
+    if not originalVideo:
+        raise gr.Error("This project doesn't have original video")
     timestamp = int(datetime.datetime.now().timestamp())
     fragmentsPath = os.path.join(project_path, f'out {timestamp}')
     resultPath = os.path.join(fragmentsPath, "result")
-    frames = list(getFrames(project_path))
-    masks = list(getMasks(project_path))
+    frames = getFrames(project_path)
+    masks = getMasks(project_path)
+    if not frames or not masks:
+        raise gr.Error("This project doesn't have frames or masks")
+    frames = list(frames)
+    masks = list(masks)
+    saveVideoPath = os.path.join(fragmentsPath, f'output_{os.path.basename(originalVideo)}_{timestamp}.mp4')
+    if len(saveVideoPath) > 260:
+        saveVideoPath = os.path.join(fragmentsPath, f'output_{timestamp}.mp4')
 
     restore = overrideSettingsForVideo()
     try:
         animatediffGenerate(gArgs, fragmentsPath, resultPath, frames, masks, target_video_fps)
+
+        shared.state.textinfo = 'video saving'
+        print("video saving")
+        save_video(resultPath, target_video_fps, originalVideo, saveVideoPath, gArgs.seed)
     finally:
         restore()
 
-    return f"Saved into {resultPath}"
+    return [], "", plaintext_to_html(f"Saved as {saveVideoPath}"), ""
+

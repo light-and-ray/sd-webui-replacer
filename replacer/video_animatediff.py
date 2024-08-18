@@ -94,8 +94,7 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
 
         Pause.wait()
         if interrupted(): return
-        shared.state.textinfo = f"generating masks for fragment {fragmentNum} / {totalFragments}"
-        print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
+        print(f"    preparing frame in fragment {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
         mask = masks[frameIdx]
