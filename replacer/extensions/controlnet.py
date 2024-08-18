@@ -177,6 +177,7 @@ def enableInpaintModeForCN(gArgs: GenerationArgs, p, previousFrame):
             else:
                 from scripts.enums import InputMode
                 gArgs.cn_args[i].input_mode = InputMode.BATCH
+                gArgs.cn_args[i].batch_modifiers = []
             p.image_mask = None
             p.inpaint_full_res = False
             p.needRestoreAfterCN = True
