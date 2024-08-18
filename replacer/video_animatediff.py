@@ -75,10 +75,13 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
     frame: Image.Image = None
     mask: Image.Image = None
 
+
     for frameIdx in range(len(masks)):
         if frameInFragmentIdx == fragmentSize:
             if fragmentPath is not None:
-                shared.state.textinfo = f"inpainting fragment {fragmentNum} / {totalFragments}"
+                text = f"inpainting fragment {fragmentNum} / {totalFragments}"
+                print(text)
+                shared.state.textinfo = text
                 yield fragmentPath
             frameInFragmentIdx = 0
             fragmentNum += 1
@@ -108,6 +111,9 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
         frameInFragmentIdx += 1
 
     if frameInFragmentIdx > 1:
+        text = f"inpainting fragment {fragmentNum} / {totalFragments}"
+        print(text)
+        shared.state.textinfo = text
         yield fragmentPath
 
 

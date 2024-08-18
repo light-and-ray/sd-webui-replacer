@@ -17,6 +17,14 @@ except Exception:
     errors.report(f"Error reading replacer git info from {__file__}", exc_info=True)
     REPLACER_VERSION = "None"
 
+colorfix = None
+try:
+    from modules import colorfix
+except ImportError:
+    try:
+        from srmodule import colorfix
+    except ImportError:
+        pass
 
 
 def addReplacerMetadata(p, gArgs: GenerationArgs):
@@ -179,7 +187,15 @@ def applyMask(res, orig, mask, gArgs):
         upscaler = None
 
     w, h = orig.size
-    imageProc = resize_image(1, res.convert('RGB'), w, h, upscaler).convert('RGBA') # 1 - resize and crop
+    res = res.convert('RGB')
+    # beforeUpscale = res
+    imageProc = resize_image(1, res, w, h, upscaler) # 1 - resize and crop
+    # if colorfix:
+    #     imageProc.show()
+    #     imageProc = colorfix.wavelet_color_fix(imageProc, beforeUpscale.resize(imageProc.size))
+    #     imageProc.show()
+    imageProc = imageProc.convert('RGBA')
+
     mask = mask.convert('L')
     if gArgs.inpainting_mask_invert:
         mask = ImageChops.invert(mask)
