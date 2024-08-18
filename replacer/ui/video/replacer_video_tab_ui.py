@@ -4,7 +4,7 @@ from replacer.ui.tools_ui import AttrDict, OverrideCustomScriptSource
 from replacer.ui.video.video_options_ui import makeVideoOptionsUI
 from replacer.ui.video.video_project_ui import makeVideoProjectUI
 from replacer.ui.video.video_masking_ui import makeVideoMaskingUI
-
+from replacer.ui.video.video_generation_ui import makeVideoGenerationUI
 
 
 def getVideoTabUI(mainTabComp: AttrDict, isDedicatedPage: bool):
@@ -20,10 +20,8 @@ def getVideoTabUI(mainTabComp: AttrDict, isDedicatedPage: bool):
                     makeVideoOptionsUI(comp)
                 with gr.Tab("Step 3 (Masking)", elem_id="replacer_video_masking_tab"):
                     makeVideoMaskingUI(comp, mainTabComp)
-                with gr.Tab("Step 4 (First frame)"):
-                    pass
-                with gr.Tab("Step 5 (Generation)"):
-                    pass
+                with gr.Tab("Step 4 (Generation)"):
+                    makeVideoGenerationUI(comp, mainTabComp)
             comp.selected_project_status.render()
             comp.selected_project.render()
 

@@ -61,11 +61,9 @@ def detectVideoMasks(gArgs: GenerationArgs, frames: list[Image.Image], masksPath
 
 
 
-def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: int):
+def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.Image], masks: list[Image.Image], totalFragments: int):
     fragmentSize = gArgs.animatediff_args.fragment_length
 
-    frames = gArgs.images
-    blackFilling = Image.new('L', frames[0].size, 0).convert('RGBA')
     fragmentNum = 0
     frameInFragmentIdx = fragmentSize
     fragmentPath: str = None
@@ -75,14 +73,14 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
     frame: Image.Image = None
     mask: Image.Image = None
 
-    for frameIdx in range(len(frames)):
+    for frameIdx in range(len(masks)):
         if frameInFragmentIdx == fragmentSize:
             if fragmentPath is not None:
                 shared.state.textinfo = f"inpainting fragment {fragmentNum} / {totalFragments}"
                 yield fragmentPath
             frameInFragmentIdx = 0
             fragmentNum += 1
-            fragmentPath = os.path.join(video_output_dir, f"fragment_{fragmentNum}")
+            fragmentPath = os.path.join(fragments_path, f"fragment_{fragmentNum}")
 
             framesDir = os.path.join(fragmentPath, 'frames'); os.makedirs(framesDir, exist_ok=True)
             masksDir = os.path.join(fragmentPath, 'masks'); os.makedirs(masksDir, exist_ok=True)
@@ -100,19 +98,7 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         print(f"    {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
-        try:
-            mask = createMask(frame, gArgs).mask
-            if gArgs.inpainting_mask_invert:
-                mask = ImageChops.invert(mask.convert('L'))
-            mask = applyMaskBlur(mask.convert('RGBA'), gArgs.mask_blur)
-            mask = mask.resize(frame.size)
-        except NothingDetectedError as e:
-            print(e)
-            if mask is None or mask is blackFilling:
-                mask = blackFilling
-            else:
-                mask = removeRotationFix(mask, gArgs.rotation_fix)
-                mask = extraMaskExpand(mask, 50)
+        mask = masks[frameIdx]
 
         frame = applyRotationFix(frame, gArgs.rotation_fix)
         fastFrameSave(frame, framesDir, frameInFragmentIdx)
@@ -124,17 +110,18 @@ def getFragments(gArgs: GenerationArgs, video_output_dir: str, totalFragments: i
         yield fragmentPath
 
 
-def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir: str, video_fps: float):
+def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: str,
+                            frames: list[Image.Image], masks: list[Image.Image], video_fps: float):
     if gArgs.animatediff_args.force_override_sd_model:
         gArgs.override_sd_model = True
         gArgs.sd_model_checkpoint = gArgs.animatediff_args.force_sd_model_checkpoint
     if gArgs.animatediff_args.internal_fps <= 0:
         gArgs.animatediff_args.internal_fps = video_fps
-    if gArgs.animatediff_args.fragment_length <= 0 or len(gArgs.images) < gArgs.animatediff_args.fragment_length:
-        gArgs.animatediff_args.fragment_length = len(gArgs.images)
+    if gArgs.animatediff_args.fragment_length <= 0 or len(masks) < gArgs.animatediff_args.fragment_length:
+        gArgs.animatediff_args.fragment_length = len(masks)
     gArgs.animatediff_args.needApplyCNForAnimateDiff = True
 
-    totalFragments = math.ceil((len(gArgs.images) - 1) / (gArgs.animatediff_args.fragment_length - 1))
+    totalFragments = math.ceil((len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1))
     if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
     shared.state.job_count = 1 + totalFragments
@@ -143,19 +130,21 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
 
     try:
         shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
-        processedFirstImg, _ = generateSingle(gArgs.images[0], gArgs.copy(), "", "", False, [], None)
+        firstFrameGArgs = gArgs.copy()
+        firstFrameGArgs.only_custom_mask = True
+        firstFrameGArgs.custom_mask = masks[0]
+        processedFirstImg, _ = generateSingle(frames[0], firstFrameGArgs, "", "", False, [], None)
         initImage: Image.Image = processedFirstImg.images[0]
     except NothingDetectedError as e:
         print(e)
-        initImage: Image.Image = copy.copy(gArgs.images[0])
+        initImage: Image.Image = copy.copy(frames[0])
         shared.state.nextjob()
         shared.total_tqdm.clear()
 
     fragmentPaths = []
 
-
     try:
-        for fragmentPath in getFragments(gArgs, video_output_dir, totalFragments):
+        for fragmentPath in getFragments(gArgs, fragments_path, frames, masks, totalFragments):
             if not shared.cmd_opts.lowram: # do not confuse with lowvram. lowram is for really crazy people
                 clearCache()
             processed = processFragment(fragmentPath, initImage, gArgs)
@@ -204,4 +193,5 @@ def animatediffGenerate(gArgs: GenerationArgs, video_output_dir: str, result_dir
             saveImage(image)
             frameNum += 1
     saveImage(theLastImage)
+
 
