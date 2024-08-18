@@ -187,14 +187,8 @@ def applyMask(res, orig, mask, gArgs):
         upscaler = None
 
     w, h = orig.size
-    res = res.convert('RGB')
-    # beforeUpscale = res
-    imageProc = resize_image(1, res, w, h, upscaler) # 1 - resize and crop
-    # if colorfix:
-    #     imageProc.show()
-    #     imageProc = colorfix.wavelet_color_fix(imageProc, beforeUpscale.resize(imageProc.size))
-    #     imageProc.show()
-    imageProc = imageProc.convert('RGBA')
+
+    imageProc = resize_image(1, res.convert('RGB'), w, h, upscaler).convert('RGBA') # 1 - resize and crop
 
     mask = mask.convert('L')
     if gArgs.inpainting_mask_invert:
