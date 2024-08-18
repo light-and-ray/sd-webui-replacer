@@ -17,3 +17,18 @@ button.pause-button{
     font-size: 120%;
     text-align: center;
 }
+
+#replacer_video_masking_progress_gallery_container {
+    display: none;
+}
+
+#image_buttons_replacer_video_masking_progress {
+    display: none;
+}
+
+#replacer_video_masking_progress_results_panel {
+    background: unset;
+    margin-top: 20px;
+    margin-bottom: 3px;
+    padding: unset;
+}

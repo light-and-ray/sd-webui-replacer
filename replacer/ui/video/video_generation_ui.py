@@ -9,19 +9,19 @@ def makeVideoGenerationUI(comp: AttrDict, mainTabComp: AttrDict):
     with gr.Row():
         if IS_WEBUI_1_8:
             outputPanel = create_output_panel('replacer_video', "")
-            comp.replacer_gallery = outputPanel.gallery
-            comp.generation_info = outputPanel.generation_info
-            comp.html_info = outputPanel.infotext
-            comp.html_log = outputPanel.html_log
+            replacer_gallery = outputPanel.gallery
+            generation_info = outputPanel.generation_info
+            html_info = outputPanel.infotext
+            html_log = outputPanel.html_log
         else:
-            comp.replacer_gallery, comp.generation_info, comp.html_info, comp.html_log = \
+            replacer_gallery, generation_info, html_info, html_log = \
                 create_output_panel('replacer_video', "")
-        comp.generation_info_button = gr.Button(visible=False, elem_id="replacer_video_generation_info_button")
-        comp.generation_info_button.click(
+        generation_info_button = gr.Button(visible=False, elem_id="replacer_video_generation_info_button")
+        generation_info_button.click(
             fn=update_generation_info,
             _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
-            inputs=[comp.generation_info, comp.html_info, comp.html_info],
-            outputs=[comp.html_info, comp.html_info],
+            inputs=[generation_info, html_info, html_info],
+            outputs=[html_info, html_info],
             show_progress=False,
         )
 
@@ -97,10 +97,10 @@ def makeVideoGenerationUI(comp: AttrDict, mainTabComp: AttrDict):
         ] + mainTabComp.cn_inputs
           + mainTabComp.soft_inpaint_inputs,
         outputs=[
-            comp.replacer_gallery,
-            comp.generation_info,
-            comp.html_info,
-            comp.html_log,
+            replacer_gallery,
+            generation_info,
+            html_info,
+            html_log,
         ],
         show_progress=ui_toprow is None,
     )

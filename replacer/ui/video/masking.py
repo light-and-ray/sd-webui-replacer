@@ -16,7 +16,7 @@ from replacer.video_animatediff import detectVideoMasks
 def prepareMasksDir(project_path: str, fps_out: int):
     if not project_path:
         raise gr.Error("No project selected")
-
+    shared.state.textinfo = "preparing mask dir"
     framesDir = os.path.join(project_path, 'frames')
     if os.path.exists(framesDir):
         assert framesDir.endswith('frames')
@@ -164,7 +164,6 @@ def generateDetectedMasks(task_id, project_path: str, fps_out: int, only_the_fir
     prepareExpectedUIBehavior(gArgs)
 
 
-
     prepareMasksDir(project_path, fps_out)
     frames = list(getFrames(project_path))
     maxNum = len(frames)
@@ -174,7 +173,7 @@ def generateDetectedMasks(task_id, project_path: str, fps_out: int, only_the_fir
 
     detectVideoMasks(gArgs, frames, masksDir, maxNum)
 
-    return getMasksPreview(project_path, page=0)
+    return [], "", "", ""
 
 
 

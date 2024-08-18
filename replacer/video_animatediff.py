@@ -36,6 +36,7 @@ def detectVideoMasks(gArgs: GenerationArgs, frames: list[Image.Image], masksPath
     if not maxNum:
         maxNum = len(frames)
     mask = None
+    shared.state.job_count = maxNum
 
     for idx in range(maxNum):
         Pause.wait()
@@ -58,6 +59,7 @@ def detectVideoMasks(gArgs: GenerationArgs, frames: list[Image.Image], masksPath
                 mask = extraMaskExpand(mask, 50)
 
         fastFrameSave(mask, masksPath, idx)
+        shared.state.nextjob()
 
 
 
@@ -94,7 +96,7 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
 
         Pause.wait()
         if interrupted(): return
-        print(f"    preparing frame in fragment {frameInFragmentIdx+1} / {fragmentSize}")
+        print(f"    Preparing frame in fragment {fragmentNum}: {frameInFragmentIdx+1} / {fragmentSize}")
 
         frame = frames[frameIdx]
         mask = masks[frameIdx]
