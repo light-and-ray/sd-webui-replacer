@@ -32,3 +32,7 @@ button.pause-button{
     margin-bottom: 3px;
     padding: unset;
 }
+
+#replacer_video_gallery {
+    height: 450px;
+}

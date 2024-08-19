@@ -32,7 +32,7 @@ def makeVideoOptionsUI(comp: AttrDict):
                             elem_id="replacer_ad_fragment_length",
                         )
                         comp.ad_internal_fps = gr.Number(
-                            value=0, precision=0, info="Set 0 to use the same with input video",
+                            value=0, precision=0, info="Set 0 to use the fps above",
                             minimum=0,
                             label="Internal AD FPS",
                             elem_id="replacer_ad_internal_fps"

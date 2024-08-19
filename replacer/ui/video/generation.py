@@ -157,7 +157,7 @@ def videoGenerateUI(
         raise gr.Error("This project doesn't have frames or masks")
     frames = list(frames)
     masks = list(masks)
-    saveVideoPath = os.path.join(fragmentsPath, f'{EXT_NAME_LOWER}_{os.path.basename(originalVideo)}_{timestamp}.mp4')
+    saveVideoPath = os.path.join(fragmentsPath, f'{EXT_NAME_LOWER}_{os.path.basename(originalVideo)}_{gArgs.seed}.mp4')
     if len(saveVideoPath) > 260:
         saveVideoPath = os.path.join(fragmentsPath, f'{EXT_NAME_LOWER}_{timestamp}.mp4')
 
