@@ -129,15 +129,8 @@ def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: 
         gArgs.animatediff_args.fragment_length = len(masks)
     gArgs.animatediff_args.needApplyCNForAnimateDiff = True
 
-    if not gArgs.animatediff_args.generate_only_first_fragment:
-        framesInTheLastFragment = (len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1)
-        totalFragments = math.ceil((len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1))
-        if framesInTheLastFragment < min(12, gArgs.animatediff_args.fragment_length) and framesInTheLastFragment >= (totalFragments-1) and (totalFragments-1) < 12:
-            newFragmentLength = gArgs.animatediff_args.fragment_length + math.ceil(framesInTheLastFragment / (totalFragments-1))
-            print(f"Fragment length has been recalculated to avoid too small the last fragment length: {gArgs.animatediff_args.fragment_length} -> {newFragmentLength}")
-            gArgs.animatediff_args.fragment_length = newFragmentLength
-        totalFragments = math.ceil((len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1))
-    else:
+    totalFragments = math.ceil((len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1))
+    if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
     shared.state.job_count = 1 + totalFragments
     shared.total_tqdm.clear()
