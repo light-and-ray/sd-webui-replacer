@@ -19,6 +19,7 @@ def processFragment(fragmentPath: str, initImage: Image.Image, gArgs: Generation
     fastFrameSave(initImage, os.path.join(fragmentPath, 'frames'), 0)
     gArgs = gArgs.copy()
     gArgs.inpainting_mask_invert = False
+    gArgs.mask_blur = 0
     gArgs.animatediff_args.needApplyAnimateDiff = True
     gArgs.animatediff_args.video_path = os.path.join(fragmentPath, 'frames')
     gArgs.animatediff_args.mask_path = os.path.join(fragmentPath, 'masks')
