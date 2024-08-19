@@ -77,7 +77,7 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
     mask: Image.Image = None
 
 
-    for frameIdx in range(len(masks)):
+    for frameIdx in range(len(masks)+1):
         if frameInFragmentIdx == fragmentSize:
             if fragmentPath is not None:
                 text = f"inpainting fragment {fragmentNum} / {totalFragments}"
@@ -97,7 +97,8 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
                 fastFrameSave(frame, framesDir, frameInFragmentIdx)
                 fastFrameSave(mask, masksDir, frameInFragmentIdx)
                 frameInFragmentIdx = 1
-
+        if frameIdx == len(masks):
+            break
         Pause.wait()
         if interrupted(): return
         print(f"    Preparing frame in fragment {fragmentNum}: {frameInFragmentIdx+1} / {fragmentSize}")
@@ -112,6 +113,10 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
         frameInFragmentIdx += 1
 
     if frameInFragmentIdx > 1:
+        for idx in range(frameInFragmentIdx+1, min(fragmentSize, 12)):
+            fastFrameSave(frame, framesDir, idx)
+            fastFrameSave(mask, masksDir, idx)
+
         text = f"inpainting fragment {fragmentNum} / {totalFragments}"
         print(text)
         shared.state.textinfo = text
@@ -198,6 +203,8 @@ def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: 
         images = images[:-1]
 
         for image in images:
+            if frameNum >= len(masks):
+                break
             saveImage(image)
             frameNum += 1
     saveImage(theLastImage)
