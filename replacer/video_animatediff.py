@@ -77,7 +77,7 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
     mask: Image.Image = None
 
 
-    for frameIdx in range(len(masks)+1):
+    for frameIdx in range(len(masks)):
         if frameInFragmentIdx == fragmentSize:
             if fragmentPath is not None:
                 text = f"inpainting fragment {fragmentNum} / {totalFragments}"
@@ -97,8 +97,7 @@ def getFragments(gArgs: GenerationArgs, fragments_path: str, frames: list[Image.
                 fastFrameSave(frame, framesDir, frameInFragmentIdx)
                 fastFrameSave(mask, masksDir, frameInFragmentIdx)
                 frameInFragmentIdx = 1
-        if frameIdx == len(masks):
-            break
+
         Pause.wait()
         if interrupted(): return
         print(f"    Preparing frame in fragment {fragmentNum}: {frameInFragmentIdx+1} / {fragmentSize}")
