@@ -137,9 +137,6 @@ def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: 
     totalFragments = math.ceil((len(masks) - 1) / (gArgs.animatediff_args.fragment_length - 1))
     if gArgs.animatediff_args.generate_only_first_fragment:
         totalFragments = 1
-    shared.state.job_count = 1 + totalFragments
-    shared.total_tqdm.clear()
-    Pause.paused = False
 
     try:
         shared.state.textinfo = f"processing the first frame. Total fragments number = {totalFragments}"
@@ -151,8 +148,13 @@ def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: 
     except NothingDetectedError as e:
         print(e)
         initImage: Image.Image = copy.copy(frames[0])
-        shared.state.nextjob()
-        shared.total_tqdm.clear()
+
+    oldJob = shared.state.job
+    shared.state.end()
+    shared.state.begin(oldJob + '_animatediff_inpaint')
+    shared.state.job_count = totalFragments
+    shared.total_tqdm.clear()
+    Pause.paused = False
 
     fragmentPaths = []
 
