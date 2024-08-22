@@ -10,7 +10,8 @@ from .project import getOriginalVideoPath
 def onGetFpsFromVideo(projectPath: str) -> float:
     video = getOriginalVideoPath(projectPath)
     if not video:
-        raise gr.Error("This project doesn't have a video")
+        gr.Warning("This project doesn't have a video")
+        return gr.update()
     return getFpsFromVideo(video)
 
 
