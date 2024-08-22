@@ -201,7 +201,7 @@ def getTabUI(comp: AttrDict, isDedicatedPage: bool):
                     '-',
                     elem_id='replacer_pause',
                     visible=False,
-                    elem_classes=["pause-button"],
+                    elem_classes=["replacer-pause-button"],
                     variant='compact'
                 )
 

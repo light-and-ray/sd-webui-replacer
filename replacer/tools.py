@@ -242,7 +242,7 @@ class Pause:
         Pause.paused = not Pause.paused
         text = f"    [{EXT_NAME}]: "
         text += "Paused" if Pause.paused else "Resumed"
-        text += " batch generation"
+        text += " generation"
         gr.Info(text)
         print(text)
         if Pause.paused:

@@ -38,6 +38,7 @@ def detectVideoMasks(gArgs: GenerationArgs, frames: list[Image.Image], masksPath
         maxNum = len(frames)
     mask = None
     shared.state.job_count = maxNum
+    Pause.paused = False
 
     for idx in range(maxNum):
         Pause.wait()
