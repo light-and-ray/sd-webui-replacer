@@ -96,3 +96,11 @@ def overrideSettingsForVideo():
     shared.opts.data["controlnet_ignore_noninpaint_mask"] = True
     return restoreOpts
 
+
+
+def getFpsFromVideo(video_path: str) -> float:
+    video = cv2.VideoCapture(video_path)
+    fps = video.get(cv2.CAP_PROP_FPS)
+    video.release()
+    return fps
+

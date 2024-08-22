@@ -1,15 +1,35 @@
 import gradio as gr
 from modules import shared, ui_settings
+from modules.ui_components import ToolButton
 from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import AttrDict, ResizeHandleRow
+from replacer.video_tools import getFpsFromVideo
+from .project import getOriginalVideoPath
+
+
+def onGetFpsFromVideo(projectPath: str) -> float:
+    video = getOriginalVideoPath(projectPath)
+    if not video:
+        raise gr.Error("This project doesn't have a video")
+    return getFpsFromVideo(video)
 
 
 
 def makeVideoOptionsUI(comp: AttrDict):
     gr.Markdown("**These options are not saved in the project**")
-    comp.target_video_fps = gr.Slider(
-        label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0,
-        elem_id="replacer_video_fps")
+    with gr.Row():
+        comp.target_video_fps = gr.Slider(
+            label='FPS', value=15.0, step=0.1, minimum=0.0, maximum=100.0,
+            elem_id="replacer_video_fps")
+        comp.get_fps_from_video = ToolButton('↙️',
+            elem_id=f'replacer_video_get_fps_from_video',
+            tooltip="Get fps from video",
+            visible=True)
+        comp.get_fps_from_video.click(
+            fn=onGetFpsFromVideo,
+            inputs=[comp.selected_project],
+            outputs=[comp.target_video_fps],
+        )
 
     comp.selected_video_mode = gr.Textbox(value="video_mode_animatediff", visible=False)
 
