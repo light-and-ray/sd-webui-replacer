@@ -59,7 +59,7 @@ API is available on `/replacer/replace`
     hf_extra_mask_blur: int = 2
     hf_randomize_seed: bool = True
     hf_soft_inpaint: str = "Same"
-    hf_supersampling: float = 1.0
+    hf_supersampling: float = 1.6
 
     scripts : dict = {} # ControlNet and Soft Inpainting. See apiExample.py for example
 ```

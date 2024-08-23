@@ -152,8 +152,12 @@ onUiUpdate(replacerRemoveVideoMaskUpload);
 onUiLoaded(function () {
     let replacer_generate = gradioApp().getElementById('replacer_generate');
     let replacer_hf_generate = gradioApp().getElementById('replacer_hf_generate');
+    let replacer_video_masks_detect_generate = gradioApp().getElementById('replacer_video_masks_detect_generate');
+    let replacer_video_gen_generate = gradioApp().getElementById('replacer_video_gen_generate');
     replacer_generate.title = '';
     replacer_hf_generate.title = '';
+    replacer_video_masks_detect_generate.title = '';
+    replacer_video_gen_generate.title = '';
 });
 
 
@@ -250,7 +254,7 @@ function closeAllVideoMasks() {
             });
         }
     });
-    return [...arguments]
+    return [...arguments];
 }
 
 
