@@ -29,7 +29,7 @@ def inpaint(
             x1, y1, x2, y2 = getActualCropRegion(gArgs.mask, gArgs.inpaint_full_res_padding, gArgs.inpainting_mask_invert)
         else:
             x1, y1, x2, y2 = 0, 0, image.width, image.height
-        if (x2-x1) > gArgs.originalW or (y2-y1) > gArgs.originalH:
+        if not gArgs.forbid_too_small_crop_region or (x2-x1) > gArgs.originalW or (y2-y1) > gArgs.originalH:
             ratio = (x2-x1) / (y2-y1)
             pixels = gArgs.originalW * gArgs.originalH
             newW = (pixels * ratio)**0.5
