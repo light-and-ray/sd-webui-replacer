@@ -17,6 +17,7 @@ You can detect few objects, just using comma `,`
 
 - _"Do exactly the number of steps the slider specifies"_: actual steps num is steps from slider * denoising straight
 - _"width"_, _"height"_: internal resolution on generation. 512 for sd1, 1024 for sdxl. If you increase, it will produce mutations for high denoising straight
+- _"Correct aspect ratio"_: Preserve original width x height number of pixels, but follow generated mask's aspect ratio. In some cases can hide necessary context
 - _"Upscaler for img2Img"_: which method will be used to fix the generated image inside the original image. It can be used instead hires fix. DAT upscalers are good. For example this is a good one: https://openmodeldb.info/models/4x-FaceUpDAT
 - _"Rotation fix"_: fixes, if your photo is rotated by 90, 180 or 270 degree and it causes artifacts in detection and generation
 
@@ -34,23 +35,16 @@ You can detect few objects, just using comma `,`
 - _"Soft inpainting"_: can be used instead of inpainting models, or with a small `mask expand` to not change inpainting area too much. E.g. change color. You need to set high `mask blur` for it!
 - _"Mask mode"_: useful to invert selection (Replace everything except something). You need to set a negative `mask expand` for it.
 
-### Avoidance
-![](/docs/images/advanced_options_avoidance.jpg)
+### Others
+![](/docs/images/advanced_options_others.jpg)
 
+### Avoidance
 - You can draw mask or/and type prompt, which will be excluded from the mask
 
 ### Custom mask
-![](/docs/images/advanced_options_custom_mask.jpg)
-
 - If you want to use this extension for regular inpainting by drown mask, to take advantage of HiresFix, batch processing or controlnet inpainting, which are not able in img2img/inpaint tab of webui
 - Or it can be appended to generated mask if `Do not use detection prompt if use custom mask` is disabled. Opposite of avoidance mask
 
-### Inpaing Diff
-*discontinued, maybe temporary*
-
-![](/docs/images/advanced_options_inpaint_diff.jpg)
-
-[Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference) extension.
 
 ## HiresFix
 You can select the blurred image in the gallery, then press "Apply HiresFix ✨" button. Or you can enable `Pass into hires fix automatically`
@@ -64,6 +58,7 @@ Note: hires fix is designed for single-user server
 ### Options - General
 ![](/docs/images/hiresfix_options_general.jpg)
 - _"Extra inpaint padding"_: higher are recommended because generation size will never be higher then the original image
+- _"Hires supersampling"_: 1.0 is the resolution of original image's crop region, but not smaller then firstpass resolution. More then 1.0 - multiplying on this number each sides. It calculates before limiting resolution, so it still can't be bigger then you set above
 
 ### Options - Advanced
 ![](/docs/images/hiresfix_options_advanced.jpg)
