@@ -116,6 +116,8 @@ def applyHiresFix(
         processed, scriptImages = inpaint(generatedImage, hrGArgs, getSaveDir(), "-hires-fix")
 
         shared.state.end()
+        if interrupted():
+            raise Exception("Interrupted")
 
     except Exception as e:
         text = f"Error while processing hires fix: {e}"
