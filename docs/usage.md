@@ -42,7 +42,7 @@ You can detect few objects, just using comma `,`
 ### Custom mask
 ![](/docs/images/advanced_options_custom_mask.jpg)
 
-- If you want to use this extension for regular inpainting by drown mask, to take advantage of HiresFix, batch processing or controlnet inpaining, which are not able in img2img/inpaint tab of webui
+- If you want to use this extension for regular inpainting by drown mask, to take advantage of HiresFix, batch processing or controlnet inpainting, which are not able in img2img/inpaint tab of webui
 - Or it can be appended to generated mask if `Do not use detection prompt if use custom mask` is disabled. Opposite of avoidance mask
 
 ### Inpaing Diff
@@ -53,7 +53,7 @@ You can detect few objects, just using comma `,`
 [Inpaint Difference](https://github.com/John-WL/sd-webui-inpaint-difference) extension.
 
 ## HiresFix
-You can select the blured image in the gallery, then press "Apply HiresFix ✨" button. Or you can enable `Pass into hires fix automatically`
+You can select the blurred image in the gallery, then press "Apply HiresFix ✨" button. Or you can enable `Pass into hires fix automatically`
 
 Default settings are designed for using lcm lora for fast upscale. It requires lcm lora I mentioned, cfg scale 1.0 and sampling steps 4. There is no difference in quality for my opinion
 
@@ -83,12 +83,12 @@ Dedicated page (replacer tab only) is available on url `/replacer-dedicated`
 You can use it to pass generated images into replacer immediately
 
 
-## Extention name
+## Extension name
 Replacer" name of this extension, you can provide it inside `ExtensionName.txt` in root of extension directory.
 
 Or you can override it using the environment variable `SD_WEBUI_REPLACER_EXTENSION_NAME`
 
-For exaple: Linux
+For example: Linux
 ```sh
 export SD_WEBUI_REPLACER_EXTENSION_NAME="Fast Inpaint"
 ```

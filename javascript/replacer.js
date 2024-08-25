@@ -1,11 +1,11 @@
 function submit_replacer() {
-    var arguments_ = Array.from(arguments);
+    let arguments_ = Array.from(arguments);
     galleryId = arguments_.pop();
     buttonsId = arguments_.pop();
     extraShowButtonsId = arguments_.pop();
     showSubmitButtons(buttonsId, false);
 
-    var id = randomId();
+    let id = randomId();
 
     requestProgress(id,
         gradioApp().getElementById(galleryId + "_gallery_container"),
@@ -18,7 +18,7 @@ function submit_replacer() {
         }
     );
 
-    var res = create_submit_args(arguments_);
+    let res = create_submit_args(arguments_);
 
     res[0] = id;
 
@@ -50,7 +50,7 @@ onAfterUiUpdate(function () {
 
 function replacerGetCurrentSourceImg(dummy_component, isAvoid, needLimit, maxResolutionOnDetection) {
     const img = gradioApp().querySelector('#replacer_image div div img');
-    var maskId = '';
+    let maskId = '';
     if (isAvoid) {
         maskId = 'replacer_avoidance_mask';
     } else {
@@ -75,28 +75,28 @@ async function replacer_waitForOpts() {
     }
 }
 
-var isZoomAndPanIntegrationApplied = false;
+var isReplacerZoomAndPanIntegrationApplied = false;
 
 function replacerApplyZoomAndPanIntegration() {
-    if (typeof window.applyZoomAndPanIntegration === "function" && !isZoomAndPanIntegrationApplied) {
+    if (typeof window.applyZoomAndPanIntegration === "function" && !isReplacerZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
 
         const maskIds = [...Array(10).keys()].map(i => `#replacer_video_mask_${i + 1}`);
         window.applyZoomAndPanIntegration("#replacer_video_masking_tab", maskIds);
 
-        isZoomAndPanIntegrationApplied = true;
+        isReplacerZoomAndPanIntegrationApplied = true;
     }
 }
 
 function replacerApplyZoomAndPanIntegration_withMod() {
-    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function" && !isZoomAndPanIntegrationApplied) {
+    if (typeof window.applyZoomAndPanIntegration === "function" && typeof window.applyZoomAndPanIntegration_replacer_mod === "function" && !isReplacerZoomAndPanIntegrationApplied) {
         window.applyZoomAndPanIntegration_replacer_mod("#replacer_advanced_options", ["#replacer_avoidance_mask", "#replacer_custom_mask"]);
-        isZoomAndPanIntegrationApplied = true;
+        isReplacerZoomAndPanIntegrationApplied = true;
     }
 }
 
 onUiUpdate(async () => {
-    if (isZoomAndPanIntegrationApplied) return;
+    if (isReplacerZoomAndPanIntegrationApplied) return;
     const opts = await replacer_waitForOpts();
 
     if ('set_scale_by_when_changing_upscaler' in opts) { // webui 1.9
@@ -110,7 +110,7 @@ onUiUpdate(async () => {
 function replacerRemoveInpaintDiffMaskUpload() {
     const mask = gradioApp().getElementById('replacer_inpaint_diff_mask_view');
     if (!mask) return;
-    var imageContainer = mask.getElementsByClassName('image-container')[0];
+    let imageContainer = mask.getElementsByClassName('image-container')[0];
     if (!imageContainer) return;
     const images = imageContainer.getElementsByTagName('img');
 
@@ -164,7 +164,7 @@ onUiLoaded(function () {
 
 
 function sendBackToReplacer() {
-    var res = Array.from(arguments);
+    let res = Array.from(arguments);
 
     res[1] = selected_gallery_index();
 
@@ -186,12 +186,12 @@ function replacer_imageComparisonloadImage() {
 
 function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/sd-webui-image-comparison
     // 0: Off ; 1: Text ; 2: Icon
-    var option = 0;
+    let option = 0;
     const replacer_image_comparison = gradioApp().getElementById('replacer_image_comparison');
     if (replacer_image_comparison) {
         option = 2;
         const inputs = gradioApp().getElementById('tab_sd-webui-image-comparison')?.getElementsByTagName('input');
-        for (var i = 0; i < inputs.length; i++) {
+        for (let i = 0; i < inputs.length; i++) {
             inputs[i].disabled = false;
         }
     } else {

@@ -182,7 +182,7 @@ def replacer_api(_, app: FastAPI):
 
 
     @app.post("/replacer/available_options")
-    async def api_replacer_avaliable_options() -> Any:
+    async def api_replacer_available_options() -> Any:
         return {
             "sam_model_name": sam_model_list,
             "dino_model_name": dino_model_list,

@@ -148,7 +148,6 @@ def makeVideoMaskingUI(comp: AttrDict, mainTabComp: AttrDict):
         _js='closeAllVideoMasks',
     ).then(
         fn=generateEmptyMasks,
-        # _js=getSubmitJsFunction('replacer_video_masking_progress', 'replacer_video_masks_detect', '', False),
         inputs=[mainTabComp.dummy_component, comp.selected_project, comp.target_video_fps, comp.ad_generate_only_first_fragment, comp.ad_fragment_length],
         outputs=[selectedPage, pageLabel, mask1, mask2, mask3, mask4, mask5, mask6, mask7, mask8, mask9, mask10],
         postprocess=False,

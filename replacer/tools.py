@@ -118,10 +118,10 @@ def fastMaskDilate(mask, _, dilation_amount, imageResized):
     print("Dilation Amount: ", dilation_amount)
     dilated_mask = fastMaskDilate_(mask, dilation_amount // 2)
     preview = makePreview(imageResized, dilated_mask)
-    cutted = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
-    cutted.paste(imageResized, dilated_mask)
+    cut = Image.new('RGBA', dilated_mask.size, (0, 0, 0, 0))
+    cut.paste(imageResized, dilated_mask)
 
-    return [preview, dilated_mask, cutted]
+    return [preview, dilated_mask, cut]
 
 
 @dataclass

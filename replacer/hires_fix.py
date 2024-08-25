@@ -14,7 +14,6 @@ def prepareGenerationArgsBeforeHiresFixPass(gArgs: GenerationArgs) -> None:
 
 
 def getGenerationArgsForHiresFixPass(gArgs: GenerationArgs) -> GenerationArgs:
-    # image = next(iter(copy.copy(gArgs.images)))
     hf = gArgs.hires_fix_args
     if hf.positive_prompt_suffix == "":
         hf.positive_prompt_suffix = getHiresFixPositivePromptSuffixExamples()[0]
