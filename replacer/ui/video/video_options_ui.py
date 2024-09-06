@@ -118,7 +118,7 @@ def makeVideoOptionsUI(comp: AttrDict):
                         with gr.Row():
                             comp.ad_force_override_sd_model = gr.Checkbox(label='Force override stable diffusion model',
                                 value=True, elem_id=f"replacer_ad_force_override_sd_model",
-                                info='Be sure you use NON-inpainting model here')
+                                info='Be sure you use NON-inpainting model here. Otherwise you will have OOM error in any case')
                             comp.ad_force_sd_model_checkpoint = ui_settings.create_setting_component('sd_model_checkpoint')
 
                         with gr.Row():
