@@ -174,14 +174,21 @@ function sendBackToReplacer() {
 
 
 function replacer_imageComparisonloadImage() {
-    let source_a = gradioApp().getElementById('replacer_image').querySelector('img');
-    let source_b = gradioApp().getElementById('replacer_gallery').querySelector('img');
+    let source_a = document.getElementById('replacer_image').querySelector('img');
+    let source_b = document.getElementById('replacer_gallery').querySelector('img');
 
     if (source_a == null || source_b == null) return;
 
     ImageComparator.img_A.src = source_a.src;
     ImageComparator.img_B.src = source_b.src;
     ImageComparator.reset();
+    const tabs = document.querySelector('#tabs').querySelector('.tab-nav').querySelectorAll('button');
+    for (let i = 0; i < tabs.length; i++) {
+        if (tabs[i].textContent.trim() === "Comparison") {
+            tabs[i].click();
+            break;
+        }
+    }
 }
 
 function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/sd-webui-image-comparison
@@ -223,7 +230,6 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
 
     btn.addEventListener('click', () => {
         replacer_imageComparisonloadImage();
-        ImageComparator.switch_to_comparison();
     });
     row.appendChild(btn);
 }
