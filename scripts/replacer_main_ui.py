@@ -1,8 +1,8 @@
 import copy
 import gradio as gr
-from modules import script_callbacks, progress, shared, errors
+from modules import script_callbacks, progress, shared, errors, ui_postprocessing
 from replacer.options import (EXT_NAME, EXT_NAME_LOWER, needHideSegmentAnythingAccordions,
-    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, hideVideoInMainUI,
+    getDedicatedPagePath, on_ui_settings, needHideAnimateDiffAccordions, hideVideoInMainUI, extrasInDedicated,
 )
 from replacer.ui.tools_ui import IS_WEBUI_1_5
 from replacer.ui import replacer_main_ui
@@ -45,6 +45,10 @@ def mountDedicatedPage(demo, app):
                 with gr.Tab(label="Video", elem_id=f"tab_video"):
                     tab_video = replacer_main_ui.replacerMainUI_dedicated.getReplacerVideoTabUI()
                     tab_video.render()
+                if extrasInDedicated():
+                    with gr.Tab(label="Extras", elem_id="extras"):
+                        with gr.Blocks(analytics_enabled=False) as extras_interface:
+                            ui_postprocessing.create_ui()
                 replacer_extensions.image_comparison.mountImageComparisonTab()
 
             footer = getReplacerFooter()
@@ -55,6 +59,8 @@ def mountDedicatedPage(demo, app):
         video_title = f"{EXT_NAME} - video"
         loadsave.add_block(tab, EXT_NAME)
         loadsave.add_block(tab_video, video_title)
+        if extrasInDedicated():
+            loadsave.add_block(extras_interface, "extras")
         loadsave.dump_defaults()
         replacerUi.ui_loadsave = loadsave
         gr.mount_gradio_app(app, replacerUi, path=path)

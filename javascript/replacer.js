@@ -172,6 +172,16 @@ function sendBackToReplacer() {
 }
 
 
+function replacer_go_to_comp_tab() {
+    const tabs = document.querySelector('#tabs').querySelector('.tab-nav').querySelectorAll('button');
+    for (let i = 0; i < tabs.length; i++) {
+        if (tabs[i].textContent.trim() === "Comparison") {
+            tabs[i].click();
+            break;
+        }
+    }
+}
+
 
 function replacer_imageComparisonloadImage() {
     let source_a = document.getElementById('replacer_image').querySelector('img');
@@ -182,20 +192,14 @@ function replacer_imageComparisonloadImage() {
     ImageComparator.img_A.src = source_a.src;
     ImageComparator.img_B.src = source_b.src;
     ImageComparator.reset();
-    const tabs = document.querySelector('#tabs').querySelector('.tab-nav').querySelectorAll('button');
-    for (let i = 0; i < tabs.length; i++) {
-        if (tabs[i].textContent.trim() === "Comparison") {
-            tabs[i].click();
-            break;
-        }
-    }
 }
+
 
 function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/sd-webui-image-comparison
     // 0: Off ; 1: Text ; 2: Icon
     let option = 0;
-    const replacer_image_comparison = gradioApp().getElementById('replacer_image_comparison');
-    if (replacer_image_comparison) {
+    const is_dedicated = gradioApp().getElementById('replacer_image_comparison');
+    if (is_dedicated) {
         option = 2;
         const inputs = gradioApp().getElementById('tab_sd-webui-image-comparison')?.getElementsByTagName('input');
         for (let i = 0; i < inputs.length; i++) {
@@ -230,8 +234,32 @@ function replacer_imageComparisonAddButton() { // https://github.com/Haoming02/s
 
     btn.addEventListener('click', () => {
         replacer_imageComparisonloadImage();
+        replacer_go_to_comp_tab();
     });
     row.appendChild(btn);
+
+
+    if (is_dedicated && gradioApp().getElementById('extras')) {
+        const rowExtras = gradioApp().getElementById("image_buttons_extras").querySelector('.form');
+        const btnExtras = rowExtras.lastElementChild.cloneNode();
+        btnExtras.id = "replacer_send_to_comp";
+        btnExtras.title = "Send images to comparison tab.";
+        if (btnExtras.classList.contains("hidden")) {
+            btnExtras.classList.remove("hidden");
+        }
+        if (option === 1) {
+            btnExtras.textContent = "Send to Comparison";
+        } else {
+            btnExtras.textContent = "🆚";
+        }
+
+        btnExtras.addEventListener('click', () => {
+            gradioApp().getElementById('img_comp_extras').click();
+            replacer_go_to_comp_tab();
+        });
+        rowExtras.appendChild(btnExtras);
+    }
+
 }
 
 onUiLoaded(replacer_imageComparisonAddButton);

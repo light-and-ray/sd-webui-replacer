@@ -1,6 +1,6 @@
 import importlib
 import gradio as gr
-from replacer.options import EXT_NAME
+from replacer.options import EXT_NAME, extrasInDedicated
 
 
 
@@ -24,7 +24,10 @@ def watchImageComparison(component, **kwargs):
     if not needWatchImageComparison:
         return
     elem_id = kwargs.get('elem_id', None)
-    if elem_id in ['img_comp_i2i', 'img_comp_inpaint', 'img_comp_extras']:
+    hideButtons = ['img_comp_i2i', 'img_comp_inpaint']
+    if not extrasInDedicated():
+        hideButtons.append('img_comp_extras')
+    if elem_id in hideButtons:
         component.visible = False
 
 

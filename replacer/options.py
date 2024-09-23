@@ -70,6 +70,11 @@ def hideVideoInMainUI():
     return opt
 
 
+def extrasInDedicated():
+    opt = shared.opts.data.get(EXT_NAME_LOWER + "_add_extras_tab_into_dedicated_page", False)
+    return opt
+
+
 defaultMaskColor = '#84FF9A'
 
 def getMaskColorStr():
@@ -475,6 +480,16 @@ def on_ui_settings():
             gr.Checkbox,
             section=section,
         ).info("Show only in dedicated tab").needs_restart()
+    )
+
+    shared.opts.add_option(
+        EXT_NAME_LOWER + "_add_extras_tab_into_dedicated_page",
+        shared.OptionInfo(
+            False,
+            "Add extras tab into dedicated page",
+            gr.Checkbox,
+            section=section,
+        ).needs_reload_ui()
     )
 
 

@@ -6,7 +6,7 @@ from replacer.ui.generate_ui import generate_ui, getLastUsedSeed, getLastUsedVar
 from replacer.ui.apply_hires_fix import applyHiresFix
 from replacer.options import (EXT_NAME, getSaveDir, getDetectionPromptExamples,
     getPositivePromptExamples, getNegativePromptExamples, useFirstPositivePromptFromExamples,
-    useFirstNegativePromptFromExamples, doNotShowUnloadButton, getDedicatedPagePath,
+    useFirstNegativePromptFromExamples, doNotShowUnloadButton, getDedicatedPagePath, extrasInDedicated,
     getDetectionPromptExamplesNumber, getPositivePromptExamplesNumber, getNegativePromptExamplesNumber
 )
 from replacer.extensions import replacer_extensions
@@ -180,6 +180,7 @@ def getTabUI(comp: AttrDict, isDedicatedPage: bool):
                     if isDedicatedPage and OutputPanelWatcher.send_to_img2img:
                         OutputPanelWatcher.send_to_img2img.visible = False
                         OutputPanelWatcher.send_to_inpaint.visible = False
+                        # if not extrasInDedicated():
                         OutputPanelWatcher.send_to_extras.visible = False
 
                 with gr.Row():
