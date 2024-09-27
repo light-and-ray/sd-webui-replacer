@@ -163,6 +163,9 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                     comp.denoise = gr.Slider(label='Denoising',
                         value=1.0, elem_id="replacer_denoise",
                         minimum=0.0, maximum=1.0, step=0.01)
+                    comp.forbid_too_small_crop_region = gr.Checkbox(label='Forbid too small crop region',
+                        value=True, visible=hasattr(shared.opts, 'forbid_too_small_crop_region'),
+                        elem_id="replacer_forbid_too_small_crop_region")
 
                 with gr.Row():
                     comp.inpainting_fill = gr.Radio(label='Masked content',
@@ -226,8 +229,6 @@ def makeAdvancedOptions(comp: AttrDict, isDedicatedPage: bool):
                         value=False, visible=hasattr(shared.opts, 'integer_only_masked'), elem_id="replacer_integer_only_masked")
 
                 with gr.Row():
-                    comp.forbid_too_small_crop_region = gr.Checkbox(label='Forbid too small crop region',
-                        value=True, visible=hasattr(shared.opts, 'forbid_too_small_crop_region'), elem_id="replacer_forbid_too_small_crop_region")
                     comp.fix_steps = gr.Checkbox(label='Do exactly the amount of steps the slider specifies',
                         value=False, elem_id="replacer_fix_steps")
 

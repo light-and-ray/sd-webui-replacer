@@ -247,8 +247,11 @@ def generate_ui_(
 
     saveDir = getSaveDir()
     saveToSubdirs = shared.opts.save_to_dirs
-    if selected_input_mode == "tab_batch_dir" and output_batch_dir != "":
-        saveDir = output_batch_dir
+    if selected_input_mode == "tab_batch_dir":
+        if output_batch_dir != "":
+            saveDir = output_batch_dir
+        else:
+            saveDir = os.path.join(input_batch_dir, 'out')
         saveToSubdirs = False
 
 

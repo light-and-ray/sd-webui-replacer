@@ -129,7 +129,7 @@ def getTabUI(comp: AttrDict, isDedicatedPage: bool):
                             elem_id="replacer_input_batch_dir")
                         comp.output_batch_dir = gr.Textbox(
                             label="Output directory",
-                            placeholder="Leave blank to save images to the default path.",
+                            placeholder="Leave blank to save images to the default path: \"out\" subdirectory",
                             elem_id="replacer_output_batch_dir")
                         comp.keep_original_filenames_from_dir = gr.Checkbox(
                             label='Keep original filenames (batch from dir)', value=True, elem_id="replacer_keep_original_filenames_from_dir")

@@ -15,7 +15,8 @@ I recommend you to using [EpicPhotoGasm - Z - Inpainting](https://civitai.com/mo
 4. Set `Custom Name` the same as your target model name (`.inpainting` suffix will be added automatically)
 5. Set `Multiplier (M)` to 1.0
 6. Select `Interpolation Method` to "add difference", and "Save as float16"
-7. Merge
+7. For sdxl I recommend you to select fixed sdxl vae in baked vae dropdown
+8. Merge
 
 ![](images/inpaint_merge.jpg)
 
