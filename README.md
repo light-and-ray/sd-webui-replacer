@@ -86,8 +86,14 @@ When you press the "Apply hires fix" button, the extension regenerates the image
 
 
 --------------------------------
+## "I want to help, how can I do it?"
 
-## Need to do:
+If you want to help with the extension, you can close one of the following tasks which I can't do:
+
+- Make a colab link to auto install (or something simmilar) https://github.com/light-and-ray/sd-webui-replacer/issues/10
+- Make union_inpaint preprocessor in the controlnet extension https://github.com/Mikubill/sd-webui-controlnet/issues/3035 https://github.com/light-and-ray/sd-webui-replacer/issues/89 It can make Video Replacer work with SDXL models, in theory
+
+## Need to do (for me):
 
 - ☑️ cache mask
 - ☑️ batch processing
