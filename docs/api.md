@@ -38,6 +38,9 @@ API is available on `/replacer/replace`
     integer_only_masked: bool = False
     forbid_too_small_crop_region: bool = True
     correct_aspect_ratio: bool = True
+    avoidance_mask: str = "base64 image"
+    custom_mask: str = "base64 image"
+    only_custom_mask: bool = True # only if there is a custom mask
 
     use_hires_fix: bool = False
     hf_upscaler: str = "ESRGAN_4x"

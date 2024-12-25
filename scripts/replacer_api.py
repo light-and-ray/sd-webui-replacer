@@ -58,6 +58,9 @@ def replacer_api(_, app: FastAPI):
         integer_only_masked: bool = False
         forbid_too_small_crop_region: bool = True
         correct_aspect_ratio: bool = True
+        avoidance_mask: str = "base64 image"
+        custom_mask: str = "base64 image"
+        only_custom_mask: bool = True # only if there is a custom mask
 
         use_hires_fix: bool = False
         hf_upscaler: str = "ESRGAN_4x"
@@ -87,6 +90,12 @@ def replacer_api(_, app: FastAPI):
     @app.post("/replacer/replace")
     async def api_replacer_replace(data: ReplaceRequest = Body(...)) -> Any:
         image = decode_base64_to_image(data.input_image).convert("RGBA")
+        avoidance_mask = None
+        if isinstance(data.avoidance_mask, str) and len(data.avoidance_mask) > 20:
+            avoidance_mask = decode_base64_to_image(data.avoidance_mask)
+        custom_mask = None
+        if isinstance(data.custom_mask, str) and len(data.custom_mask) > 20:
+            custom_mask = decode_base64_to_image(data.custom_mask)
 
         cn_args, soft_inpaint_args = replacer_extensions.prepareScriptsArgs_api(data.scripts)
 
@@ -145,9 +154,9 @@ def replacer_api(_, app: FastAPI):
             override_sd_model=True,
             sd_model_checkpoint=data.sd_model_checkpoint,
             mask_num=data.mask_num,
-            avoidance_mask=None,
-            only_custom_mask=False,
-            custom_mask=None,
+            avoidance_mask=avoidance_mask,
+            only_custom_mask=data.only_custom_mask,
+            custom_mask=custom_mask,
             use_inpaint_diff=False,
             clip_skip=data.clip_skip,
             pass_into_hires_fix_automatically=data.use_hires_fix,
