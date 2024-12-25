@@ -1,4 +1,3 @@
-import math
 from PIL import Image
 import modules.shared as shared
 from modules.shared import opts
@@ -73,8 +72,7 @@ def generate(
         Pause.paused = False
         shared.total_tqdm.clear()
         shared.state.job_count = len(gArgs.images) * gArgs.batch_count
-        totalSteps = shared.state.job_count * min(math.ceil((gArgs.steps-1) * (1 if gArgs.img2img_fix_steps else gArgs.denoising_strength) + 1), gArgs.steps)
-
+        totalSteps = shared.state.job_count * gArgs.totalSteps()
         if gArgs.pass_into_hires_fix_automatically:
             hiresCount = shared.state.job_count * gArgs.batch_size
             totalSteps += hiresCount * gArgs.hires_fix_args.steps

@@ -154,6 +154,7 @@ def animatediffGenerate(gArgs: GenerationArgs, fragments_path: str, result_dir: 
     shared.state.begin(oldJob + '_animatediff_inpaint')
     shared.state.job_count = totalFragments
     shared.total_tqdm.clear()
+    shared.total_tqdm.updateTotal(totalFragments * gArgs.totalSteps())
     Pause.paused = False
 
     fragmentPaths = []

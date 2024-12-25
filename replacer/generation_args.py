@@ -1,4 +1,4 @@
-import copy
+import copy, math
 from dataclasses import dataclass
 from PIL import Image
 
@@ -51,6 +51,11 @@ class AnimateDiffArgs:
     overlap: int
     latent_power: float
     latent_scale: float
+    freeinit_enable: bool
+    freeinit_filter: str
+    freeinit_ds: float
+    freeinit_dt: float
+    freeinit_iters: int
     generate_only_first_fragment: bool
 
     cn_inpainting_model: str
@@ -64,7 +69,7 @@ class AnimateDiffArgs:
     video_path: str = None
     mask_path: str = None
 
-DUMMY_ANIMATEDIFF_ARGS = AnimateDiffArgs(0, 0, 0, 0, 0, 0, 0, False, "", 0, False, "", "")
+DUMMY_ANIMATEDIFF_ARGS = AnimateDiffArgs(0, 0, 0, 0, 0, 0, 0, False, "", 0, 0, 0, False, "", 0, False, "", "")
 
 @dataclass
 class GenerationArgs:
@@ -127,6 +132,11 @@ class GenerationArgs:
     previous_frame_into_controlnet: list[str] = None
     animatediff_args: AnimateDiffArgs = None
 
+    def totalSteps(self):
+        total = min(math.ceil((self.steps-1) * (1 if self.img2img_fix_steps else self.denoising_strength) + 1), self.steps)
+        if self.animatediff_args and self.animatediff_args.freeinit_enable:
+            total *= self.animatediff_args.freeinit_iters
+        return total
 
     def copy(self):
         gArgs = copy.copy(self)

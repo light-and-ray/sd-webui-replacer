@@ -49,6 +49,11 @@ def apply(p, animatediff_args: AnimateDiffArgs):
         params.overlap = animatediff_args.overlap
         params.latent_power = animatediff_args.latent_power
         params.latent_scale = animatediff_args.latent_scale
+        params.freeinit_enable = animatediff_args.freeinit_enable
+        params.freeinit_filter = animatediff_args.freeinit_filter
+        params.freeinit_ds = animatediff_args.freeinit_ds
+        params.freeinit_dt = animatediff_args.freeinit_dt
+        params.freeinit_iters = animatediff_args.freeinit_iters
         params.model = animatediff_args.motion_model
 
         params.video_path = animatediff_args.video_path

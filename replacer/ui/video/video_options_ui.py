@@ -3,8 +3,9 @@ from modules import shared, ui_settings
 from modules.ui_components import ToolButton
 from replacer.extensions import replacer_extensions
 from replacer.ui.tools_ui import AttrDict, ResizeHandleRow
-from replacer.video_tools import getFpsFromVideo
+from replacer.video_tools import getFpsFromVideo, FREEINIT_filter_type_list
 from .project import getOriginalVideoPath
+from modules.ui_components import InputAccordion
 
 
 def onGetFpsFromVideo(projectPath: str) -> float:
@@ -90,6 +91,47 @@ def makeVideoOptionsUI(comp: AttrDict):
                         )
 
                     with gr.Row():
+                        with InputAccordion(label="Use FreeInit", open=False, value=False, elem_id=f"replacer_ad_freeinit-enable") \
+                                as comp.ad_freeinit_enable:
+                            gr.Markdown("Adjust to control the smoothness. ! Way slower, multiply your steps by `FreeInit Iterations`")
+
+                            comp.ad_freeinit_filter = gr.Dropdown(
+                                value=FREEINIT_filter_type_list[0],
+                                label="Filter Type",
+                                info="Default as Butterworth. To fix large inconsistencies, consider using Gaussian.",
+                                choices=FREEINIT_filter_type_list,
+                                interactive=True,
+                                elem_id=f"replacer_ad_freeinit-filter"
+                            )
+                            comp.ad_freeinit_ds = gr.Slider(
+                                value=0.25,
+                                minimum=0,
+                                maximum=1,
+                                step=0.125,
+                                label="d_s",
+                                info="Stop frequency for spatial dimensions (0.0-1.0)",
+                                elem_id=f"replacer_ad_freeinit-ds"
+                            )
+                            comp.ad_freeinit_dt = gr.Slider(
+                                value=0.25,
+                                minimum=0,
+                                maximum=1,
+                                step=0.125,
+                                label="d_t",
+                                info="Stop frequency for temporal dimension (0.0-1.0)",
+                                elem_id=f"replacer_ad_freeinit-dt"
+                            )
+                            comp.ad_freeinit_iters = gr.Slider(
+                                value=3,
+                                minimum=2,
+                                maximum=5,
+                                step=1,
+                                label="FreeInit Iterations",
+                                info="Larger value leads to smoother results & longer inference time.",
+                                elem_id=f"replacer_ad_freeinit-dt",
+                            )
+
+                    with gr.Row():
                         comp.ad_generate_only_first_fragment = gr.Checkbox(
                             label='Generate only the first fragment',
                             info="Useful if you want to test animatediff's options",
@@ -146,9 +188,11 @@ def makeVideoOptionsUI(comp: AttrDict):
                             "decrease the consistency. But you can use the `upscaler for img2img` option - these "
                             "upscalers work and consistent enough.\n\n"
                             \
-                            "To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use "
-                            "`Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recommend make "
-                            "`Fragment length` few times more then `Context batch size`\n\n"
+                            "To increase consistency between fragments, you can try to use `Fragment length` = 0. "
+                            "It will work in 100% cases, but can preserve artifacts thought whole the video. Or you "
+                            "can use ControlNet, especially `SparseCtrl`. Also you can adjust `Context batch size`, "
+                            "`Stride`, `Overlap`. I recommend make `Fragment length` few times more then `Context "
+                            "batch size`\n\n"
                             \
                             "`Context batch size` is set up for 12GB VRAM with one additional "
                             "ControlNet unit. If you get OutOfMemory error, decrease it\n\n"

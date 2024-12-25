@@ -104,3 +104,9 @@ def getFpsFromVideo(video_path: str) -> float:
     video.release()
     return fps
 
+FREEINIT_filter_type_list = [
+    "butterworth",
+    "gaussian",
+    "box",
+    "ideal"
+]

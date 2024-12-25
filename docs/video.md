@@ -17,7 +17,7 @@ Due to high AnimateDiff's consistency in comparison with *"Frame by frame"* mode
 
 Hires fix doesn't work here, and as I think, it basically can't, because it will decrease the consistency. But you can use the "upscaler for img2img" option - these upscalers work and consistent enough.
 
-To increase consistency between fragments, you can use ControlNet, especially `SparseCtrl`, or try to use `Fragment length` = 0 (or just very big) and set up `Context batch size`, `Stride`, `Overlap`. I recommend make `Fragment length` few times more then `Context batch size`
+To increase consistency between fragments, you can try to use `Fragment length` = 0. It will work in 100% cases, but can preserve artifacts thought whole the video. Or you can use ControlNet, especially `SparseCtrl`. Also you can adjust `Context batch size`, `Stride`, `Overlap`. I recommend make `Fragment length` few times more then `Context batch size`
 
 `Context batch size` is set up for 12GB VRAM with one additional ControlNet unit. If you get OutOfMemory error, decrease it
 
@@ -40,6 +40,10 @@ If you know any other good advice, please send them into github issues, I can pl
 1. **Overlap** — Number of frames to overlap in context. If overlap is -1 (default): your overlap will be `Context batch size` // 4.
     1. Due to the limitation of the infinite context generator, this parameter is effective only when `Number of frames` > `Context batch size`, including when ControlNet is enabled and the source video frame number > `Context batch size` and `Number of frames` is 0.
 1. **Latent power** and **Latent scale** — Initial latent for each AnimateDiff's frame is calculated using `init_alpha` made with this formula: `init_alpha = 1 - frame_number ^ latent_power / latent_scale`. You can see these factors in console log `AnimateDiff - INFO - Randomizing init_latent according to [ ... ]`. It describes the straight of initial image of the frames. Inside Replacer initial image is the last image of the previous fragment, or inpainted the first frame in the first fragment
+1. **FreeInit** - Using FreeInit to improve temporal consistency of your videos.
+   1. The default parameters provide satisfactory results for most use cases.
+   1. Use "Gaussian" filter when your motion is intense.
+   1. See [original repo of Freeinit](https://github.com/TianxingWu/FreeInit) to for more parameter settings.
 
 ### SparseCtrl
 SparseCtrl is a special ControlNet models for AnimateDiff. Set up it in a ControlNet unit to use it. Produces much better correspondence of the first result frame of the fragment and the initial image

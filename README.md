@@ -112,4 +112,3 @@ If you want to help with the extension, you can close one of the following tasks
 
 ### small todo:
 - add hires fix args into metadata
-- FreeInit support
