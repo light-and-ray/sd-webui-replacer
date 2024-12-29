@@ -13,7 +13,7 @@ You also can draw your mask instead of or in addition to detection, and take adv
 1. Install [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything) extension. If it bothers you, you can hide it in the Replacer's settings. Go to tab `Extension` -> `Available` -> click `Load from` and search _"sd-webui-segment-anything"_
 2. Download model [sam_hq_vit_l.pth](https://huggingface.co/lkeab/hq-sam/resolve/main/sam_hq_vit_l.pth), or others from the list bellow, and put it into `extensions/sd-webui-segment-anything/models/sam`
 3. For faster hires fix, download [lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/blob/main/pytorch_lora_weights.safetensors), rename it into `lcm-lora-sdv1-5.safetensors`, put into `models/Lora`. Or if you have already lcm lora, then change hires suffix in the extension options
-4. Install this extension. Go to tab `Extension` -> `Available` -> click `Load from` and search _"Replacer"_. For AMD and Intel GPUs, and maybe something else, you need to enable CPU for detection in Replacer's settings. Go to `Settings` -> `Replacer` and enable it
+4. Install this extension. Go to tab `Extension` -> `Available` -> click `Load from` and search _"Replacer"_. For AMD and Intel GPUs, and maybe something else, you maybe need to enable CPU for detection in Replacer's settings. But try first without this option. Or if your NVidia gpu has very littel vram (e.g. 2GB, I've tested) it's also handy. Go to `Settings` -> `Replacer` and enable cpu for detection
 5. Reload UI
 
 If you don't want to use Video feature, that's all for you. Further steps are for Video:
