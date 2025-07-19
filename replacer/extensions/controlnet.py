@@ -217,7 +217,13 @@ def getInpaintModels() -> list:
 
     result = []
     try:
-        models = external_code.get_models()
+        models = []
+        if IS_SD_WEBUI_FORGE:
+            from lib_controlnet import global_state
+            global_state.update_controlnet_filenames() 
+            models = global_state.get_all_controlnet_names()
+        else:
+            models = external_code.get_models()
         for model in models:
             if "inpaint" in model.lower():
                 result.append(model)
