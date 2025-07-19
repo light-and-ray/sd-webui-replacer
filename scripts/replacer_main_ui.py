@@ -9,6 +9,7 @@ from replacer.ui import replacer_main_ui
 from replacer.tools import getReplacerFooter
 from replacer.ui.tools_ui import watchOutputPanel, watchSetCustomScriptSourceForComponents
 from replacer.extensions import replacer_extensions
+from replacer.other.markdown_browser import getDocsTabUI
 
 
 
@@ -50,6 +51,8 @@ def mountDedicatedPage(demo, app):
                         with gr.Blocks(analytics_enabled=False) as extras_interface:
                             ui_postprocessing.create_ui()
                 replacer_extensions.image_comparison.mountImageComparisonTab()
+                with gr.Tab(label="Docs", elem_id=f"tab_docs"):
+                    tab_docs = getDocsTabUI()
 
             footer = getReplacerFooter()
             gr.HTML(footer, elem_id="footer")
