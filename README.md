@@ -1,5 +1,5 @@
 > [!NOTE]  
-> I've made a spiritual successor of Replacer: [Minimalistic-Comfy-Wrapper-WebUI](https://github.com/light-and-ray/Minimalistic-Comfy-Wrapper-WebUI). Use it to use the most recent models in a similar interface
+> I've made a spiritual successor of Replacer: [Minimalistic-Comfy-Wrapper-WebUI](https://github.com/light-and-ray/Minimalistic-Comfy-Wrapper-WebUI). It has similar UI but it's  much stable and supports any models. See this discussion topic for details: [discussions/119](https://github.com/light-and-ray/sd-webui-replacer/discussions/119)
 
 # Replacer
 
