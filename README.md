@@ -1,9 +1,9 @@
-> [!NOTE]  
+> [!NOTE]
 > I've made a spiritual successor of Replacer: [Minimalistic-Comfy-Wrapper-WebUI](https://github.com/light-and-ray/Minimalistic-Comfy-Wrapper-WebUI). It has similar UI but it's  much stable and supports any models. See this discussion topic for details: [discussions/119](https://github.com/light-and-ray/sd-webui-replacer/discussions/119)
 
 # Replacer
 
-Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with AnimateDiff
+Replacer is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui). Also should work in [reForge](https://github.com/Panchovix/stable-diffusion-webui-reForge) and [forge-classic](https://github.com/Haoming02/sd-webui-forge-classic). The goal of this extension is to automate objects masking by detection prompt, using [sd-webui-segment-anything](https://github.com/continue-revolution/sd-webui-segment-anything), and img2img inpainting in one easy to use tab. It also useful for batch inpaint, and inpaint in video with AnimateDiff
 
 
 ![](/docs/images/main_screenshot.jpg)
