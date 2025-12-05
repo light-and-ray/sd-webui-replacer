@@ -41,10 +41,10 @@ def replacer_api(_, app: FastAPI):
         mask_expand: int = 35
         mask_blur: int = 4
         mask_num: str = "Random"
-        max_resolution_on_detection = 1280
+        max_resolution_on_detection: int = 1280
         cfg_scale: float = 5.5
         denoise: float = 1.0
-        inpaint_padding = 40
+        inpaint_padding: int = 40
         inpainting_mask_invert: bool = False
         upscaler_for_img2img : str = ""
         fix_steps : bool = False
