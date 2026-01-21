@@ -36,3 +36,63 @@ button.replacer-pause-button{
 #replacer_video_gallery {
     height: 440px;
 }
+
+
+
+
+
+.markdown-browser-file
+{
+    max-width: 1012px;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    font-size: 16px !important;
+    line-height: 1.1 !important;
+    overflow-wrap: break-word;
+}
+
+.markdown-browser-file table
+{
+    display: block;
+    overflow-x: auto;
+}
+
+.markdown-browser-file strong
+{
+    font-size: 105% !important;
+}
+
+.markdown-browser-file a[href]
+{
+    text-decoration: underline dotted !important;
+}
+
+.markdown-browser-file a[href]:where([href="#markdown_browser_top_anchor"])::after
+{
+    content: '↪';
+    font-size: 60% !important;
+    font-family: monospace;
+}
+
+.markdown-browser-file a[href]:where([href^="#"]:not([href="#markdown_browser_top_anchor"]))::after
+{
+    content: '#';
+    font-size: 65% !important;
+    font-family: monospace;
+}
+
+.markdown-browser-file p, .markdown-browser-file ol, .markdown-browser-file ul
+{
+    margin-bottom: 22px !important;
+}
+
+.markdown-browser-file details
+{
+    margin-bottom: 8px !important;
+}
+
+.markdown-browser-file a[href]:not([href*="://"]):not([href^="#"])::before
+{
+    content: '📎';
+    font-size: 88% !important;
+}
